@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM archlinux:latest
 
 LABEL maintainer="Bryant Paz"
 
@@ -12,17 +12,16 @@ ENV TZ="America/Merida"
 USER ${USER}
 USER root
 
-RUN apt-get update && \
-  apt-get upgrade -y && \
-  apt-get install -y \
-  sudo \
-  curl \
-  git-core \
-  gnupg \
-  locales \
-  tzdata \
-  wget && \
-  apt-get autoremove -y
+RUN pacman -Syu --noconfirm && \
+    pacman -S --noconfirm \
+    sudo \
+    curl \
+    git \
+    gnupg \
+    glibc \
+    tzdata \
+    wget && \
+    pacman -Rns --noconfirm $(pacman -Qdtq)
 
 RUN locale-gen en_US.UTF-8
 
@@ -41,13 +40,7 @@ USER ${USER}
 
 COPY --chown=${USER}:${group} bin/dotfiles /home/${USER}/dotfiles
 
-RUN \
-  mkdir -p /home/${USER}/.ansible-vault && \
-  touch /home/${USER}/.ansible-vault/vault.secret && \
-  echo '$vault_secret' > /home/${USER}/.ansible-vault/vault.secret
-
 RUN git clone --quiet https://github.com/pazbryant/ansible-dots.git /home/${USER}/.dotfiles
 COPY --chown=${USER}:${group} ansible.cfg /home/${USER}/.dotfiles/ansible.cfg
-RUN sh -c "/home/${USER}/dotfiles"
 
-RUN rm ~/.ansible-vault/vault.secret
+RUN sh -c "/home/${USER}/dotfiles"

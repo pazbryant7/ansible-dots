@@ -1,11 +1,46 @@
 #!/bin/env sh
 
+DOTFILES_DIR="$HOME/.dotfiles"
+
+update_ansible_galaxy() {
+  OS=$1
+  OS_REQUIREMENTS=""
+  if [ -f "$DOTFILES_DIR/requirements/$OS.yml" ]; then
+    OS_REQUIREMENTS="$DOTFILES_DIR/requirements/$OS.yml"
+  fi
+  _cmd "ansible-galaxy install -r $DOTFILES_DIR/requirements/common.yml $OS_REQUIREMENTS"
+}
+
 detect_os() {
   if [ -f /etc/os-release ]; then
     . /etc/os-release
     echo "$ID"
   else
     uname -s | tr '[:upper:]' '[:lower:]'
+  fi
+}
+
+ubuntu_setup() {
+  if ! dpkg -s ansible >/dev/null 2>&1; then
+    sudo apt-get update
+    sudo apt-get install -y software-properties-common
+    sudo apt-add-repository -y ppa:ansible/ansible
+    sudo apt-get update
+    sudo apt-get install -y ansible
+    sudo apt-get install -y python3-argcomplete
+    sudo activate-global-python-argcomplete3
+  fi
+  if ! dpkg -s python3 >/dev/null 2>&1; then
+    sudo apt-get install -y python3
+  fi
+  UBUNTU_MAJOR_VERSION=$(echo "$VERSION_ID" | cut -d. -f1)
+  if [ "$UBUNTU_MAJOR_VERSION" -le 22 ]; then
+    if ! dpkg -s python3-pip >/dev/null 2>&1; then
+      sudo apt-get install -y python3-pip
+    fi
+    if ! pip3 list | grep watchdog >/dev/null 2>&1; then
+      sudo apt-get install -y python3-watchdog
+    fi
   fi
 }
 
@@ -43,8 +78,15 @@ case $DOTFILES_OS in
 arch)
   arch_setup
   ;;
+ubuntu)
+  ubuntu_setup
+  ;;
 *)
   echo "Unsupported OS"
   exit 1
   ;;
 esac
+
+update_ansible_galaxy "$DOTFILES_OS"
+
+exit 0
