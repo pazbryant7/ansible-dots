@@ -3,9 +3,9 @@ FROM archlinux:latest
 LABEL maintainer="Bryant Paz"
 
 ARG USER=bryant
-ARG group=bryant
-ARG uid=1000
-ARG DEBIAN_FRONTEND=noninteractive
+ARG GROUP=bryant
+ARG UID=1000
+ARG GID=1000
 
 ENV TZ="America/Merida"
 
@@ -20,27 +20,28 @@ RUN pacman -Syu --noconfirm && \
     gnupg \
     glibc \
     tzdata \
-    wget && \
-    pacman -Rns --noconfirm $(pacman -Qdtq)
+    wget
 
-RUN locale-gen en_US.UTF-8
+RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && \
+    locale-gen
 
-RUN adduser --quiet --disabled-password \
-  --shell /bin/sh --home /home/${USER} \
-  --gecos "User" ${USER}
+RUN groupadd --gid ${GID} ${GROUP} && \
+    useradd --uid ${UID} --gid ${GID} --shell /bin/sh --home /home/${USER} --create-home ${USER} && \
+    echo "%${GROUP} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/${USER} && \
+    chmod 0440 /etc/sudoers.d/${USER}
 
-RUN mkdir -p /etc/sudoers.d && \
-  touch /etc/sudoers.d/${USER} && \
-  echo "%${group} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/${USER} && \
-  groupadd docker && \
-  usermod -aG docker ${USER}
+RUN groupadd docker && \
+    usermod -aG docker ${USER}
 
-RUN chown -R ${USER}:${group} /home/${USER}
+RUN chown -R ${USER}:${GROUP} /home/${USER}
+
 USER ${USER}
 
-COPY --chown=${USER}:${group} bin/dotfiles /home/${USER}/dotfiles
+WORKDIR /home/${USER}
+
+COPY --chown=${USER}:${GROUP} bin/dotfiles /home/${USER}/dotfiles
 
 RUN git clone --quiet https://github.com/pazbryant/ansible-dots.git /home/${USER}/.dotfiles
-COPY --chown=${USER}:${group} ansible.cfg /home/${USER}/.dotfiles/ansible.cfg
+COPY --chown=${USER}:${GROUP} ansible.cfg /home/${USER}/.dotfiles/ansible.cfg
 
-RUN sh -c "/home/${USER}/dotfiles"
+RUN sh "/home/${USER}/dotfiles"
