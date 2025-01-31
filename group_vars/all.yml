@@ -10,3 +10,4 @@ default_roles:
   - fd
   - fontconfig
   - imv
+  - lazygit
