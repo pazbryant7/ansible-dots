@@ -1,0 +1,12 @@
+# vault
+vault
+
+# generated metadata
+/callback_plugins/__pycache__
+
+# lazy-nvim
+roles/neovim/files/lazy-lock.json
+
+# defaults
+.DS_Store
+*.DS_Store
