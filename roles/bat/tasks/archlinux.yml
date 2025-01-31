@@ -1,0 +1,6 @@
+---
+- name: "{{ role_name }} | {{ ansible_distribution | lower }} | Install {{ role_name }}"
+  community.general.pacman:
+    name: "{{ role_name }}"
+    state: present
+  become: true
