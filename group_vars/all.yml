@@ -1,13 +1,14 @@
 default_roles:
   - system
-  - atuin
-  - alacritty
-  - bat
-  - bottom
-  - calibre
-  - dunst
-  - dust
   - fd
-  - fontconfig
+  - mpd
+  - bat
   - imv
+  - dust
+  - dunst
+  - atuin
+  - bottom
   - lazygit
+  - calibre
+  - alacritty
+  - fontconfig
