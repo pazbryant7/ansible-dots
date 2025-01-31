@@ -33,15 +33,12 @@ RUN groupadd --gid ${GID} ${GROUP} && \
 RUN groupadd docker && \
     usermod -aG docker ${USER}
 
+WORKDIR /home/${USER}
+
+COPY . /home/${USER}/.dotfiles
+
 RUN chown -R ${USER}:${GROUP} /home/${USER}
 
 USER ${USER}
 
-WORKDIR /home/${USER}
-
-COPY --chown=${USER}:${GROUP} bin/dotfiles /home/${USER}/dotfiles
-
-RUN git clone --quiet https://github.com/pazbryant/ansible-dots.git /home/${USER}/.dotfiles
-COPY --chown=${USER}:${GROUP} ansible.cfg /home/${USER}/.dotfiles/ansible.cfg
-
-RUN sh "/home/${USER}/dotfiles"
+RUN sh "/home/${USER}/.dotfiles/bin/dotfiles"
