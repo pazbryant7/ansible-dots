@@ -1,5 +1,5 @@
 ---
-- name: "alacritty | {{ ansible_distribution }} | Install alacritty"
+- name: "alacritty | {{ ansible_distribution | lower }} | Install alacritty"
   community.general.pacman:
     name: alacritty
     state: present

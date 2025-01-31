@@ -104,4 +104,7 @@ fi
 update_ansible_galaxy "$DOTFILES_OS"
 ansible-playbook "$DOTFILES_DIR/main.yml" "$@"
 
+printf "Run this with sudo to install packages and then run it again without it
+to copy file configurations"
+
 exit 0
