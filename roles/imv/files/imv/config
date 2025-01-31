@@ -1,0 +1,49 @@
+[options]
+overlay = true
+overlay_font = Maple Mono SC NF:10
+suppress_default_binds = true
+
+[binds]
+# Quit
+q = quit
+<Escape> = quit
+
+# Vim-style navigation
+h = pan -10 0
+j = pan 0 10
+k = pan 0 -10
+l = pan 10 0
+
+# Zoom controls
+<equal> = zoom actual
+<minus> = zoom -1.5
+<Ctrl+Shift+plus> = zoom +1.5
+
+# Image navigation
+n = next
+p = prev
+
+# center
+c = center
+
+# View controls
+f = fullscreen
+i = overlay
+
+# Scaling
+s = scaling next
+<Shift-S> = reset
+
+# Go to
+gg = goto 1
+<Shift+G> = goto -1
+
+# Open
+o = open -r /home/bryant/Pictures
+
+# Rotation
+r = rotate by 90
+<Ctrl+r> = rotate by -90
+
+
+; vim: se ft=dosini:
