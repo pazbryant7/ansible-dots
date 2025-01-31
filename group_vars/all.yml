@@ -12,3 +12,4 @@ default_roles:
   - calibre
   - alacritty
   - fontconfig
+  - mpv

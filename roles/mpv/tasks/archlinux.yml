@@ -1,0 +1,6 @@
+---
+- name: "Install mpv on {{ ansible_distribution | lower }}"
+  community.general.pacman:
+    name: "{{ role_name }}"
+    state: present
+  become: true
