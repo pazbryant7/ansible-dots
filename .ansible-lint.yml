@@ -1,0 +1,2 @@
+skip_list:
+  - R001 # Rule ID for files starting with uppercase
