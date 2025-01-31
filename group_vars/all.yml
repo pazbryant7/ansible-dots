@@ -5,3 +5,4 @@ default_roles:
   - bat
   - bottom
   - calibre
+  - dunst
