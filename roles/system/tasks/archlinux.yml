@@ -1,0 +1,14 @@
+---
+- name: "Update pacman on {{ ansible_distribution | lower }}"
+  community.general.pacman:
+    update_cache: true
+    upgrade: true
+    state: latest
+  become: true
+
+- name: "Install with pacman on {{ ansible_distribution | lower }}"
+  community.general.pacman:
+    name:
+      - jq
+    state: present
+  become: true
