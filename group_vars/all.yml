@@ -13,3 +13,4 @@ default_roles:
   - alacritty
   - fontconfig
   - mpv
+  - ncmpcpp
