@@ -1,5 +1,6 @@
 #!/bin/env sh
 
+SSH_DIR="$HOME/.ssh"
 DOTFILES_DIR="$HOME/.dotfiles"
 
 update_ansible_galaxy() {
@@ -8,7 +9,8 @@ update_ansible_galaxy() {
   if [ -f "$DOTFILES_DIR/requirements/$OS.yml" ]; then
     OS_REQUIREMENTS="$DOTFILES_DIR/requirements/$OS.yml"
   fi
-  _cmd "ansible-galaxy install -r $DOTFILES_DIR/requirements/common.yml $OS_REQUIREMENTS"
+  # ansible-galaxy install -r "$DOTFILES_DIR"/requirements/common.yml "$OS_REQUIREMENTS"
+  ansible-galaxy install -r "$OS_REQUIREMENTS"
 }
 
 detect_os() {
@@ -68,7 +70,7 @@ arch_setup() {
     sudo pacman -S --noconfirm openssh
   fi
   echo "Setting Locale"
-  sudo localectl set-locale LANG=en_US.UTF-7
+  sudo localectl set-locale LANG=en_US.UTF-8
 }
 
 DOTFILES_OS=$(detect_os)
@@ -87,6 +89,19 @@ ubuntu)
   ;;
 esac
 
+if [ ! -f "$SSH_DIR/private/personal_github" ]; then
+  mkdir -p "$SSH_DIR"
+  chmod 700 "$SSH_DIR"
+  echo "create ssh private key"
+fi
+
+if [ ! -d "$DOTFILES_DIR" ]; then
+  git clone --quiet https://github.com/pazbryant/ansible-dots.git "$DOTFILES_DIR"
+else
+  git -C "$DOTFILES_DIR" pull --quiet
+fi
+
 update_ansible_galaxy "$DOTFILES_OS"
+ansible-playbook "$DOTFILES_DIR/main.yml" "$@"
 
 exit 0
