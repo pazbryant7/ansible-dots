@@ -95,13 +95,6 @@ if [ ! -f "$SSH_DIR/private/personal_github" ]; then
   echo "create ssh private key"
 fi
 
-if [ ! -d "$DOTFILES_DIR" ]; then
-  git clone --quiet https://github.com/pazbryant/ansible-dots.git "$DOTFILES_DIR"
-else
-  git -C "$DOTFILES_DIR" pull --quiet
-fi
-
-clone_dotfiles
 update_ansible_galaxy "$DOTFILES_OS"
 ansible-playbook "$DOTFILES_DIR/main.yml" "$@"
 
