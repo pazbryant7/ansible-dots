@@ -1,5 +1,5 @@
 ---
-- name: "{{ role_name }} | {{ ansible_distribution | lower }} | Install {{ role_name }}"
+- name: "Install bottom on {{ ansible_distribution | lower }}"
   community.general.pacman:
     name: "{{ role_name }}"
     state: present
