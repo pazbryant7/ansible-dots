@@ -2,3 +2,4 @@ default_roles:
   - atuin
   - alacritty
   - bat
+  - bottom
