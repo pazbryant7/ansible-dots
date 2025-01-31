@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>lineedit_history_bulk_edit_replace_with</key>
+	<array>
+		<string>The Angel Next Door Spoils Me Rotten, Vol.</string>
+		<string>Alya Sometimes Hides Her Feelings in Russian, Vol. 6</string>
+		<string>Vol.</string>
+		<string>Vol. </string>
+		<string>Vol. 1</string>
+		<string>V</string>
+	</array>
+	<key>lineedit_history_bulk_edit_search_for</key>
+	<array>
+		<string>The Angel Next Door Spoils Me Rotten, Vol.</string>
+		<string>The Angel Next Door Spoils Me Rotten, Vol. 2</string>
+		<string>RoshiDere v06</string>
+		<string>v06</string>
+		<string>\((.*)</string>
+		<string>^(.*?)(?:\s*\(.*\))?$
+</string>
+		<string>^</string>
+		<string>^(.*?)\s*\(</string>
+		<string>^[^()]*?(?=\()
+{</string>
+		<string>(*</string>
+		<string>0</string>
+	</array>
+	<key>lineedit_history_bulk_edit_test_test</key>
+	<array/>
+	<key>lineedit_history_tag_list_filter_box_Publisher</key>
+	<array/>
+	<key>lineedit_history_tag_list_filter_box_Series</key>
+	<array/>
+	<key>lineedit_history_tag_list_search_box_Publisher</key>
+	<array/>
+	<key>lineedit_history_tag_list_search_box_Series</key>
+	<array>
+		<string>Damn Reincarnation</string>
+	</array>
+</dict>
+</plist>
