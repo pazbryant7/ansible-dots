@@ -20,6 +20,7 @@ RUN pacman -Syu --noconfirm && \
     gnupg \
     glibc \
     tzdata \
+    neovim \
     wget
 
 RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && \
