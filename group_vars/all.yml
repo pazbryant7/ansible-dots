@@ -14,4 +14,4 @@ default_roles:
   - fontconfig
   - mpv
   - ncmpcpp
-  - qBittorrent
+  - qbittorrent
