@@ -1,6 +1,0 @@
----
-- name: "Install qbittorrent on {{ ansible_distribution | lower }}"
-  community.general.pacman:
-    name: "qbittorrent"
-    state: present
-  become: true

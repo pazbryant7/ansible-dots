@@ -1,0 +1,22 @@
+---
+- name: Remove Wayland packages (if present) via pacman for Xorg
+  become: true
+  ansible.builtin.command: pacman -R --noconfirm {{ item }}
+  loop:
+    - sway
+    - waybar
+  ignore_errors: yes
+
+- name: Install Xorg packages via pacman
+  become: true
+  ansible.builtin.command: pacman -S --noconfirm {{ item }}
+  loop:
+    - xorg-server
+    - xorg-xinit
+    - fastfetch
+
+- name: Install Xorg AUR packages via paru
+  become: true
+  ansible.builtin.command: paru -S --noconfirm {{ item }}
+  loop:
+    - polybar

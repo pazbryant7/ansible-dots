@@ -1,0 +1,41 @@
+---
+- name: DotFiles Config
+  hosts: localhost
+  connection: local
+
+  pre_tasks:
+    - name: Detect Host System
+      include_tasks: pre_tasks/whoami.yml
+      tags:
+        - always
+
+  tasks:
+    - name: Run default OS tasks
+      include_role:
+        name: "{{ my_system }}" # This will be either "archlinux" or "macos"
+        tasks_from: default # Loads tasks/default.yml from that role
+      tags:
+        - always
+
+    - name: Run extra Arch Linux Wayland tasks
+      include_role:
+        name: archlinux
+        tasks_from: wayland # Loads tasks/wayland.yml
+      when: my_system == 'archlinux'
+      tags:
+        - wayland
+
+    - name: Run extra Arch Linux Xorg tasks
+      include_role:
+        name: archlinux
+        tasks_from: xorg # Loads tasks/xorg.yml
+      when: my_system == 'archlinux'
+      tags:
+        - xorg
+
+    - name: Run shared projects tasks
+      include_role:
+        name: shared
+        tasks_from: projects # Loads tasks/projects.yml
+      tags:
+        - always

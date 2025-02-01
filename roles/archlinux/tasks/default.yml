@@ -1,0 +1,37 @@
+---
+- name: Ensure base development packages and git are installed
+  become: true
+  ansible.builtin.command: pacman -S --needed --noconfirm base-devel git
+  changed_when: false
+
+- name: Check if paru is installed
+  ansible.builtin.command: command -v paru
+  register: paru_check
+  ignore_errors: true
+  changed_when: false
+
+- name: Install paru from AUR if not present
+  become: true
+  ansible.builtin.shell: |
+    cd /tmp
+    git clone https://aur.archlinux.org/paru.git
+    cd paru
+    makepkg -si --noconfirm
+  args:
+    executable: /bin/bash
+  when: paru_check.rc != 0
+
+- name: Install common Arch Linux packages using pacman
+  become: true
+  ansible.builtin.command: pacman -S --noconfirm {{ item }}
+  loop:
+    - base-devel
+    - vim
+    - git
+
+- name: Install common Arch Linux AUR packages via paru
+  become: true
+  ansible.builtin.command: paru -S --noconfirm {{ item }}
+  loop:
+    - google-chrome
+    - visual-studio-code-bin

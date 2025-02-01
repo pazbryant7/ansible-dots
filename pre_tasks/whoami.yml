@@ -1,5 +1,15 @@
 ---
-- name: Register Current User
-  ansible.builtin.set_fact:
-    host_user: "{{ ansible_env['USER']}}"
-  when: host_user is not defined
+- name: Detect Arch Linux
+  set_fact:
+    my_system: archlinux
+  when: "'Arch' in ansible_facts['distribution']"
+
+- name: Detect macOS
+  set_fact:
+    my_system: macos
+  when: ansible_facts['system'] == "Darwin"
+
+- name: Fail if unsupported system
+  fail:
+    msg: "Unsupported system: {{ ansible_facts['distribution'] }}"
+  when: my_system is not defined

@@ -1,0 +1,26 @@
+---
+- name: Check if Homebrew is installed
+  ansible.builtin.command: brew --version
+  register: brew_check
+  ignore_errors: true
+  changed_when: false
+
+- name: Install Homebrew if not installed
+  ansible.builtin.shell: |
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  args:
+    executable: /bin/bash
+  when: brew_check.rc != 0
+
+- name: Install Homebrew packages on macOS
+  ansible.builtin.command: brew install {{ item }}
+  loop:
+    - git
+    - vim
+    - wget
+
+- name: Install Homebrew cask packages on macOS
+  ansible.builtin.command: brew install --cask {{ item }}
+  loop:
+    - google-chrome
+    - visual-studio-code
