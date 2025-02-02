@@ -1,0 +1,38 @@
+---
+- name: Remove packages not needed for xorg-server
+  community.general.pacman:
+    name:
+      - waybar
+    state: absent
+  when: xorg_server_uninstalled.rc != 0
+
+- name: Install xorg-server packages using pacman
+  become: true
+  community.general.pacman:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - xorg-server
+    - xorg-xev
+    - xorg-xinit
+    - xorg-xrandr
+    - xorg-xsetroot
+    - bspwm
+    - sxhkd
+    - breeze-gtk
+    - breeze-icons
+    - capitaine-cursors
+    - picom
+    - lxappearance
+    - feh
+    - ueberzugpp
+
+- name: Install aur packages with paru
+  community.general.pacman:
+    name: "{{ item }}"
+    state: present
+    executable: paru
+  loop:
+    - bun-bin
+    - vesktop-bin
+  when: xorg_server_installed.rc != 0

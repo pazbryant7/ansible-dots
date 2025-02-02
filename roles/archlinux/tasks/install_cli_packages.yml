@@ -1,0 +1,92 @@
+---
+- name: Install common cli arch linux packages using pacman
+  become: true
+  community.general.pacman:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - xh
+    - jq
+    - fd
+    - go
+    - sl
+    - mpc
+    - eza
+    - zsh
+    - fzf
+    - git
+    - imv
+    - mpv
+    - bat
+    - bob
+    - yarn
+    - yazi
+    - hurl
+    - zbar
+    - rofi
+    - rust
+    - tree
+    - less
+    - maim
+    - grex
+    - 7zip
+    - dust
+    - dunst
+    - atuin
+    - rsync
+    - bottom
+    - xcolor
+    - rclone
+    - yt-dlp
+    - zoxide
+    - polybar
+    - poppler
+    - sshpass
+    - dbeaver
+    - udiskie
+    - ripgrep
+    - calibre
+    - pcmanfm
+    - firefox
+    - zathura
+    - lazygit
+    - ghostty
+    - ncmpcpp
+    - starship
+    - tealdeer
+    - libpulse
+    - luarocks
+    - chromium
+    - obsidian
+    - pass-otp
+    - syncthing
+    - unclutter
+    - alacritty
+    - bandwhich
+    - hyperfine
+    - screenkey
+    - fastfetch
+    - miniserve
+    - streamlink
+    - python-pip
+    - gnu-netcat
+    - pavucontrol
+    - imagemagick
+    - python-pipx
+    - shellharden
+    - qbittorrent
+    - speedtest-cli
+    - translate-shell
+    - python-watchdog
+    - telegram-desktop
+    - zathura-pdf-mupdf
+    - ffmpegthumbnailer
+
+- name: Install aur packages with paru
+  community.general.pacman:
+    name: "{{ item }}"
+    state: present
+    executable: paru
+  loop:
+    - bun-bin
+    - vesktop-bin

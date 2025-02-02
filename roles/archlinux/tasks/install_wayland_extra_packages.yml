@@ -1,0 +1,38 @@
+---
+- name: Install wayland-server packages using pacman
+  become: true
+  community.general.pacman:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - wayland
+    - sway
+    - swaybg
+
+- name: Install wayland aur packages with paru
+  community.general.pacman:
+    name: "{{ item }}"
+    state: present
+    executable: paru
+  loop:
+    - bun-bin
+    - vesktop-bin
+
+- name: Remove packages not needed for xorg-server
+  community.general.pacman:
+    name:
+      - xorg-server
+      - xorg-xev
+      - xorg-xinit
+      - xorg-xrandr
+      - xorg-xsetroot
+      - bspwm
+      - sxhkd
+      - breeze-gtk
+      - breeze-icons
+      - capitaine-cursors
+      - picom
+      - lxappearance
+      - feh
+      - ueberzugpp
+    state: absent

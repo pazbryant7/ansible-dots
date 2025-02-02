@@ -1,0 +1,10 @@
+---
+- name: Install archlinux intel drivers
+  become: true
+  community.general.pacman:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - vulkan-intel
+    - libva-intel-driver
+    - intel-media-driver

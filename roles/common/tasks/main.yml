@@ -1,0 +1,4 @@
+- name: Clone default github repositories to local host
+  ansible.builtin.import_tasks: clone_github_project.yml
+  tags:
+    - common-projects

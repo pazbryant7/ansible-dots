@@ -1,0 +1,53 @@
+---
+- name: Ensure base development packages are installed
+  become: true
+  community.general.pacman:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - ufw
+    - grub
+    - base
+    - tmux
+    - pass
+    - linux
+    - xclip
+    - man-db
+    - cronie
+    - neovim
+    - docker
+    - openssh
+    - xdotool
+    - pipewire
+    - linux-lts
+    - base-devel
+    - openresolv
+    - wireplumber
+    - intel-ucode
+    - otf-overpass
+    - terminus-font
+    - docker-buildx
+    - xdg-user-dirs
+    - pipewire-alsa
+    - linux-headers
+    - pipewire-jack
+    - docker-compose
+    - zram-generator
+    - linux-firmware
+    - noto-fonts-emoji
+    - linux-lts-headers
+    - gst-plugin-pipewire
+
+- name: Install paru from aur if not present
+  ansible.builtin.shell: |
+    cd {{ downloads }}
+    if [ -d paru ]; then
+      rm -rf paru
+    fi
+    git clone https://aur.archlinux.org/paru.git
+    cd paru
+    makepkg -si --noconfirm
+  args:
+    creates: /usr/bin/paru
+  register: paru
+  changed_when: paru.rc == 0
