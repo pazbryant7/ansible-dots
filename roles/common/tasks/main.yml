@@ -1,4 +1,27 @@
-- name: Clone default github repositories to local host
-  ansible.builtin.import_tasks: clone_github_project.yml
+- name: Deploy ssh private key
+  ansible.builtin.import_tasks: deploy_ssh_private_keys.yml
   tags:
-    - common-projects
+    - always
+
+- name: Deploy gpg private key
+  ansible.builtin.import_tasks: deploy_gpg_private_keys.yml
+  tags:
+    - always
+
+- name: Clone default github dotfiles
+  ansible.builtin.import_tasks: clone_github_dotfiles.yml
+  tags:
+    - always
+  ignore_errors: yes
+
+- name: Clone github personal repositories
+  ansible.builtin.import_tasks: clone_github_personal_repositories.yml
+  tags:
+    - always
+  ignore_errors: yes
+
+- name: Clone github work repositories
+  ansible.builtin.import_tasks: clone_github_work_repositories.yml
+  tags:
+    - always
+  ignore_errors: yes

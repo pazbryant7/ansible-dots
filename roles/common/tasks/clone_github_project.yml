@@ -1,6 +1,0 @@
-- name: Clone dotfiles repository
-  ansible.builtin.git:
-    repo: "https://github.com/pazbryant/dotfiles.git"
-    dest: "{{ github_dir }}/dotfiles"
-    version: main
-    update: true

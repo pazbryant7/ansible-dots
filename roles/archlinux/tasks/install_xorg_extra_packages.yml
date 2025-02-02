@@ -1,5 +1,6 @@
 ---
 - name: Remove packages not needed for xorg-server
+  become: true
   community.general.pacman:
     name:
       - waybar
