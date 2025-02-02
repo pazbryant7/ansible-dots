@@ -10,3 +10,6 @@ roles/neovim/files/lazy-lock.json
 # defaults
 .DS_Store
 *.DS_Store
+
+# secret
+.secrets/.passphrase
