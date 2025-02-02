@@ -1,11 +1,11 @@
 - name: Ensure GPG directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.gnupg"
     state: directory
     mode: "0700"
 
 - name: Deploy GPG private_key key
-  copy:
+  ansible.builtin.copy:
     dest: "{{ ansible_env.HOME }}/.gnupg/private_key.asc"
     mode: "0600"
     content: "{{ lookup('file', '.secrets/gpg/private-key.asc') }}"

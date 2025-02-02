@@ -10,9 +10,9 @@
   ansible.builtin.git:
     repo: "git@personal.github:pazbryant/dotfiles.git"
     dest: "{{ github_dir }}/dotfiles"
-    recursive: yes
-    update: yes
-    accept_hostkey: yes
+    recursive: true
+    update: true
+    accept_hostkey: true
     version: main
 # - name: Stow dotfiles
 #   shell: cd {{ github_dir }}/dotfiles && ./ubuntu

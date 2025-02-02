@@ -12,16 +12,16 @@
   ansible.builtin.import_tasks: clone_github_dotfiles.yml
   tags:
     - always
-  ignore_errors: yes
+  register: clone_result
+  failed_when: >
+    clone_result is failed and
+    "'Repository already exists'" not in (clone_result.stderr | default(''))
 
 - name: Clone github personal repositories
   ansible.builtin.import_tasks: clone_github_personal_repositories.yml
   tags:
     - always
-  ignore_errors: yes
-
-- name: Clone github work repositories
-  ansible.builtin.import_tasks: clone_github_work_repositories.yml
-  tags:
-    - always
-  ignore_errors: yes
+  register: clone_result
+  failed_when: >
+    clone_result is failed and
+    "'Repository already exists'" not in (clone_result.stderr | default(''))
