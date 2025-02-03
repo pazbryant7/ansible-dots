@@ -1,0 +1,13 @@
+# work github account
+Host work.github
+   HostName github.com
+   AddKeysToAgent yes
+   IdentityFile ~/.ssh/private/work_github
+   IdentitiesOnly yes
+
+# personal github account
+Host personal.github
+   HostName github.com
+   AddKeysToAgent yes
+   IdentityFile ~/.ssh/private/personal_github
+   IdentitiesOnly yes

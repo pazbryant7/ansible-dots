@@ -1,27 +1,24 @@
-- name: Deploy ssh private key
-  ansible.builtin.import_tasks: deploy_ssh_private_keys.yml
+- name: Setup ssh
+  include_tasks: private/deploy_ssh_private_keys.yml
   tags:
-    - always
+    - private
 
-- name: Deploy gpg private key
-  ansible.builtin.import_tasks: deploy_gpg_private_keys.yml
+- name: Setup gpg
+  include_tasks: private/deploy_gpg_private_keys.yml
   tags:
-    - always
+    - private
 
-- name: Clone default github dotfiles
-  ansible.builtin.import_tasks: clone_github_dotfiles.yml
+- name: Setup dotfiles
+  include_tasks: github/clone_dotfiles.yml
   tags:
-    - always
-  register: clone_result
-  failed_when: >
-    clone_result is failed and
-    "'Repository already exists'" not in (clone_result.stderr | default(''))
+    - dotfiles
 
-- name: Clone github personal repositories
-  ansible.builtin.import_tasks: clone_github_personal_repositories.yml
+- name: Setup github personal
+  include_tasks: github/clone_personal.yml
   tags:
-    - always
-  register: clone_result
-  failed_when: >
-    clone_result is failed and
-    "'Repository already exists'" not in (clone_result.stderr | default(''))
+    - dotfiles
+
+- name: Setup github work
+  include_tasks: github/clone_work.yml
+  tags:
+    - dotfiles

@@ -4,6 +4,12 @@
     state: directory
     mode: "0700"
 
+- name: Deploy SSH configuration file
+  ansible.builtin.copy:
+    src: files/ssh/config
+    dest: "{{ ansible_env.HOME }}/.ssh/config"
+    mode: "0600"
+
 - name: Deploy personal github private ssh key
   ansible.builtin.copy:
     dest: "{{ ansible_env.HOME }}/.ssh/private/personal_github"

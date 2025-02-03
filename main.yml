@@ -1,0 +1,28 @@
+---
+- name: Dotfiles config
+  hosts: localhost
+  connection: local
+
+  vars:
+    downloads: "{{ ansible_env.HOME }}/Downloads"
+    github_dir: "{{ ansible_env.HOME }}/Documents/github"
+    dotfiles_dir: "{{ github_dir }}/dotfiles"
+
+  pre_tasks:
+    - name: Detect host system
+      ansible.builtin.import_tasks: pre_tasks/whoami.yml
+      tags:
+        - always
+
+  roles:
+    - role: common
+      tasks_from:
+        - main.yml
+      tags:
+        - common
+
+    - role: archlinux
+      tasks_from:
+        - main.yml
+      tags:
+        - archlinux

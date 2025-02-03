@@ -1,9 +1,9 @@
 - name: Clone GitHub repositories
   ansible.builtin.git:
-    repo: "git@personal.github:pazbryant/{{ item.repo }}.git"
+    update: no
     dest: "{{ github_dir }}/{{ item.repo }}"
     version: "{{ item.branch | default('main') }}"
-    update: true
+    repo: "git@personal.github:pazbryant/{{ item.repo }}.git"
   loop:
     - { repo: "pass", branch: "main" }
     - { repo: "nvim", branch: "main" }
