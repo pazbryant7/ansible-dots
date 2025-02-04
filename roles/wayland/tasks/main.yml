@@ -1,5 +1,5 @@
 ---
-- name: Install wayland-server packages using pacman
+- name: Ensure install wayland packages
   become: true
   community.general.pacman:
     name: "{{ item }}"
@@ -9,7 +9,7 @@
     - sway
     - swaybg
 
-- name: Install wayland aur packages with paru
+- name: Ensure intall aur packages
   community.general.pacman:
     name: "{{ item }}"
     state: present
@@ -17,8 +17,9 @@
   loop:
     - bun-bin
     - vesktop-bin
+  tags: wayland
 
-- name: Remove packages not needed for xorg-server
+- name: Ensure remove xorg packages
   community.general.pacman:
     name:
       - xorg-server
@@ -36,3 +37,4 @@
       - feh
       - ueberzugpp
     state: absent
+  tags: wayland

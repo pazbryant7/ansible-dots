@@ -1,0 +1,13 @@
+---
+- name: Ensure setup dotfiles
+  ansible.builtin.git:
+    update: no
+    version: main
+    recursive: true
+    accept_newhostkey: true
+    dest: "{{ dotfiles_dir }}"
+    repo: "git@personal.github:pazbryant/dotfiles.git"
+
+- name: Setup dotfiles with stop
+  shell: cd {{ dotfiles_dir }} && stow -t {{ ansible_env.HOME }} .
+  tags: dotfiles

@@ -15,14 +15,10 @@
         - always
 
   roles:
-    - role: common
-      tasks_from:
-        - main.yml
-      tags:
-        - common
-
+    - role: gpg
+    - role: ssh
+    - role: xorg
+    - role: github
+    - role: wayland
+    - role: dotfiles
     - role: archlinux
-      tasks_from:
-        - main.yml
-      tags:
-        - archlinux

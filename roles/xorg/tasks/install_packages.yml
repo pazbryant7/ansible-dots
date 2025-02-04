@@ -1,13 +1,5 @@
 ---
-- name: Remove packages not needed for xorg-server
-  become: true
-  community.general.pacman:
-    name:
-      - waybar
-    state: absent
-  when: xorg_server_uninstalled.rc != 0
-
-- name: Install xorg-server packages using pacman
+- name: Ensure install xorg packages
   become: true
   community.general.pacman:
     name: "{{ item }}"
@@ -28,7 +20,7 @@
     - feh
     - ueberzugpp
 
-- name: Install aur packages with paru
+- name: Ensure intall aur packages
   community.general.pacman:
     name: "{{ item }}"
     state: present
@@ -36,4 +28,11 @@
   loop:
     - bun-bin
     - vesktop-bin
-  when: xorg_server_installed.rc != 0
+
+- name: Ensure remove wayland
+  become: true
+  community.general.pacman:
+    name:
+      - waybar
+    state: absent
+

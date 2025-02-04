@@ -1,5 +1,5 @@
 ---
-- name: Install common cli arch linux packages using pacman
+- name: Ensure common cli arch linux packages are installed
   become: true
   community.general.pacman:
     name: "{{ item }}"

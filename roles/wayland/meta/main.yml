@@ -1,0 +1,5 @@
+---
+dependencies:
+  - role: gpg
+  - role: ssh
+  - role: archlinux

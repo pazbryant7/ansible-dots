@@ -1,24 +1,7 @@
-- name: Install install default sytsem packages
-  ansible.builtin.import_tasks: default_system/install_default_system_packages.yml
-  tags:
-    - archlinux
+- name: Install default system packages
+  ansible.builtin.import_tasks: install_default_packages.yml
+  tags: archlinux
 
 - name: Install cli packages
-  ansible.builtin.import_tasks: default_system/install_cli_packages.yml
-  tags:
-    - archlinux-cli
-
-- name: Install archlinux drivers
-  ansible.builtin.import_tasks: default_system/install_archlinux_drivers.yml
-  tags:
-    - archlinux-drivers
-
-- name: Install wayland extra packages
-  ansible.builtin.import_tasks: desktop_servers/install_wayland_extra.yml
-  tags:
-    - archlinux-wayland
-
-- name: Install xorg extra packages
-  ansible.builtin.import_tasks: desktop_servers/install_xorg_extra.yml
-  tags:
-    - archlinux-xorg
+  ansible.builtin.import_tasks: install_cli_packages.yml
+  tags: archlinux

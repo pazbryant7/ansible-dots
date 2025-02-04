@@ -1,5 +1,5 @@
 ---
-- name: Install archlinux intel drivers
+- name: Ensure linux drivers are installed
   become: true
   community.general.pacman:
     name: "{{ item }}"
@@ -8,3 +8,4 @@
     - vulkan-intel
     - libva-intel-driver
     - intel-media-driver
+  tags: drivers
