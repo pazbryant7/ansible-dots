@@ -1,12 +1,11 @@
 ---
 - name: Ensure clone github repositories
   ansible.builtin.git:
-   update: no
-   version: main
-   recursive: true
-   dest: "{{ github_dir }}/{{ item.repo }}"
-   version: "{{ item.branch | default('main') }}"
-   repo: "git@personal.github:pazbryant/{{ item.repo }}.git"
+    update: false
+    recursive: true
+    dest: "{{ github_dir }}/{{ item.repo }}"
+    version: "{{ item.branch | default('main') }}"
+    repo: "git@personal.github:pazbryant/{{ item.repo }}.git"
   loop:
     - { repo: "pass", branch: "main" }
     - { repo: "nvim", branch: "main" }

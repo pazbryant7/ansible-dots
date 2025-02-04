@@ -35,4 +35,3 @@
     name:
       - waybar
     state: absent
-

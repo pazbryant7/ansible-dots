@@ -1,7 +1,7 @@
 ---
 - name: Clone st
   ansible.builtin.git:
-    update: no
+    update: false
     version: main
     recursive: true
     accept_newhostkey: true
@@ -9,4 +9,8 @@
     repo: "git@personal.github:pazbryant/st.git"
 
 - name: Install st
-  shell: cd {{ github_dir }}/st && sudo make install clean
+  become: true
+  ansible.builtin.command: make install clean
+  args:
+    chdir: "{{ github_dir }}/st"
+    creates: "/usr/local/bin/st"
