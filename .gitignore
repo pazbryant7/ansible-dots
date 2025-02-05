@@ -13,3 +13,4 @@ roles/neovim/files/lazy-lock.json
 
 # secret
 .secrets/.passphrase
+.secrets/.become_password
