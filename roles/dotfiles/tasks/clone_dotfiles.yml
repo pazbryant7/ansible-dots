@@ -9,4 +9,3 @@
     repo: "git@personal.github:pazbryant/dotfiles.git"
   notify:
     - Setup dotfiles with stow
-  tags: dotfiles
