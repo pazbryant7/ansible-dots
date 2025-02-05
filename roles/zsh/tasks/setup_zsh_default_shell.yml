@@ -5,5 +5,8 @@
     name: "zsh"
     state: present
 
-- name: Setup zsh as a default shell
-  shell: chsh -s $(which zsh)
+- name: Handle shell output with return code
+  become: true
+  ansible.builtin.shell: chsh -s $(which zsh)
+  register: zsh
+  changed_when: zsh.rc != 0
