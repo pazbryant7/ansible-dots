@@ -1,27 +1,9 @@
-- name: Ensure ssh directory exists
-  ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.ssh/private"
-    state: directory
-    mode: "0700"
-  tags: ssh
-
 - name: Import ssh configuration file
-  ansible.builtin.copy:
-    src: files/ssh/config
-    dest: "{{ ansible_env.HOME }}/.ssh/config"
-    mode: "0600"
-  tags: ssh
+  ansible.builtin.import_tasks: configuration.yml
+  tags:
+    - ssh
 
-- name: Import ssh personal github private
-  ansible.builtin.copy:
-    dest: "{{ ansible_env.HOME }}/.ssh/private/personal_github"
-    mode: "0600"
-    content: "{{ lookup('file', '.secrets/ssh/personal_github/personal_github') | regex_replace('\\s*$', '\n') }}"
-  tags: ssh
-
-- name: Import ssh work github private
-  ansible.builtin.copy:
-    dest: "{{ ansible_env.HOME }}/.ssh/private/work_github"
-    mode: "0600"
-    content: "{{ lookup('file', '.secrets/ssh/work_github/work_github') | regex_replace('\\s*$', '\n') }}"
-  tags: ssh
+- name: Import private keys to host
+  ansible.builtin.import_tasks: send_to_host.yml
+  tags:
+    - ssh

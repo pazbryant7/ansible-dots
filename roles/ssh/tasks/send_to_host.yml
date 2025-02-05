@@ -1,0 +1,11 @@
+- name: Import ssh personal github private
+  ansible.builtin.copy:
+    dest: "{{ ansible_env.HOME }}/.ssh/private/personal_github"
+    mode: "0600"
+    content: "{{ lookup('file', '.secrets/ssh/github/personal_github') | regex_replace('\\s*$', '\n') }}"
+
+- name: Import ssh work github private
+  ansible.builtin.copy:
+    dest: "{{ ansible_env.HOME }}/.ssh/private/work_github"
+    mode: "0600"
+    content: "{{ lookup('file', '.secrets/ssh/github/work_github') | regex_replace('\\s*$', '\n') }}"

@@ -1,0 +1,11 @@
+- name: Ensure ssh directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.ssh/private"
+    state: directory
+    mode: "0700"
+
+- name: Import ssh configuration file
+  ansible.builtin.copy:
+    src: files/ssh/config
+    dest: "{{ ansible_env.HOME }}/.ssh/config"
+    mode: "0600"
