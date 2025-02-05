@@ -1,7 +1,11 @@
 - name: Install default system packages
   ansible.builtin.import_tasks: install_default_packages.yml
-  tags: archlinux
+  tags:
+    - archlinux
+    - archlinux-base
 
 - name: Install cli packages
   ansible.builtin.import_tasks: install_cli_packages.yml
-  tags: archlinux
+  tags:
+    - archlinux
+    - archlinux-cli

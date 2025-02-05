@@ -1,17 +1,4 @@
----
-- name: Ensure setup dotfiles
-  ansible.builtin.git:
-    update: false
-    version: main
-    recursive: true
-    accept_newhostkey: true
-    dest: "{{ dotfiles_dir }}"
-    repo: "git@personal.github:pazbryant/dotfiles.git"
-
-- name: Setup dotfiles with stow
-  ansible.builtin.command: cd {{ dotfiles_dir }} && stow -t {{ ansible_env.HOME }} .
-  args:
-    chdir: "{{ dotfiles_dir }}"
-  register: stow_output
-  changed_when: "'LINK' in stow_output.stdout or 'override' in stow_output.stdout"
-  tags: dotfiles
+- name: Clone dotfiles
+  ansible.builtin.import_tasks: clone_dotfiles.yml
+  tags:
+    - dotfiles

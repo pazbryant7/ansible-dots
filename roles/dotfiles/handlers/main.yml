@@ -1,0 +1,7 @@
+---
+- name: Setup dotfiles with stow
+  ansible.builtin.command:
+    cmd: stow --target={{ ansible_env.HOME }} --restow .
+  changed_when: true
+  args:
+    chdir: "{{ dotfiles_dir }}"

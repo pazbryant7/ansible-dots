@@ -10,7 +10,8 @@
 
 - name: Install st
   become: true
-  ansible.builtin.command: make install clean
+  ansible.builtin.command:
+    cmd: make install clean
   args:
     chdir: "{{ github_dir }}/st"
     creates: "/usr/local/bin/st"
