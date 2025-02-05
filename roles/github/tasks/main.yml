@@ -9,6 +9,7 @@
   loop:
     - { repo: "pass", branch: "main" }
     - { repo: "notes", branch: "main" }
+    - { repo: "youtube", branch: "main" }
     - { repo: "portfolio", branch: "main" }
     - { repo: "boilerplate", branch: "main" }
   tags: github
