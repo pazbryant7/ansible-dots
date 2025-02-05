@@ -1,0 +1,9 @@
+---
+- name: Ensure zsh is installed
+  become: true
+  community.general.pacman:
+    name: "zsh"
+    state: present
+
+- name: Setup zsh as a default shell
+  shell: chsh -s $(which zsh)

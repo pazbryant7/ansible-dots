@@ -17,6 +17,7 @@
   roles:
     - role: gpg
     - role: ssh
+    - role: zsh
     - role: xorg
     - role: github
     - role: wayland

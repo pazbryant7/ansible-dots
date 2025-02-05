@@ -1,0 +1,4 @@
+- name: Set zsh as a default shell
+  ansible.builtin.import_tasks: setup_zsh_default_shell.yml
+  tags:
+    - zsh
