@@ -12,6 +12,7 @@
     - { repo: "youtube", branch: "main" }
     - { repo: "portfolio", branch: "main" }
     - { repo: "boilerplate", branch: "main" }
+    - { repo: "ansible-dots", branch: "main" }
 
 - name: Ensule neovim symlink is created in github folder
   ansible.builtin.file:
