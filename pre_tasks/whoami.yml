@@ -3,3 +3,13 @@
   ansible.builtin.set_fact:
     host_user: "{{ ansible_env['USER']}}"
   when: host_user is not defined
+
+- name: Register current os
+  ansible.builtin.set_fact:
+    host_os: "{{ ansible_distribution | lower }}"
+  when: host_os is not defined
+
+- name: Register window manager
+  ansible.builtin.set_fact:
+    host_wm: "{{ ansible_env.WM }}"
+  when: host_wm is not defined

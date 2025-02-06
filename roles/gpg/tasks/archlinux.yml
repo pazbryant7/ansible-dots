@@ -1,5 +1,5 @@
 ---
-- name: Ensure zsh is installed
+- name: Ensure gnupg is installed
   become: true
   community.general.pacman:
     name: "gnupg"

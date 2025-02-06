@@ -1,4 +1,10 @@
-- name: Clone dotfiles
-  ansible.builtin.import_tasks: clone_dotfiles.yml
-  tags:
-    - dotfiles
+- name: Ensure clone dotfiles
+  ansible.builtin.git:
+    update: false
+    version: main
+    recursive: true
+    accept_newhostkey: true
+    dest: "{{ dotfiles_dir }}"
+    repo: "https://github.com/pazbryant/dotfiles.git"
+  notify:
+    - Setup dotfiles with stow

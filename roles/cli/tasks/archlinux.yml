@@ -1,5 +1,4 @@
----
-- name: Ensure common cli arch linux packages are installed
+- name: Ensure common cli tools are installed
   become: true
   community.general.pacman:
     name: "{{ item }}"
@@ -83,7 +82,6 @@
 - name: Install aur packages with paru
   community.general.pacman:
     name: "{{ item }}"
-    state: present
     executable: paru
   loop:
     - bun-bin

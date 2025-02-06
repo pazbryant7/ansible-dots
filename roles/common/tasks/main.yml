@@ -6,9 +6,3 @@
 - name: "Run tasks for archlinux"
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
-
-- name: "Set zsh as a default shell"
-  ansible.builtin.user:
-    name: "{{ host_user }}"
-    shell: /usr/bin/zsh
-  become: true

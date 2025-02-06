@@ -1,7 +1,0 @@
-- name: Install xorg extra packages
-  ansible.builtin.import_tasks: install_packages.yml
-  tags: xorg
-
-- name: Install st
-  ansible.builtin.import_tasks: install_st.yml
-  tags: xorg

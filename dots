@@ -1,0 +1,38 @@
+#!/usr/bin/env sh
+
+set -x
+set -e
+
+ARCHLINUX="arch"
+
+detect_os() {
+  if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    echo "$ID"
+  else
+    uname -s | tr '[:upper:]' '[:lower:]'
+  fi
+}
+
+setup_archlinux() {
+  if ! command -v ansible >/dev/null 2>&1; then
+    sudo pacman -S --noconfirm ansible
+    sudo pacman -S --noconfirm ansible-core
+  fi
+
+  if ! command -v ansible-lint >/dev/null 2>&1; then
+    sudo pacman -S --noconfirm ansible-lint
+  fi
+}
+
+main() {
+  system_os=$(detect_os)
+
+  if [ "$system_os" = "$ARCHLINUX" ]; then
+    setup_archlinux
+  fi
+
+  ansible-playbook local.yml "$@" --become-password-file=.secrets/.become_password
+}
+
+main "$@"
