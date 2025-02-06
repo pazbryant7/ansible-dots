@@ -1,9 +1,33 @@
-- name: Import ssh configuration file
-  ansible.builtin.import_tasks: configuration.yml
-  tags:
-    - ssh
+---
+- name: "Get distribution"
+  ansible.builtin.stat:
+    path: "{{ role_path }}/tasks/{{ ansible_distribution | lower }}.yml"
+  register: distribution_config
 
-- name: Import private keys to host
-  ansible.builtin.import_tasks: send_to_host.yml
-  tags:
-    - ssh
+- name: "Run tasks for archlinux"
+  ansible.builtin.include_tasks: "{{ ansible_distribution }}.yml"
+  when: distribution_config.stat.exists
+
+- name: Ensure ssh home dir exist
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.ssh/private"
+    state: directory
+    mode: "0700"
+
+- name: Import ssh config file
+  ansible.builtin.copy:
+    src: files/ssh/config
+    dest: "{{ ansible_env.HOME }}/.ssh/config"
+    mode: "0600"
+
+- name: Import ssh github personal private key
+  ansible.builtin.copy:
+    dest: "{{ ansible_env.HOME }}/.ssh/private/personal_github"
+    mode: "0600"
+    content: "{{ lookup('file', '.secrets/ssh/github/personal_github') | regex_replace('\\s*$', '\n') }}"
+
+- name: Import ssh github work private key
+  ansible.builtin.copy:
+    dest: "{{ ansible_env.HOME }}/.ssh/private/work_github"
+    mode: "0600"
+    content: "{{ lookup('file', '.secrets/ssh/github/work_github') | regex_replace('\\s*$', '\n') }}"
