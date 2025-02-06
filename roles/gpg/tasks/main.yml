@@ -1,12 +1,20 @@
+- name: "Get distribution"
+  ansible.builtin.stat:
+    path: "{{ role_path }}/tasks/{{ ansible_distribution | lower }}.yml"
+  register: distribution_config
+
+- name: "Run tasks for archlinux"
+  ansible.builtin.include_tasks: "{{ ansible_distribution }}.yml"
+  when: distribution_config.stat.exists
+
 - name: Ensure gpg directory exists
   ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.gnupg"
     state: directory
     mode: "0700"
 
-- name: Ensure gpg key is imported
+- name: Import gpg private key
   ansible.builtin.copy:
     dest: "{{ ansible_env.HOME }}/.gnupg/private_key.asc"
     mode: "0600"
     content: "{{ lookup('file', '.secrets/gpg/private-key.asc') }}"
-  tags: gpg

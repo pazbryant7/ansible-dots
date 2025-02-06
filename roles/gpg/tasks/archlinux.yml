@@ -1,0 +1,6 @@
+---
+- name: Ensure zsh is installed
+  become: true
+  community.general.pacman:
+    name: "gnupg"
+    state: present
