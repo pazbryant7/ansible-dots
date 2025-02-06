@@ -25,6 +25,20 @@ setup_archlinux() {
   fi
 }
 
+post_install() {
+  printf "Would you like to restar your system (y/n)"
+  read -r response
+
+  if [ "$response" != "y" ]; then
+    echo "Dotfiles has been setup"
+    return 0
+  fi
+
+  echo "System rebooting.."
+  echo "Do not forget to delete this .ansible-dots after reboot"
+  systemctl reboot
+}
+
 main() {
   system_os=$(detect_os)
 
@@ -32,7 +46,10 @@ main() {
     setup_archlinux
   fi
 
-  ansible-playbook local.yml "$@" --become-password-file=.secrets/.become_password
+  ansible-playbook local.yml "$@" \
+    --become-password-file=.secrets/.become_password
+
+  post_install
 }
 
 main "$@"
