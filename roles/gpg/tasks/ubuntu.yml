@@ -1,0 +1,6 @@
+---
+- name: Ensure gnupg is installed
+  become: true
+  community.builtin.apt:
+    name: "gnupg"
+    state: present
