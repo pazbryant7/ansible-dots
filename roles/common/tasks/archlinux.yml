@@ -1,14 +1,4 @@
 ---
-- name: Ensure linux intel drivers are installed
-  become: true
-  community.general.pacman:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - vulkan-intel
-    - libva-intel-driver
-    - intel-media-driver
-
 - name: Ensure base development packages are installed
   become: true
   community.general.pacman:
