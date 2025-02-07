@@ -4,11 +4,9 @@
     name: "{{ item }}"
     state: present
   loop:
-    - xh
     - jq
     - fd
     - go
-    - sl
     - mpc
     - fzf
     - git
@@ -18,23 +16,18 @@
     - bob
     - yarn
     - yazi
-    - hurl
     - zbar
     - rofi
     - rust
     - tree
     - less
     - maim
-    - grex
     - 7zip
     - dust
-    - dunst
     - atuin
     - rsync
-    - bottom
     - xcolor
     - rclone
-    - yt-dlp
     - zoxide
     - polybar
     - poppler
@@ -46,9 +39,7 @@
     - firefox
     - zathura
     - lazygit
-    - ghostty
     - ncmpcpp
-    - tealdeer
     - libpulse
     - luarocks
     - chromium
@@ -61,18 +52,13 @@
     - hyperfine
     - screenkey
     - fastfetch
-    - miniserve
-    - streamlink
     - python-pip
-    - gnu-netcat
     - pavucontrol
     - imagemagick
     - python-pipx
-    - shellharden
     - qbittorrent
     - speedtest-cli
     - translate-shell
-    - python-watchdog
     - telegram-desktop
     - zathura-pdf-mupdf
     - ffmpegthumbnailer
