@@ -5,5 +5,50 @@
     name: "{{ item }}"
     state: present
   loop:
-    - fd-find
+    - ufw
+    - cron
+    - xclip
+    - grub2
+    - man-db
+    - pipewire
+    - docker.io
+    - openresolv
+    - zram-tools
+    - wireplumber
+    - pipewire-alsa
+    - xdg-user-dirs
+    - docker-buildx
+    - pipewire-jack
+    - docker-compose
+    - fonts-overpass
+    - fonts-terminus
+    - gstreamer1.0-pipewire
+    - fonts-noto-color-emoji
 
+- name: Ensure install xorg packages
+  become: true
+  community.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - feh
+    - picom
+    - bspwm
+    - sxhkd
+    - xinit
+    - breeze
+    - xdotool
+    - x11-utils
+    - xserver-xorg
+    - lxappearance
+    - x11-xserver-utils
+    - breeze-icon-theme
+  when: host_wm == "bspwm"
+
+- name: Ensure remove wayland
+  become: true
+  community.builtin.apt:
+    name:
+      - waybar
+    state: absent
+  when: host_wm == "bspwm"

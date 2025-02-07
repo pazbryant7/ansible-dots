@@ -17,13 +17,11 @@
     - cronie
     - neovim
     - docker
-    - xdotool
     - pipewire
     - linux-lts
     - base-devel
     - openresolv
     - wireplumber
-    - intel-ucode
     - otf-overpass
     - terminus-font
     - docker-buildx
@@ -58,20 +56,21 @@
     name: "{{ item }}"
     state: present
   loop:
-    - xorg-server
+    - feh
+    - sxhkd
+    - picom
+    - bspwm
+    - xdotool
     - xorg-xev
+    - breeze-gtk
+    - ueberzugpp
     - xorg-xinit
     - xorg-xrandr
-    - xorg-xsetroot
-    - bspwm
-    - sxhkd
-    - breeze-gtk
+    - xorg-server
     - breeze-icons
-    - capitaine-cursors
-    - picom
     - lxappearance
-    - feh
-    - ueberzugpp
+    - xorg-xsetroot
+    - capitaine-cursors
   when: host_wm == "bspwm"
 
 - name: Ensure remove wayland
