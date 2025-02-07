@@ -4,7 +4,7 @@
     path: "{{ role_path }}/tasks/{{ host_os }}.yml"
   register: distribution_config
 
-- name: "Run tasks for archlinux"
+- name: "Run tasks for {{ host_os }}"
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
 

@@ -33,7 +33,6 @@ setup_ubuntu() {
     sudo apt-get update
     sudo apt-get install -y ansible
     sudo apt-get install -y python3-argcomplete
-    sudo activate-global-python-argcomplete3
   fi
 }
 
@@ -60,7 +59,9 @@ main() {
     setup_ubuntu
   fi
 
-  ansible-playbook local.yml "$@" \
+  tree
+
+  ansible-playbook ./local.yml "$@" \
     --become-password-file=.secrets/.become_password
 
   post_install

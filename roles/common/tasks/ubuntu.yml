@@ -1,0 +1,9 @@
+---
+- name: "Ensure base development packages are installed"
+  become: true
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - fd-find
+

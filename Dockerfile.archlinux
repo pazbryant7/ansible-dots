@@ -7,8 +7,6 @@ ARG GROUP=bryant
 ARG UID=1000
 ARG GID=1000
 
-ENV TZ="America/Merida"
-
 USER ${USER}
 USER root
 
@@ -24,12 +22,12 @@ RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && \
     locale-gen
 
 RUN groupadd --gid ${GID} ${GROUP} && \
-    useradd --uid ${UID} --gid ${GID} --shell /bin/sh --home /home/${USER} --create-home ${USER} && \
-    echo "%${GROUP} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/${USER} && \
+    useradd --uid ${UID} --gid ${GID} --shell /usr/bin/zsh --home /home/${USER} --create-home ${USER}
+
+RUN echo "%${GROUP} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/${USER} && \
     chmod 0440 /etc/sudoers.d/${USER}
 
-RUN groupadd docker && \
-    usermod -aG docker ${USER}
+RUN groupadd docker && usermod -aG docker ${USER}
 
 WORKDIR /home/${USER}
 
@@ -39,4 +37,4 @@ RUN chown -R ${USER}:${GROUP} /home/${USER}
 
 USER ${USER}
 
-RUN sh "/home/${USER}/.dotfiles/dots"
+RUN sh -c "/home/${USER}/.dotfiles/dots"
