@@ -1,16 +1,18 @@
 services:
-  arch-environment:
+  ansible-arch:
     build:
       context: .
       dockerfile: Dockerfile.archlinux
     container_name: ansible-arch-dev
     environment:
       - TZ=America/Merida
+    tty: true
 
-  ubuntu-environment:
+  ansible-ubuntu:
     build:
       context: .
       dockerfile: Dockerfile.ubuntu
     container_name: ansible-ubuntu-dev
     environment:
       - TZ=America/Merida
+    tty: true
