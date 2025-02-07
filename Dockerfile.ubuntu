@@ -1,27 +1,20 @@
-FROM archlinux:latest
-
+FROM ubuntu:latest
 LABEL maintainer="Bryant Paz"
 
 ARG USER=bryant
 ARG GROUP=bryant
 ARG UID=1000
 ARG GID=1000
-
 ENV TZ="America/Merida"
 
-USER ${USER}
 USER root
 
-RUN pacman -Syu --noconfirm && \
-    pacman -S --noconfirm \
+RUN apt-get update && apt-get install -y \
     sudo \
     curl \
     git \
-    gnupg \
-    glibc \
-    tzdata \
     neovim \
-    wget
+    apt-get autoremove -y
 
 RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && \
     locale-gen
@@ -31,15 +24,17 @@ RUN groupadd --gid ${GID} ${GROUP} && \
     echo "%${GROUP} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/${USER} && \
     chmod 0440 /etc/sudoers.d/${USER}
 
+# Add user to docker group
 RUN groupadd docker && \
     usermod -aG docker ${USER}
 
+# Set timezone
+RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && \
+    echo ${TZ} > /etc/timezone
+
 WORKDIR /home/${USER}
-
 COPY . /home/${USER}/.dotfiles
-
 RUN chown -R ${USER}:${GROUP} /home/${USER}
 
 USER ${USER}
-
-RUN sh "/home/${USER}/.dotfiles/bin/dotfiles"
+RUN sh "/home/${USER}/.dotfiles/dots"

@@ -1,0 +1,41 @@
+FROM archlinux:latest
+
+LABEL maintainer="Bryant Paz"
+
+ARG USER=bryant
+ARG GROUP=bryant
+ARG UID=1000
+ARG GID=1000
+
+ENV TZ="America/Merida"
+
+USER ${USER}
+USER root
+
+RUN pacman -Syu --noconfirm && \
+    pacman -S --noconfirm \
+    sudo \
+    git \
+    neovim \
+    tree
+
+RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && \
+    locale-gen
+
+RUN groupadd --gid ${GID} ${GROUP} && \
+    useradd --uid ${UID} --gid ${GID} --shell /bin/sh --home /home/${USER} --create-home ${USER} && \
+    echo "%${GROUP} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/${USER} && \
+    chmod 0440 /etc/sudoers.d/${USER}
+
+RUN groupadd docker && \
+    usermod -aG docker ${USER}
+
+WORKDIR /home/${USER}
+
+COPY . /home/${USER}/.dotfiles
+
+RUN chown -R ${USER}:${GROUP} /home/${USER}
+
+USER ${USER}
+
+RUN sh "/home/${USER}/.dotfiles/dots"
