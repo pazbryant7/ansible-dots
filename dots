@@ -25,6 +25,18 @@ setup_archlinux() {
   fi
 }
 
+setup_ubuntu() {
+  if ! dpkg -s ansible >/dev/null 2>&1; then
+    sudo apt-get update
+    sudo apt-get install -y software-properties-common
+    sudo apt-add-repository -y ppa:ansible/ansible
+    sudo apt-get update
+    sudo apt-get install -y ansible
+    sudo apt-get install -y python3-argcomplete
+    sudo activate-global-python-argcomplete3
+  fi
+}
+
 post_install() {
   printf "Would you like to restar your system (y/n)"
   read -r response
@@ -44,6 +56,8 @@ main() {
 
   if [ "$system_os" = "$ARCHLINUX" ]; then
     setup_archlinux
+  else
+    setup_ubuntu
   fi
 
   ansible-playbook local.yml "$@" \
