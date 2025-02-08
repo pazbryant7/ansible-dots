@@ -48,7 +48,7 @@
     - pass-otp
     - chromium
     - obsidian
-    - luarocks
+    - starship
     - fastfetch
     - screenkey
     - hyperfine

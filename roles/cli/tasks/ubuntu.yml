@@ -46,6 +46,7 @@
     - ripgrep
     - libpulse
     - pass-otp
+    - starship
     - chromium
     - obsidian
     - luarocks
