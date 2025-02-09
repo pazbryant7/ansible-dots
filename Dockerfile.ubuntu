@@ -10,16 +10,16 @@ USER root
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
-    sudo \
-    curl \
-    git-core \
-    locales \
-    tree \
-    neovim \
-    zsh \
-    && apt-get autoremove -y
-
-RUN locale-gen en_US.UTF-8
+		zsh \
+		tree \
+		sudo \
+		neovim \
+		locales \
+		git-core \
+		ansible \
+		ansible-core \
+    && apt-get autoremove -y \
+		&& locale-gen en_US.UTF-8
 
 RUN adduser --quiet --disabled-password \
   --shell /usr/bin/zsh --home /home/${USER} \
@@ -31,9 +31,8 @@ RUN mkdir -p /etc/sudoers.d && touch /etc/sudoers.d/${USER} && \
 RUN groupadd docker && usermod -aG docker ${USER}
 
 WORKDIR /home/${USER}
-COPY . /home/${USER}/.dotfiles
-RUN chown -R ${USER}:${GROUP} /home/${USER}
+COPY . dotfiles
+RUN chown -R ${USER}:${GROUP} /home/${USER} && \
+	chmod -R u+w dotfiles
 
 USER ${USER}
-
-RUN sh -c "/home/${USER}/.dotfiles/dots"
