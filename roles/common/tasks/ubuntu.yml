@@ -27,7 +27,7 @@
 
 - name: Ensure install xorg packages
   become: true
-  community.builtin.apt:
+  ansible.builtin.apt:
     name: "{{ item }}"
     state: present
   loop:
@@ -47,7 +47,7 @@
 
 - name: Ensure remove wayland
   become: true
-  community.builtin.apt:
+  ansible.builtin.apt:
     name:
       - waybar
     state: absent

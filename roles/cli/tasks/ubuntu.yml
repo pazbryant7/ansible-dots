@@ -1,6 +1,6 @@
 - name: Ensure common cli tools are installed
   become: true
-  community.builtin.apt:
+  ansible.builtin.apt:
     name: "{{ item }}"
     state: present
   loop:
