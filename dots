@@ -4,67 +4,78 @@ set -x
 set -e
 
 ARCHLINUX="arch"
+BECOME_FILE_PASSWORD=".secrets/.become_password"
+ANSIBLE_VAULT_FILE_PASSWORD=".secrets/.become_password"
+
+validate_secrets() {
+	if [ ! -f "$BECOME_FILE_PASSWORD" ]; then
+		echo "$BECOME_FILE_PASSWORD is needed"
+		exit 1
+	fi
+	if [ ! -f "$ANSIBLE_VAULT_FILE_PASSWORD" ]; then
+		echo "$BECOME_FILE_PASSWORD is needed"
+		exit 1
+	fi
+}
 
 detect_os() {
-  if [ -f /etc/os-release ]; then
-    . /etc/os-release
-    echo "$ID"
-  else
-    uname -s | tr '[:upper:]' '[:lower:]'
-  fi
+	if [ -f /etc/os-release ]; then
+		. /etc/os-release
+		echo "$ID"
+	else
+		uname -s | tr '[:upper:]' '[:lower]'
+	fi
+}
+
+install_ansible_galaxy() {
+	OS=$1
+	OS_REQUIREMENTS=""
+	if [ -f "requirements/$OS.yml" ]; then
+		OS_REQUIREMENTS="requirements/$OS.yml"
+	fi
+	ansible-galaxy install -r requirements/common.yml "$OS_REQUIREMENTS"
 }
 
 setup_archlinux() {
-  if ! command -v ansible >/dev/null 2>&1; then
-    sudo pacman -S --noconfirm ansible
-    sudo pacman -S --noconfirm ansible-core
-  fi
-
-  if ! command -v ansible-lint >/dev/null 2>&1; then
-    sudo pacman -S --noconfirm ansible-lint
-  fi
+	if ! command -v ansible >/dev/null 2>&1; then
+		sudo pacman -S --noconfirm ansible
+		sudo pacman -S --noconfirm ansible-core
+	fi
 }
 
 setup_ubuntu() {
-  if ! dpkg -s ansible >/dev/null 2>&1; then
-    sudo apt-get update
-    sudo apt-get install -y software-properties-common
-    sudo apt-add-repository -y ppa:ansible/ansible
-    sudo apt-get update
-    sudo apt-get install -y ansible
-    sudo apt-get install -y python3-argcomplete
-  fi
-}
-
-post_install() {
-  printf "Would you like to restar your system (y/n)"
-  read -r response
-
-  if [ "$response" != "y" ]; then
-    echo "Dotfiles has been setup"
-    return 0
-  fi
-
-  echo "System rebooting.."
-  echo "Do not forget to delete this .ansible-dots after reboot"
-  systemctl reboot
+	if ! dpkg -s ansible >/dev/null 2>&1; then
+		sudo apt-get update
+		sudo apt-get install -y software-properties-common
+		sudo apt-add-repository -y ppaansible/ansible
+		sudo apt-get update
+		sudo apt-get install -y ansible
+		sudo apt-get install -y python3-argcomplete
+	fi
 }
 
 main() {
-  system_os=$(detect_os)
+	validate_secrets
 
-  if [ "$system_os" = "$ARCHLINUX" ]; then
-    setup_archlinux
-  else
-    setup_ubuntu
-  fi
+	system_os=$(detect_os)
 
-  tree
+	if [ -z "$system_os" ]; then
+		echo "System was not recognized"
+		exit 1
+	fi
 
-  ansible-playbook ./local.yml "$@" \
-    --become-password-file=.secrets/.become_password
+	if [ "$system_os" = "$ARCHLINUX" ]; then
+		setup_archlinux
+	else
+		setup_ubuntu
+	fi
 
-  post_install
+	install_ansible_galaxy system_os
+
+	ansible-playbook ./local.yml "$@" \
+		--become-password-file=.secrets/.become_password
+
+	printf "Finalized succsessfully"
 }
 
 main "$@"
