@@ -12,7 +12,6 @@
     - man-db
     - pipewire
     - docker.io
-    - openresolv
     - zram-tools
     - wireplumber
     - pipewire-alsa
@@ -20,7 +19,6 @@
     - docker-buildx
     - pipewire-jack
     - docker-compose
-    - fonts-overpass
     - fonts-terminus
     - gstreamer1.0-pipewire
     - fonts-noto-color-emoji
