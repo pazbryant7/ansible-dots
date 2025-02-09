@@ -13,7 +13,7 @@ validate_secrets() {
 		exit 1
 	fi
 	if [ ! -f "$ANSIBLE_VAULT_FILE_PASSWORD" ]; then
-		echo "$BECOME_FILE_PASSWORD is needed"
+		echo "$ANSIBLE_VAULT_FILE_PASSWORD is needed"
 		exit 1
 	fi
 }
@@ -45,12 +45,8 @@ setup_archlinux() {
 
 setup_ubuntu() {
 	if ! dpkg -s ansible >/dev/null 2>&1; then
-		sudo apt-get update
-		sudo apt-get install -y software-properties-common
-		sudo apt-add-repository -y ppaansible/ansible
-		sudo apt-get update
-		sudo apt-get install -y ansible
-		sudo apt-get install -y python3-argcomplete
+		sudo apt-get install ansible
+		sudo apt-get install ansible-core
 	fi
 }
 
