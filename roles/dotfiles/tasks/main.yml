@@ -5,6 +5,6 @@
     recursive: true
     accept_newhostkey: true
     dest: "{{ dotfiles_dir }}"
-    repo: "https://github.com/pazbryant/dotfiles.git"
+    repo: "git@personal.github/pazbryant/dotfiles.git"
   notify:
     - Setup dotfiles with stow
