@@ -1,15 +1,20 @@
 ---
-- name: Register current user
-  ansible.builtin.set_fact:
-    host_user: "{{ ansible_env['USER']}}"
+- name: Get current user
+  ansible.builtin.command: whoami
+  register: current_user
   when: host_user is not defined
 
-- name: Register current os
+- name: Register current user
+  ansible.builtin.set_fact:
+    host_user: "{{ current_user.stdout }}"
+  when: host_user is not defined
+
+- name: Register current OS
   ansible.builtin.set_fact:
     host_os: "{{ ansible_distribution | lower }}"
   when: host_os is not defined
 
 - name: Register window manager
   ansible.builtin.set_fact:
-    host_wm: "{{ ansible_env.WM }}"
+    host_wm: "{{ ansible_env.WM | default('unknown') }}"
   when: host_wm is not defined
