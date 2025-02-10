@@ -1,3 +1,16 @@
+- name: Ensure required directories exist
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - /etc/pacman.d/hooks/
+    - /usr/share/kbd/keymaps/i386/dvorak/
+    - /etc/X11/xorg.conf.d/
+
 - name: Import pacman hooks
   become: true
   ansible.builtin.copy:
