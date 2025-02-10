@@ -23,7 +23,6 @@
 - name: Import ssh known_hosts file
   ansible.builtin.copy:
     src: files/known_hosts
-
     dest: "{{ ansible_env.HOME }}/.ssh/known_hosts"
     mode: "0600"
 
