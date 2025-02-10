@@ -1,77 +1,122 @@
 #!/usr/bin/env sh
 
-set -x
 set -e
+set -x
 
 ARCHLINUX="arch"
 BECOME_FILE_PASSWORD=".secrets/.become_password"
 ANSIBLE_VAULT_FILE_PASSWORD=".secrets/.become_password"
 
-validate_secrets() {
-	if [ ! -f "$BECOME_FILE_PASSWORD" ]; then
-		echo "$BECOME_FILE_PASSWORD is needed"
-		exit 1
-	fi
-	if [ ! -f "$ANSIBLE_VAULT_FILE_PASSWORD" ]; then
-		echo "$ANSIBLE_VAULT_FILE_PASSWORD is needed"
-		exit 1
-	fi
+validate_file_secrets() {
+  if [ ! -f "$BECOME_FILE_PASSWORD" ]; then
+    echo "$BECOME_FILE_PASSWORD is needed"
+    exit 1
+  fi
+  if [ ! -f "$ANSIBLE_VAULT_FILE_PASSWORD" ]; then
+    echo "$ANSIBLE_VAULT_FILE_PASSWORD is needed"
+    exit 1
+  fi
 }
 
 detect_os() {
-	if [ -f /etc/os-release ]; then
-		. /etc/os-release
-		echo "$ID"
-	else
-		uname -s | tr '[:upper:]' '[:lower]'
-	fi
+  if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    echo "$ID"
+  else
+    uname -s | tr '[:upper:]' '[:lower]'
+  fi
 }
 
 install_ansible_galaxy() {
-	OS=$1
-	OS_REQUIREMENTS=""
-	if [ -f "requirements/$OS.yml" ]; then
-		OS_REQUIREMENTS="requirements/$OS.yml"
-	fi
-	ansible-galaxy install -r requirements/common.yml "$OS_REQUIREMENTS"
+  OS=$1
+  OS_REQUIREMENTS=""
+  if [ -f "requirements/$OS.yml" ]; then
+    OS_REQUIREMENTS="requirements/$OS.yml"
+  fi
+  ansible-galaxy install -r requirements/common.yml "$OS_REQUIREMENTS"
 }
 
 setup_archlinux() {
-	if ! command -v ansible >/dev/null 2>&1; then
-		sudo pacman -S --noconfirm ansible
-		sudo pacman -S --noconfirm ansible-core
-	fi
+  if ! command -v ansible >/dev/null 2>&1; then
+    sudo pacman -S --noconfirm ansible
+    sudo pacman -S --noconfirm ansible-core
+  fi
 }
 
 setup_ubuntu() {
-	if ! dpkg -s ansible >/dev/null 2>&1; then
-		sudo apt-get install ansible
-		sudo apt-get install ansible-core
-	fi
+  if ! dpkg -s ansible >/dev/null 2>&1; then
+    sudo apt-get install ansible
+    sudo apt-get install ansible-core
+  fi
+}
+
+setup_ssh_keys() {
+  if [ ! -f "$HOME/.ssh/private/personal_github" ]; then
+    echo "Something went wrong, key was not found"
+    exit 1
+  fi
+
+  eval "$(ssh-agent -s)"
+
+  ssh_agent_stdr_code="$?"
+
+  if [ "$ssh_agent_stdr_code" != 0 ]; then
+    echo "Something went wroing starting ssh-agent: LINE 67"
+    exit 1
+  fi
+
+  ssh-add "$HOME/.ssh/private/personal_github"
+
+  ssh_add_stdr_code="$?"
+
+  if [ "$ssh_add_stdr_code" != 0 ]; then
+    echo "Something went wroing adding ssh key: LINE 71"
+    exit 1
+  fi
+
+  echo "SSH keys were added succsessfully"
+}
+
+run_ansible_playbooks() {
+  ansible-playbook ./local.yml \
+    --become-password-file=.secrets/.become_password \
+    --tags ssh && setup_ssh_keys
+
+  echo "----------------------------------"
+  printf "Would you like to continue? (y/n) "
+  read -r response
+  echo "----------------------------------"
+
+  if [ "$response" != "y" ]; then
+    exit 0
+  fi
+
+  ansible-playbook ./local.yml "$@" \
+    --become-password-file=.secrets/.become_password \
+    --skip-tags ssh # this because we already setup ssh keys in the first run
+
+  echo "Finalized succsessfully"
 }
 
 main() {
-	validate_secrets
+  validate_file_secrets
 
-	system_os=$(detect_os)
+  system_os=$(detect_os)
 
-	if [ -z "$system_os" ]; then
-		echo "System was not recognized"
-		exit 1
-	fi
+  if [ -z "$system_os" ]; then
+    echo "System was not recognized"
+    exit 1
+  fi
 
-	if [ "$system_os" = "$ARCHLINUX" ]; then
-		setup_archlinux
-	else
-		setup_ubuntu
-	fi
+  if [ "$system_os" = "$ARCHLINUX" ]; then
+    setup_archlinux
+  else
+    setup_ubuntu
+  fi
 
-	install_ansible_galaxy system_os
+  install_ansible_galaxy system_os
 
-	ansible-playbook ./local.yml "$@" \
-		--become-password-file=.secrets/.become_password
-
-	printf "Finalized succsessfully"
+  run_ansible_playbooks "$@"
 }
 
 main "$@"
