@@ -20,7 +20,6 @@
     - 7zip
     - maim
     - dust
-    - rust
     - rofi
     - zbar
     - tmux
@@ -66,6 +65,23 @@
     - telegram-desktop
     - zathura-pdf-mupdf
     - ffmpegthumbnailer
+
+- name: Install cargo packages
+  become: true
+  community.general.cargo:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - fnm
+
+- name: Install pipx packages
+  become: true
+  community.general.cargo:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - pgcli
+    - litecli
 
 - name: Install aur packages with paru
   community.general.pacman:
