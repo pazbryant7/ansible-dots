@@ -16,8 +16,15 @@
 
 - name: Import ssh config file
   ansible.builtin.copy:
-    src: files/ssh/config
+    src: files/config
     dest: "{{ ansible_env.HOME }}/.ssh/config"
+    mode: "0600"
+
+- name: Import ssh known_hosts file
+  ansible.builtin.copy:
+    src: files/known_hosts
+
+    dest: "{{ ansible_env.HOME }}/.ssh/known_hosts"
     mode: "0600"
 
 - name: Import ssh github personal private key
