@@ -1,3 +1,5 @@
 ---
 dependencies:
-  role: ssh
+  - role: ssh
+  - role: zsh
+  - role: dotfiles
