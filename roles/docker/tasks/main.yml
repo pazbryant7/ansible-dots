@@ -1,0 +1,21 @@
+---
+- name: Install docker
+  become: true
+  community.general.pacman:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - docker-compose
+    - docker-buildx
+    - docker
+
+- name: Ensure the docker group exists
+  ansible.builtin.group:
+    name: docker
+    state: present
+
+- name: Ensure the user is in the docker group
+  ansible.builtin.user:
+    name: "{{ host_user }}"
+    groups: docker
+    append: yes
