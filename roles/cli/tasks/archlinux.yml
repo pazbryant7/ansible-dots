@@ -27,6 +27,7 @@
     - pass
     - yazi
     - yarn
+    - lua51
     - atuin
     - rsync
     - zoxide
@@ -75,7 +76,7 @@
 
 - name: Install pipx packages
   become: true
-  community.general.cargo:
+  community.general.pipx:
     name: "{{ item }}"
     state: present
   loop:
