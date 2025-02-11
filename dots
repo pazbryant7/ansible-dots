@@ -1,11 +1,10 @@
 #!/usr/bin/env sh
 
 set -e
-set -x
 
 ARCHLINUX="arch"
 BECOME_FILE_PASSWORD=".secrets/.become_password"
-ANSIBLE_VAULT_FILE_PASSWORD=".secrets/.become_password"
+ANSIBLE_VAULT_FILE_PASSWORD=".secrets/.passphrase"
 
 validate_file_secrets() {
   if [ ! -f "$BECOME_FILE_PASSWORD" ]; then
