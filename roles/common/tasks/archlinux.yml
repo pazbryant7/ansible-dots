@@ -33,20 +33,6 @@
     - linux-lts-headers
     - gst-plugin-pipewire
 
-- name: Install paru helper
-  ansible.builtin.shell: |
-    cd {{ downloads }}
-    if [ -d paru ]; then
-      rm -rf paru
-    fi
-    git clone https://aur.archlinux.org/paru.git
-    cd paru
-    makepkg -si --noconfirm
-  args:
-    creates: /usr/bin/paru
-  register: paru
-  changed_when: paru.rc == 0
-
 - name: Ensure install xorg packages
   become: true
   community.general.pacman:
