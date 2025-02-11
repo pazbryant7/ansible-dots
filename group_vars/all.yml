@@ -8,3 +8,4 @@ default_roles:
   - ssh
   - system
   - zsh
+  - docker
