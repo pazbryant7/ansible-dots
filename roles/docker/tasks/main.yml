@@ -10,11 +10,13 @@
     - docker
 
 - name: Ensure the docker group exists
+  become: true
   ansible.builtin.group:
     name: docker
     state: present
 
 - name: Ensure the user is in the docker group
+  become: true
   ansible.builtin.user:
     name: "{{ host_user }}"
     groups: docker
