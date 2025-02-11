@@ -32,7 +32,7 @@ install_ansible_galaxy() {
   if [ -f "requirements/$OS.yml" ]; then
     OS_REQUIREMENTS="requirements/$OS.yml"
   fi
-  ansible-galaxy install -r requirements/common.yml "$OS_REQUIREMENTS"
+  ansible-galaxy collection install -r "$OS_REQUIREMENTS"
 }
 
 setup_archlinux() {
@@ -113,7 +113,7 @@ main() {
     setup_ubuntu
   fi
 
-  install_ansible_galaxy system_os
+  install_ansible_galaxy "$system_os"
 
   run_ansible_playbooks "$@"
 }

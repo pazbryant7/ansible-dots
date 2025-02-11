@@ -66,3 +66,15 @@
     - telegram-desktop
     - zathura-pdf-mupdf
     - ffmpegthumbnailer
+
+- name: Install aur packages using paru
+  kewlfft.aur.aur:
+    use: paru
+    name:
+      - bun-bin
+      - ani-cli
+      - bun-bin
+      - obinskit
+      - ttf-maple
+      - lazydocker
+      - vesktop-bin
