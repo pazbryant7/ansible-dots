@@ -69,3 +69,58 @@
     src: files/archlinux/etc/vconsole.conf
     dest: "/etc/vconsole.conf"
     mode: "0644"
+
+- name: Ensure GRUB_DEFAULT is set to 'SAVE'
+  become: true
+  ansible.builtin.lineinfile:
+    name: /etc/default/grub
+    regexp: "^GRUB_DEFAULT=0"
+    line: "GRUB_DEFAULT=SAVE"
+    create: true
+    backup: true
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Ensure GRUB_SAVE_DEFAULT is set to 'true'
+  become: true
+  ansible.builtin.lineinfile:
+    dest: /etc/default/grub
+    regexp: "^#GRUB_SAVEDEFAULT=true"
+    line: "GRUB_SAVE_DEFAULT=true"
+    create: true
+    backup: true
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Ensure GRUB_DISABLE_SUBMENU is set to 'y'
+  become: true
+  ansible.builtin.lineinfile:
+    dest: /etc/default/grub
+    regexp: "^#GRUB_DISABLE_SUBMENU=y"
+    line: "GRUB_DISABLE_SUBMENU=y"
+    create: true
+    backup: true
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Ensure ParallelDownloads is set to '5'
+  become: true
+  ansible.builtin.lineinfile:
+    dest: /etc/pacman.conf
+    regexp: "^#ParallelDownloads = 5"
+    line: "ParallelDownloads = 5"
+    create: true
+    backup: true
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Regenerate GRUB configuration
+  become: true
+  ansible.builtin.command:
+    cmd: grub-mkconfig -o /boot/grub/grub.cfg
+  register: done
+  changed_when: done.rc != 0
