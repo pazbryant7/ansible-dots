@@ -32,6 +32,7 @@
     - rsync
     - zoxide
     - rclone
+    - pgcli
     - xcolor
     - ncmpcpp
     - firefox
@@ -70,11 +71,19 @@
 - name: Install aur packages using paru
   kewlfft.aur.aur:
     use: paru
-    name:
-      - bun-bin
-      - ani-cli
-      - bun-bin
-      - obinskit
-      - ttf-maple
-      - lazydocker
-      - vesktop-bin
+    name: "{{ item }}"
+    state: present
+  loop:
+    - bun-bin
+    - ani-cli
+    - obinskit
+    - ttf-maple
+    - lazydocker
+    - vesktop-bin
+
+- name: Install packages using cargo
+  community.general.cargo:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - fnm
