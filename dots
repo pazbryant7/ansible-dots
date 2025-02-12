@@ -85,6 +85,14 @@ remove_ansible_dots() {
   fi
 }
 
+get_media_from_usb() {
+  books_path="/run/media/bryant/tiagovault/backups/books/2024-11-06"
+  music_path="/run/media/bryant/tiagovault/backups/music/2024-11-06"
+
+  rsync -avh --progress --delete "$books_path/" "$HOME/Documents/books"
+  rsync -avh --progress --delete "$music_path/" "$HOME/Music"
+}
+
 post_installation() {
   echo "Updating software"
   "$HOME/bin/global/update-software"
@@ -103,17 +111,13 @@ post_installation() {
 
   echo ""
 
-  printf "Would you like to reboot your system? (y/n) "
-  read -r response
-
-  if [ "$response" = "y" ]; then
-    echo "Finished, rebooting..."
-    sleep 1 && systemctl reboot
-  fi
+  get_media_from_usb
 
   # NOTE: At this point ansible-dots is already in
   # $HOME/Documents/github/ansible-dots
   remove_ansible_dots
+
+  echo "Setup has finished"
 }
 
 run_ansible_playbooks() {
