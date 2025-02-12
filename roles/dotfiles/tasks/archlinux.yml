@@ -1,0 +1,7 @@
+- name: Ensure stow is installed
+  become: true
+  community.general.pacman:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - stow
