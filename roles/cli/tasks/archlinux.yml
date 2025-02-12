@@ -94,7 +94,7 @@
     - fnm
 
 - name: Clone the st terminal repository
-  ansible.builtin.git:
+   ansible.builtin.git:
     update: false
     version: main
     dest: "{{ github_dir }}/st"
@@ -105,7 +105,7 @@
   become: true
   command:
     cmd: sudo make clean install
-    chdir: /tmp/st
+    chdir: "{{ github_dir }}/st"
     creates: /usr/local/bin/st
   when: host_wm == "bspwm"
 
