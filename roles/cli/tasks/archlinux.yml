@@ -92,3 +92,27 @@
     state: present
   loop:
     - fnm
+
+- name: Clone the st terminal repository
+  ansible.builtin.git:
+    update: false
+    version: main
+    dest: "{{ github_dir }}/st"
+    repo: "git@personal.github:pazbryant/st.git"
+  when: host_wm == "bspwm"
+
+- name: Build and install st terminal
+  become: true
+  command:
+    cmd: sudo make clean install
+    chdir: /tmp/st
+    creates: /usr/local/bin/st
+  when: host_wm == "bspwm"
+
+- name: Symlink st terminal to xterm
+  become: true
+  ansible.builtin.file:
+    src: "/usr/local/bin/st"
+    dest: "/usr/bin/xterm"
+    state: link
+  when: host_wm == "bspwm"
