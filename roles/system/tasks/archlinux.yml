@@ -8,8 +8,9 @@
     mode: "0755"
   loop:
     - /etc/pacman.d/hooks/
-    - /usr/share/kbd/keymaps/i386/dvorak/
     - /etc/X11/xorg.conf.d/
+    - /usr/share/fonts/bryant-fonts/
+    - /usr/share/kbd/keymaps/i386/dvorak/
 
 - name: Import pacman hooks
   become: true
@@ -124,3 +125,19 @@
     cmd: grub-mkconfig -o /boot/grub/grub.cfg
   register: done
   changed_when: done.rc != 0
+
+- name: Import custom personal fonts
+  become: true
+  ansible.builtin.copy:
+    src: files/archlinux/fonts
+    dest: "/usr/share/fonts/bryant-fonts"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Refresh fonts cache
+  become: true
+  ansible.builtin.command:
+    cmd: sudo fc-cache -f -v
+  register: fontcache
+  changed_when: fontcache.rc != 0
