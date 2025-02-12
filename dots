@@ -78,6 +78,44 @@ setup_ssh_keys() {
   echo "SSH keys were added succsessfully"
 }
 
+remove_ansible_dots() {
+  ansible_dots="$HOME/ansible-dots"
+  if [ -d "$ansible_dots" ]; then
+    rm "$ansible_dots"
+  fi
+}
+
+post_installation() {
+  echo "Updating software"
+  "$HOME/bin/global/update-software"
+
+  echo "Update firefox UI"
+  "$HOME/bin/global/update-firefox-ui"
+
+  echo ""
+
+  printf "Setup post installation"
+  echo ""
+  echo "  - Setup RCLONE with MEGA"
+  echo "  - Set gtk theme using Lxappearence GUI"
+  echo "  - Login firefox,outlook.bitwarden,github,google,twitch"
+  echo "  - Import private gpg key and trut it $HOME/.gnupg/private_key.asc"
+
+  echo ""
+
+  printf "Would you like to reboot your system? (y/n) "
+  read -r response
+
+  if [ "$response" = "y" ]; then
+    echo "Finished, rebooting..."
+    sleep 1 && systemctl reboot
+  fi
+
+  # NOTE: At this point ansible-dots is already in
+  # $HOME/Documents/github/ansible-dots
+  remove_ansible_dots
+}
+
 run_ansible_playbooks() {
   ansible-playbook ./local.yml \
     --become-password-file=.secrets/.become_password \
@@ -94,9 +132,9 @@ run_ansible_playbooks() {
 
   ansible-playbook ./local.yml "$@" \
     --become-password-file=.secrets/.become_password \
-    --skip-tags ssh # this because we already setup ssh keys in the first run
+    --skip-tags ssh
 
-  echo "Finalized succsessfully"
+  printf "Ansible playbooks were executes succsessfully\n"
 }
 
 main() {
@@ -118,6 +156,8 @@ main() {
   install_ansible_galaxy "$system_os"
 
   run_ansible_playbooks "$@"
+
+  post_installation
 }
 
 main "$@"

@@ -1,12 +1,10 @@
 ---
 default_roles:
   - cli
-  - common
-  - dotfiles
-  - github
-  - gpg
-  - ssh
-  - system
   - zsh
+  - gpg
   - docker
+  - system
+  - github
   - firefox
+  - dotfiles
