@@ -7,6 +7,7 @@
   loop:
     - ufw
     - cron
+    - dunst
     - xclip
     - grub2
     - man-db
