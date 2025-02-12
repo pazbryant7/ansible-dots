@@ -7,62 +7,67 @@
     - jq
     - fd
     - go
+    - fzf
+    - git
+    - mpc
+    - imv
+    - mpv
+    - mpd
     - eza
     - bob
     - bat
-    - imv
-    - mpv
-    - fzf
-    - mpc
-    - git
-    - less
-    - tree
-    - 7zip
-    - maim
-    - dust
-    - rofi
-    - zbar
-    - tmux
     - stow
     - pass
     - yazi
+    - code
     - yarn
-    - lua51
-    - atuin
+    - tmux
+    - zbar
+    - rofi
+    - tree
+    - less
+    - 7zip
+    - dust
+    - maim
     - rsync
+    - lua51
+    - pgcli
+    - atuin
+    - ffmpeg
+    - xcolor
     - zoxide
     - rclone
-    - pgcli
-    - xcolor
-    - ncmpcpp
-    - firefox
-    - pcmanfm
-    - zathura
-    - lazygit
-    - calibre
-    - udiskie
     - polybar
     - poppler
     - ripgrep
-    - libpulse
-    - pass-otp
-    - luarocks
-    - chromium
-    - obsidian
+    - udiskie
+    - pcmanfm
+    - lazygit
+    - ncmpcpp
+    - firefox
+    - calibre
+    - zathura
     - starship
-    - fastfetch
-    - screenkey
-    - hyperfine
-    - bandwhich
+    - obsidian
+    - chromium
+    - pass-otp
+    - libpulse
+    - luarocks
+    - syncthing
     - unclutter
     - alacritty
-    - syncthing
+    - hyperfine
+    - bandwhich
+    - fastfetch
+    - screenkey
     - python-pip
     - qbittorrent
+    - pavucontrol
     - imagemagick
     - python-pipx
-    - pavucontrol
+    - imagemagick
     - speedtest-cli
+    - networkmanager
     - translate-shell
     - telegram-desktop
     - zathura-pdf-mupdf
