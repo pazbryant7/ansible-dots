@@ -8,6 +8,7 @@
     repo: "git@personal.github:pazbryant/{{ item.repo }}.git"
   loop:
     - { repo: "pass", branch: "main" }
+    - { repo: "anime", branch: "main" }
     - { repo: "notes", branch: "main" }
     - { repo: "youtube", branch: "main" }
     - { repo: "portfolio", branch: "main" }
