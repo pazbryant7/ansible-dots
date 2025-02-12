@@ -56,16 +56,16 @@
     group: root
     mode: "0644"
 
-# NOTE: when no mode is set it will use the mode of the already existing files
-
 - name: Import system custom configuration (spanish)
   become: true
   ansible.builtin.copy:
     src: files/archlinux/etc/00-keyboard.conf
     dest: "/etc/X11/xorg.conf.d/00-keyboard.conf"
+    mode: "0644"
 
 - name: Import vconsole custom keyboard configuration (spanish)
   become: true
   ansible.builtin.copy:
     src: files/archlinux/etc/vconsole.conf
     dest: "/etc/vconsole.conf"
+    mode: "0644"

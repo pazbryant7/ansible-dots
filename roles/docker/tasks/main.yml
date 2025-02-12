@@ -20,4 +20,4 @@
   ansible.builtin.user:
     name: "{{ host_user }}"
     groups: docker
-    append: yes
+    append: true
