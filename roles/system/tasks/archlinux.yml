@@ -20,6 +20,7 @@
     owner: root
     group: root
     mode: "0644"
+    force: false
 
 - name: Fix obinslab app image
   become: true
@@ -29,6 +30,7 @@
     owner: root
     group: root
     mode: "0644"
+    force: false
 
 - name: Import vconsole custom keyboard (engish)
   become: true
@@ -38,6 +40,7 @@
     owner: root
     group: root
     mode: "0644"
+    force: false
 
 - name: Import system custom keyboard (english)
   become: true
@@ -47,6 +50,7 @@
     owner: root
     group: root
     mode: "0644"
+    force: false
 
 - name: Import system custom keyboard (spanish)
   become: true
@@ -56,6 +60,7 @@
     owner: root
     group: root
     mode: "0644"
+    force: false
 
 - name: Import system custom configuration (spanish)
   become: true
@@ -63,6 +68,7 @@
     src: files/archlinux/etc/00-keyboard.conf
     dest: "/etc/X11/xorg.conf.d/00-keyboard.conf"
     mode: "0644"
+    force: true
 
 - name: Import vconsole custom keyboard configuration (spanish)
   become: true
@@ -70,6 +76,7 @@
     src: files/archlinux/etc/vconsole.conf
     dest: "/etc/vconsole.conf"
     mode: "0644"
+    force: true
 
 - name: Ensure GRUB_DEFAULT is set to 'SAVE'
   become: true
@@ -134,6 +141,8 @@
     owner: root
     group: root
     mode: "0644"
+    creates: "/usr/share/fonts/bryant-fonts/fonts/README.md"
+    force: false
 
 - name: Refresh fonts cache
   become: true
@@ -141,3 +150,41 @@
     cmd: sudo fc-cache -f -v
   register: fontcache
   changed_when: fontcache.rc != 0
+
+- name: Enable and start systemd-resolved service
+  ansible.builtin.systemd:
+    name: systemd-resolved.service
+    enabled: true
+    state: started
+
+- name: Enable and start cronie service
+  ansible.builtin.systemd:
+    name: cronie.service
+    enabled: true
+    state: started
+
+- name: Enable and start mpd service
+  ansible.builtin.systemd:
+    name: mpd.service
+    enabled: true
+    state: started
+
+- name: Enable and start syncthing service
+  ansible.builtin.systemd:
+    name: syncthing@{{ host_user }}.service
+    enabled: true
+    state: started
+
+- name: Enable and start docker service
+  ansible.builtin.systemd:
+    name: docker.service
+    enabled: true
+    state: started
+
+- name: Just force systemd to reread configs
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+
+- name: Just force systemd to re-execute itself
+  ansible.builtin.systemd_service:
+    daemon_reexec: true
