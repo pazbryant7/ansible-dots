@@ -1,6 +1,0 @@
----
-dependencies:
-  - role: common
-  - role: dotfiles
-  - role: zsh
-  - role: github
