@@ -35,6 +35,7 @@
     - atuin
     - ffmpeg
     - xcolor
+    - bottom
     - zoxide
     - rclone
     - polybar
