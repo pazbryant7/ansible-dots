@@ -39,6 +39,7 @@ setup_archlinux() {
   if ! command -v ansible >/dev/null 2>&1; then
     sudo pacman -S --noconfirm ansible
     sudo pacman -S --noconfirm ansible-core
+    sudo pacman -S --noconfirm ansible-lint
   fi
 }
 
@@ -46,6 +47,7 @@ setup_ubuntu() {
   if ! dpkg -s ansible >/dev/null 2>&1; then
     sudo apt-get install ansible
     sudo apt-get install ansible-core
+    sudo apt-get install ansible-lint
   fi
 }
 
