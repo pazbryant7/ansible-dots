@@ -163,11 +163,13 @@
     enabled: true
     state: started
 
-- name: Enable and start mpd service
+- name: Enable mpd for current user
   ansible.builtin.systemd:
     name: mpd.service
-    enabled: true
     state: started
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ myuid }}"
 
 - name: Enable and start syncthing service
   ansible.builtin.systemd:
