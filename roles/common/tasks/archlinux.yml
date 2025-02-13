@@ -34,6 +34,30 @@
     - linux-lts-headers
     - gst-plugin-pipewire
 
+- name: Create the `aur_builder` user
+  become: true
+  ansible.builtin.user:
+    name: aur_builder
+    create_home: true
+    group: wheel
+
+- name: Allow the `aur_builder` user to run `sudo pacman` without a password
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/11-install-aur_builder
+    line: "aur_builder ALL=(ALL) NOPASSWD: /usr/bin/pacman"
+    create: true
+    mode: "0644"
+    validate: "visudo -cf %s"
+
+- name: Install paru using makepkg if it isn't installed already
+  become: true
+  kewlfft.aur.aur:
+    name: paru
+    use: makepkg
+    state: present
+  become_user: aur_builder
+
 - name: Ensure install xorg packages
   become: true
   community.general.pacman:
@@ -64,27 +88,3 @@
       - waybar
     state: absent
   when: host_wm == "bspwm"
-
-- name: Create the `aur_builder` user
-  become: true
-  ansible.builtin.user:
-    name: aur_builder
-    create_home: true
-    group: wheel
-
-- name: Allow the `aur_builder` user to run `sudo pacman` without a password
-  become: true
-  ansible.builtin.lineinfile:
-    path: /etc/sudoers.d/11-install-aur_builder
-    line: "aur_builder ALL=(ALL) NOPASSWD: /usr/bin/pacman"
-    create: true
-    mode: "0644"
-    validate: "visudo -cf %s"
-
-- name: Install paru using makepkg if it isn't installed already
-  become: true
-  kewlfft.aur.aur:
-    name: paru
-    use: makepkg
-    state: present
-  become_user: aur_builder

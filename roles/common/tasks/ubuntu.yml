@@ -5,23 +5,6 @@
     name: "{{ item }}"
     state: present
   loop:
-    - ufw
-    - cron
-    - dunst
-    - xclip
-    - grub2
-    - man-db
-    - pipewire
-    - docker.io
-    - zram-tools
-    - wireplumber
-    - pipewire-alsa
-    - xdg-user-dirs
-    - docker-buildx
-    - pipewire-jack
-    - docker-compose
-    - fonts-terminus
-    - gstreamer1.0-pipewire
     - fonts-noto-color-emoji
 
 - name: Ensure install xorg packages
@@ -31,17 +14,6 @@
     state: present
   loop:
     - feh
-    - picom
-    - bspwm
-    - sxhkd
-    - xinit
-    - breeze
-    - xdotool
-    - x11-utils
-    - xserver-xorg
-    - lxappearance
-    - x11-xserver-utils
-    - breeze-icon-theme
   when: host_wm == "bspwm"
 
 - name: Ensure remove wayland
