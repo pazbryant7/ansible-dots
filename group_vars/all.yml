@@ -8,3 +8,14 @@ default_roles:
   - github
   - firefox
   - dotfiles
+
+  # NOTE: When you execute the command `ansible-playbook local.yml`, the specified
+  # roles will run. However, there is an exception: the `common` role will also
+  # execute because it is a dependency for the `cli` role. You can confirm this
+  # by reviewing the `main.yml` file located in the `meta` directory of the
+  # `cli` role.
+
+  # NOTE: You can run roles that are not explicitly listed here by using the
+  # following command: `ansible-playbook local.yml --tags ssh` to execute
+  # only the `ssh` role. Keep in mind that if the role has dependencies, they
+  # will also be executed.
