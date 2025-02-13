@@ -5,8 +5,8 @@
 
   vars:
     dotfiles_dir: "{{ github_dir }}/dotfiles"
-    downloads: "{{ ansible_env.HOME }}/Downloads"
-    github_dir: "{{ ansible_env.HOME }}/Documents/github"
+    downloads: "{{ ansible_user_dir }}/Downloads"
+    github_dir: "{{ ansible_user_dir }}/Documents/github"
 
   pre_tasks:
     - name: Detect host system
