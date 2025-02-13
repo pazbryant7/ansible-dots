@@ -1,0 +1,39 @@
+- name: "Get distribution"
+  ansible.builtin.stat:
+    path: "{{ role_path }}/tasks/{{ host_os }}.yml"
+  register: distribution_config
+
+- name: "Run tasks for {{ host_os }}"
+  ansible.builtin.include_tasks: "{{ host_os }}.yml"
+  when: distribution_config.stat.exists
+
+- name: Enable and start systemd-resolved service
+  ansible.builtin.systemd:
+    name: systemd-resolved.service
+    enabled: true
+    state: started
+
+- name: Enable and start cronie service
+  ansible.builtin.systemd:
+    name: cronie.service
+    enabled: true
+    state: started
+
+- name: Enable mpd user service
+  ansible.builtin.systemd:
+    name: mpd
+    scope: user
+
+- name: Enable and start syncthing service
+  ansible.builtin.systemd:
+    name: syncthing@{{ host_user }}.service
+    enabled: true
+    state: started
+
+- name: Reread systemd configs
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+
+- name: Restart systemd
+  ansible.builtin.systemd_service:
+    daemon_reexec: true

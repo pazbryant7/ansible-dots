@@ -7,3 +7,123 @@
 - name: "Run tasks for {{ host_os }}"
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
+
+- name: Ensure required directories exist
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - /etc/X11/xorg.conf.d/
+    - /usr/share/fonts/bryant-fonts/
+    - /usr/share/kbd/keymaps/i386/dvorak/
+
+- name: Import vconsole Engish keyboard
+  become: true
+  ansible.builtin.copy:
+    src: files/archlinux/xkb/bryant-dvorak.map
+    dest: "/usr/share/kbd/keymaps/i386/dvorak/bryant-dvorak.map"
+    owner: root
+    group: root
+    mode: "0644"
+    force: false
+
+- name: Import X11 English keyboard
+  become: true
+  ansible.builtin.copy:
+    src: files/archlinux/xkb/bryant-dvorak
+    dest: "/usr/share/X11/xkb/symbols/bryant-dvorak"
+    owner: root
+    group: root
+    mode: "0644"
+    force: false
+
+- name: Import X11 Spanish keyboard
+  become: true
+  ansible.builtin.copy:
+    src: files/archlinux/xkb/bryant-dvorak-itl
+    dest: "/usr/share/X11/xkb/symbols/bryant-dvorak-itl"
+    owner: root
+    group: root
+    mode: "0644"
+    force: false
+
+- name: Setup system keyboard
+  become: true
+  ansible.builtin.copy:
+    src: files/archlinux/etc/00-keyboard.conf
+    dest: "/etc/X11/xorg.conf.d/00-keyboard.conf"
+    mode: "0644"
+    force: true
+
+- name: Setup vconsole keyboard
+  become: true
+  ansible.builtin.copy:
+    src: files/archlinux/etc/vconsole.conf
+    dest: "/etc/vconsole.conf"
+    mode: "0644"
+    force: true
+
+- name: Ensure GRUB_DEFAULT is set to 'saved'
+  become: true
+  ansible.builtin.lineinfile:
+    name: /etc/default/grub
+    regexp: "^GRUB_DEFAULT=0"
+    line: "GRUB_DEFAULT=saved"
+    create: true
+    backup: true
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Ensure GRUB_SAVE_DEFAULT is set to 'true'
+  become: true
+  ansible.builtin.lineinfile:
+    dest: /etc/default/grub
+    regexp: "^#GRUB_SAVEDEFAULT=true"
+    line: "GRUB_SAVE_DEFAULT=true"
+    create: true
+    backup: true
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Ensure GRUB_DISABLE_SUBMENU is set to 'y'
+  become: true
+  ansible.builtin.lineinfile:
+    dest: /etc/default/grub
+    regexp: "^#GRUB_DISABLE_SUBMENU=y"
+    line: "GRUB_DISABLE_SUBMENU=y"
+    create: true
+    backup: true
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Regenerate GRUB configuration
+  become: true
+  ansible.builtin.command:
+    cmd: grub-mkconfig -o /boot/grub/grub.cfg
+  register: done
+  changed_when: done.rc != 0
+
+- name: Import custom personal fonts
+  become: true
+  ansible.builtin.copy:
+    src: files/archlinux/fonts
+    dest: "/usr/share/fonts/bryant-fonts"
+    owner: root
+    group: root
+    mode: "0644"
+    creates: "/usr/share/fonts/bryant-fonts/fonts"
+    force: false
+
+- name: Refresh fonts cache
+  become: true
+  ansible.builtin.command:
+    cmd: fc-cache -f -v
+  register: fontcache
+  changed_when: fontcache.rc != 0

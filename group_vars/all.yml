@@ -1,12 +1,12 @@
 ---
 default_roles:
   - cli
-  - zsh
   - gpg
-  - docker
-  - system
+  - zsh
   - github
+  - system
   - firefox
+  - systemd
   - dotfiles
 
   # NOTE: When you execute the command `ansible-playbook local.yml`, the specified

@@ -8,11 +8,8 @@
     mode: "0755"
   loop:
     - /etc/pacman.d/hooks/
-    - /etc/X11/xorg.conf.d/
-    - /usr/share/fonts/bryant-fonts/
-    - /usr/share/kbd/keymaps/i386/dvorak/
 
-- name: Import pacman hooks
+- name: Import pacman hook
   become: true
   ansible.builtin.copy:
     src: files/archlinux/update-software.hook
@@ -22,89 +19,7 @@
     mode: "0644"
     force: false
 
-- name: Import vconsole custom keyboard (engish)
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/xkb/bryant-dvorak.map
-    dest: "/usr/share/kbd/keymaps/i386/dvorak/bryant-dvorak.map"
-    owner: root
-    group: root
-    mode: "0644"
-    force: false
-
-- name: Import system custom keyboard (english)
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/xkb/bryant-dvorak
-    dest: "/usr/share/X11/xkb/symbols/bryant-dvorak"
-    owner: root
-    group: root
-    mode: "0644"
-    force: false
-
-- name: Import system custom keyboard (spanish)
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/xkb/bryant-dvorak-itl
-    dest: "/usr/share/X11/xkb/symbols/bryant-dvorak-itl"
-    owner: root
-    group: root
-    mode: "0644"
-    force: false
-
-- name: Import system custom configuration (spanish)
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/etc/00-keyboard.conf
-    dest: "/etc/X11/xorg.conf.d/00-keyboard.conf"
-    mode: "0644"
-    force: true
-
-- name: Import vconsole custom keyboard configuration (spanish)
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/etc/vconsole.conf
-    dest: "/etc/vconsole.conf"
-    mode: "0644"
-    force: true
-
-- name: Ensure GRUB_DEFAULT is set to 'saved'
-  become: true
-  ansible.builtin.lineinfile:
-    name: /etc/default/grub
-    regexp: "^GRUB_DEFAULT=0"
-    line: "GRUB_DEFAULT=saved"
-    create: true
-    backup: true
-    owner: root
-    group: root
-    mode: "0644"
-
-- name: Ensure GRUB_SAVE_DEFAULT is set to 'true'
-  become: true
-  ansible.builtin.lineinfile:
-    dest: /etc/default/grub
-    regexp: "^#GRUB_SAVEDEFAULT=true"
-    line: "GRUB_SAVE_DEFAULT=true"
-    create: true
-    backup: true
-    owner: root
-    group: root
-    mode: "0644"
-
-- name: Ensure GRUB_DISABLE_SUBMENU is set to 'y'
-  become: true
-  ansible.builtin.lineinfile:
-    dest: /etc/default/grub
-    regexp: "^#GRUB_DISABLE_SUBMENU=y"
-    line: "GRUB_DISABLE_SUBMENU=y"
-    create: true
-    backup: true
-    owner: root
-    group: root
-    mode: "0644"
-
-- name: Ensure ParallelDownloads is set to '5'
+- name: Ensure pacman ParallelDownloads is set to '5'
   become: true
   ansible.builtin.lineinfile:
     dest: /etc/pacman.conf
@@ -115,65 +30,3 @@
     owner: root
     group: root
     mode: "0644"
-
-- name: Regenerate GRUB configuration
-  become: true
-  ansible.builtin.command:
-    cmd: grub-mkconfig -o /boot/grub/grub.cfg
-  register: done
-  changed_when: done.rc != 0
-
-- name: Import custom personal fonts
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/fonts
-    dest: "/usr/share/fonts/bryant-fonts"
-    owner: root
-    group: root
-    mode: "0644"
-    creates: "/usr/share/fonts/bryant-fonts/fonts"
-    force: false
-
-- name: Refresh fonts cache
-  become: true
-  ansible.builtin.command:
-    cmd: fc-cache -f -v
-  register: fontcache
-  changed_when: fontcache.rc != 0
-
-- name: Enable and start systemd-resolved service
-  ansible.builtin.systemd:
-    name: systemd-resolved.service
-    enabled: true
-    state: started
-
-- name: Enable and start cronie service
-  ansible.builtin.systemd:
-    name: cronie.service
-    enabled: true
-    state: started
-
-- name: Enable mpd for current user
-  ansible.builtin.systemd:
-    name: mpd
-    scope: user
-
-- name: Enable and start syncthing service
-  ansible.builtin.systemd:
-    name: syncthing@{{ host_user }}.service
-    enabled: true
-    state: started
-
-- name: Enable and start docker service
-  ansible.builtin.systemd:
-    name: docker.service
-    enabled: true
-    state: started
-
-- name: Just force systemd to reread configs
-  ansible.builtin.systemd_service:
-    daemon_reload: true
-
-- name: Just force systemd to re-execute itself
-  ansible.builtin.systemd_service:
-    daemon_reexec: true
