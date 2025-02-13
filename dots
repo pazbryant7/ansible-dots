@@ -6,17 +6,20 @@ ARCHLINUX="arch"
 BECOME_FILE_PASSWORD=".secrets/.become_password"
 ANSIBLE_VAULT_FILE_PASSWORD=".secrets/.passphrase"
 
-validate_file_secrets() {
-  if [ ! -f "$BECOME_FILE_PASSWORD" ]; then
-    echo "$BECOME_FILE_PASSWORD is needed"
-    exit 1
-  fi
-  if [ ! -f "$ANSIBLE_VAULT_FILE_PASSWORD" ]; then
-    echo "$ANSIBLE_VAULT_FILE_PASSWORD is needed"
+# Function to validate that required files exist
+validate_file_exists() {
+  if [ ! -f "$1" ]; then
+    echo "$1 is required"
     exit 1
   fi
 }
 
+validate_secrets() {
+  validate_file_exists "$BECOME_FILE_PASSWORD"
+  validate_file_exists "$ANSIBLE_VAULT_FILE_PASSWORD"
+}
+
+# Function to detect the OS
 detect_os() {
   if [ -f /etc/os-release ]; then
     . /etc/os-release
@@ -26,142 +29,126 @@ detect_os() {
   fi
 }
 
+# Install ansible galaxy collections for the OS
 install_ansible_galaxy() {
-  OS=$1
-  OS_REQUIREMENTS=""
-  if [ -f "requirements/$OS.yml" ]; then
-    OS_REQUIREMENTS="requirements/$OS.yml"
-  fi
-  ansible-galaxy collection install -r "$OS_REQUIREMENTS"
+  local os=$1
+  local os_requirements="requirements/$os.yml"
+  [ -f "$os_requirements" ] && ansible-galaxy collection install -r "$os_requirements"
 }
 
+# Setup functions for different OSes
 setup_archlinux() {
+  # Only install if ansible is not already installed
   if ! command -v ansible >/dev/null 2>&1; then
-    sudo pacman -S --noconfirm ansible
-    sudo pacman -S --noconfirm ansible-core
-    sudo pacman -S --noconfirm ansible-lint
+    sudo pacman -S --noconfirm ansible ansible-core ansible-lint
   fi
 }
 
 setup_ubuntu() {
+  # Only install if ansible is not already installed
   if ! dpkg -s ansible >/dev/null 2>&1; then
-    sudo apt-get install ansible
-    sudo apt-get install ansible-core
-    sudo apt-get install ansible-lint
+    sudo apt-get install -y ansible ansible-core ansible-lint
   fi
 }
 
+# Setup SSH keys and agent
 setup_ssh_keys() {
-  if [ ! -f "$HOME/.ssh/private/personal_github" ]; then
-    echo "Something went wrong, key was not found"
+  local key_path="$HOME/.ssh/private/personal_github"
+
+  if [ ! -f "$key_path" ]; then
+    echo "SSH key not found: $key_path"
     exit 1
   fi
 
   eval "$(ssh-agent -s)"
-
-  ssh_agent_stdr_code="$?"
-
-  if [ "$ssh_agent_stdr_code" != 0 ]; then
-    echo "Something went wroing starting ssh-agent: LINE 67"
+  ssh-add "$key_path" >/dev/null 2>&1 || {
+    echo "Failed to add SSH key"
     exit 1
-  fi
-
-  ssh-add "$HOME/.ssh/private/personal_github"
-
-  ssh_add_stdr_code="$?"
-
-  if [ "$ssh_add_stdr_code" != 0 ]; then
-    echo "Something went wroing adding ssh key: LINE 71"
-    exit 1
-  fi
-
-  echo "SSH keys were added succsessfully"
+  }
+  echo "SSH keys added successfully"
 }
 
+# Remove ansible dots if exists
 remove_ansible_dots() {
-  ansible_dots="$HOME/ansible-dots"
-  if [ -d "$ansible_dots" ]; then
-    rm "$ansible_dots"
-  fi
+  local ansible_dots="$HOME/ansible-dots"
+  [ -d "$ansible_dots" ] && rm -rf "$ansible_dots"
 }
 
+# Get media from USB
 get_media_from_usb() {
-  books_path="/run/media/bryant/tiagovault/backups/books/2024-11-06"
-  music_path="/run/media/bryant/tiagovault/backups/music/2024-11-06"
+  local books_path="/run/media/bryant/tiagovault/backups/books/2024-11-06"
+  local music_path="/run/media/bryant/tiagovault/backups/music/2024-11-06"
 
-  rsync -avh --progress --delete "$books_path/" "$HOME/Documents/books"
   rsync -avh --progress --delete "$music_path/" "$HOME/Music"
+  rsync -avh --progress --delete "$books_path/" "$HOME/Documents/books"
 }
 
-post_installation() {
-  echo "Updating software"
-  "$HOME/bin/global/update-software"
+# Pull Docker images
+get_docker_images() {
+  for image in node:alpine redis:alpine nginx:alpine alpine:latest ubuntu:latest postgres:alpine; do
+    docker pull "$image"
+  done
+}
 
-  echo "Update firefox UI"
-  "$HOME/bin/global/update-firefox-ui"
-
-  echo ""
-
-  printf "Setup post installation"
-  echo ""
+# Print remaining steps
+print_remaining_to_be_done() {
+  echo "Remaining tasks:"
   echo "  - Setup RCLONE with MEGA"
-  echo "  - Set gtk theme using Lxappearence GUI"
-  echo "  - Login firefox,outlook.bitwarden,github,google,twitch"
-  echo "  - Import private gpg key and trut it $HOME/.gnupg/private_key.asc"
+  echo "  - Set GTK theme using LXAppearance"
+  echo "  - Login to Firefox, Outlook, Bitwarden, GitHub, Google, Twitch"
+  echo "  - Import private GPG key and trust it: $HOME/.gnupg/private_key.asc"
+}
 
-  echo ""
+# Execute custom scripts
+executing_custom_scripts() {
+  "$HOME/bin/global/update-software"
+  "$HOME/bin/global/update-firefox-ui"
+}
 
+# Post installation tasks
+setup_post_installation() {
+  echo "Executing post-installation steps..."
+  get_docker_images
   get_media_from_usb
-
-  # NOTE: At this point ansible-dots is already in
-  # $HOME/Documents/github/ansible-dots
   remove_ansible_dots
-
-  echo "Setup has finished"
+  executing_custom_scripts
+  print_remaining_to_be_done
 }
 
+# Run Ansible playbooks
 run_ansible_playbooks() {
-  ansible-playbook ./local.yml \
-    --become-password-file=.secrets/.become_password \
-    --tags ssh && setup_ssh_keys
-
-  echo "----------------------------------"
-  printf "Would you like to continue? (y/n) "
-  read -r response
-  echo "----------------------------------"
-
-  if [ "$response" != "y" ]; then
-    exit 0
-  fi
-
-  ansible-playbook ./local.yml "$@" \
-    --become-password-file=.secrets/.become_password \
-    --skip-tags ssh
-
-  printf "Ansible playbooks were executes succsessfully\n"
+  ansible-playbook ./local.yml --become-password-file="$BECOME_FILE_PASSWORD" --tags ssh && setup_ssh_keys
+  ansible-playbook ./local.yml "$@" --become-password-file="$BECOME_FILE_PASSWORD" --skip-tags ssh
+  echo "Ansible playbooks executed successfully"
 }
 
-main() {
-  validate_file_secrets
-
-  system_os=$(detect_os)
+# Install OS dependencies based on detected OS
+setup_os_dependencies() {
+  local system_os=$(detect_os)
 
   if [ -z "$system_os" ]; then
-    echo "System was not recognized"
+    echo "Unable to detect system OS"
     exit 1
   fi
 
-  if [ "$system_os" = "$ARCHLINUX" ]; then
+  case "$system_os" in
+  "$ARCHLINUX")
     setup_archlinux
-  else
+    ;;
+  *)
     setup_ubuntu
-  fi
+    ;;
+  esac
 
   install_ansible_galaxy "$system_os"
+}
 
+# Main function
+main() {
+  validate_secrets
+  setup_os_dependencies
   run_ansible_playbooks "$@"
-
-  post_installation
+  setup_post_installation
 }
 
 main "$@"
