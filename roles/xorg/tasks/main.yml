@@ -16,7 +16,7 @@
 
 - name: Build and install ST terminal emulator
   become: true
-  command:
+  ansible.builtin.command:
     cmd: sudo make clean install
     chdir: "{{ github_dir }}/st"
     creates: /usr/local/bin/st
