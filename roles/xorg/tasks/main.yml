@@ -1,0 +1,29 @@
+- name: "Get distribution"
+  ansible.builtin.stat:
+    path: "{{ role_path }}/tasks/{{ host_os }}.yml"
+  register: distribution_config
+
+- name: "Run tasks for {{ host_os }}"
+  ansible.builtin.include_tasks: "{{ host_os }}.yml"
+  when: distribution_config.stat.exists
+
+- name: Clone ST terminal emulator
+  ansible.builtin.git:
+    update: false
+    version: main
+    dest: "{{ github_dir }}/st"
+    repo: "git@personal.github:pazbryant/st.git"
+
+- name: Build and install ST terminal emulator
+  become: true
+  command:
+    cmd: sudo make clean install
+    chdir: "{{ github_dir }}/st"
+    creates: /usr/local/bin/st
+
+- name: Symlink ST terminal emulator to xterm
+  become: true
+  ansible.builtin.file:
+    src: "/usr/local/bin/st"
+    dest: "/usr/bin/xterm"
+    state: link

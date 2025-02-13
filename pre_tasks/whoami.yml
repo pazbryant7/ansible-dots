@@ -8,8 +8,3 @@
   ansible.builtin.set_fact:
     host_os: "{{ ansible_distribution | lower }}"
   when: host_os is not defined
-
-- name: Register window manager
-  ansible.builtin.set_fact:
-    host_wm: "{{ ansible_env.WM | default('unknown') }}"
-  when: host_wm is not defined

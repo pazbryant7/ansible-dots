@@ -6,20 +6,3 @@
     state: present
   loop:
     - fonts-noto-color-emoji
-
-- name: Ensure install xorg packages
-  become: true
-  ansible.builtin.apt:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - feh
-  when: host_wm == "bspwm"
-
-- name: Ensure remove wayland
-  become: true
-  ansible.builtin.apt:
-    name:
-      - waybar
-    state: absent
-  when: host_wm == "bspwm"

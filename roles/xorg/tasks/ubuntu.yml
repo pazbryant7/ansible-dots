@@ -1,0 +1,14 @@
+- name: Ensure install xorg packages
+  become: true
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - feh
+
+- name: Ensure remove wayland packages
+  become: true
+  ansible.builtin.apt:
+    name:
+      - waybar
+    state: absent

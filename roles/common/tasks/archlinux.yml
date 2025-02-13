@@ -6,30 +6,31 @@
     state: present
   loop:
     - ufw
-    - grub
+    - pass
     - base
     - tmux
-    - pass
-    - dunst
-    - linux
+    - grub
     - xclip
-    - man-db
+    - linux
+    - rtkit
+    - dunst
     - cronie
     - neovim
+    - man-db
     - pipewire
     - linux-lts
-    - base-devel
     - openresolv
+    - base-devel
     - wireplumber
     - otf-overpass
+    - pipewire-jack
+    - linux-headers
+    - pipewire-alsa
     - terminus-font
     - xdg-user-dirs
-    - pipewire-alsa
-    - linux-headers
-    - pipewire-jack
-    - pipewire-pulse
-    - zram-generator
     - linux-firmware
+    - zram-generator
+    - pipewire-pulse
     - noto-fonts-emoji
     - linux-lts-headers
     - gst-plugin-pipewire
@@ -57,34 +58,3 @@
     use: makepkg
     state: present
   become_user: aur_builder
-
-- name: Ensure install xorg packages
-  become: true
-  community.general.pacman:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - feh
-    - sxhkd
-    - picom
-    - bspwm
-    - xdotool
-    - xorg-xev
-    - breeze-gtk
-    - ueberzugpp
-    - xorg-xinit
-    - xorg-xrandr
-    - xorg-server
-    - breeze-icons
-    - lxappearance
-    - xorg-xsetroot
-    - capitaine-cursors
-  when: host_wm == "bspwm"
-
-- name: Ensure remove wayland
-  become: true
-  community.general.pacman:
-    name:
-      - waybar
-    state: absent
-  when: host_wm == "bspwm"
