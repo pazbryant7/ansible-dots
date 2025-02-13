@@ -94,7 +94,7 @@
     - fnm
 
 - name: Clone the st terminal repository
-   ansible.builtin.git:
+  ansible.builtin.git:
     update: false
     version: main
     dest: "{{ github_dir }}/st"
