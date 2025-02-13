@@ -1,13 +1,12 @@
 ---
-- name: Install docker
-  become: true
-  community.general.pacman:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - docker-compose
-    - docker-buildx
-    - docker
+- name: "Get distribution"
+  ansible.builtin.stat:
+    path: "{{ role_path }}/tasks/{{ host_os }}.yml"
+  register: distribution_config
+
+- name: "Run tasks for {{ host_os }}"
+  ansible.builtin.include_tasks: "{{ host_os }}.yml"
+  when: distribution_config.stat.exists
 
 - name: Ensure the docker group exists
   become: true
@@ -21,3 +20,9 @@
     name: "{{ host_user }}"
     groups: docker
     append: true
+
+- name: Enable and start docker service
+  ansible.builtin.systemd:
+    name: docker.service
+    enabled: true
+    state: started

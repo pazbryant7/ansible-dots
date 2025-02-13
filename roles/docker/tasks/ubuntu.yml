@@ -1,0 +1,9 @@
+- name: Install docker
+  become: true
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - docker.io
+    - docker-compose
+    - docker-buildx
