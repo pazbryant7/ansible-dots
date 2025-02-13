@@ -1,12 +1,7 @@
 ---
-- name: Get current user
-  ansible.builtin.command: whoami
-  register: current_user
-  when: host_user is not defined
-
 - name: Register current user
   ansible.builtin.set_fact:
-    host_user: "{{ current_user.stdout }}"
+    host_user: "{{ ansible_user_id }}"
   when: host_user is not defined
 
 - name: Register current OS
