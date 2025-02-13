@@ -22,16 +22,6 @@
     mode: "0644"
     force: false
 
-- name: Fix obinslab app image
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/obinslab.starter.rules
-    dest: "/etc/udev/rules.d/obinskit-kdb.rules"
-    owner: root
-    group: root
-    mode: "0644"
-    force: false
-
 - name: Import vconsole custom keyboard (engish)
   become: true
   ansible.builtin.copy:
@@ -78,12 +68,12 @@
     mode: "0644"
     force: true
 
-- name: Ensure GRUB_DEFAULT is set to 'SAVE'
+- name: Ensure GRUB_DEFAULT is set to 'saved'
   become: true
   ansible.builtin.lineinfile:
     name: /etc/default/grub
     regexp: "^GRUB_DEFAULT=0"
-    line: "GRUB_DEFAULT=SAVE"
+    line: "GRUB_DEFAULT=saved"
     create: true
     backup: true
     owner: root
@@ -141,13 +131,13 @@
     owner: root
     group: root
     mode: "0644"
-    creates: "/usr/share/fonts/bryant-fonts/fonts/README.md"
+    creates: "/usr/share/fonts/bryant-fonts/fonts"
     force: false
 
 - name: Refresh fonts cache
   become: true
   ansible.builtin.command:
-    cmd: sudo fc-cache -f -v
+    cmd: fc-cache -f -v
   register: fontcache
   changed_when: fontcache.rc != 0
 
@@ -165,11 +155,8 @@
 
 - name: Enable mpd for current user
   ansible.builtin.systemd:
-    name: mpd.service
-    state: started
+    name: mpd
     scope: user
-  environment:
-    XDG_RUNTIME_DIR: "/run/user/{{ myuid }}"
 
 - name: Enable and start syncthing service
   ansible.builtin.systemd:
