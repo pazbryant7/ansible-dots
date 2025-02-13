@@ -6,3 +6,34 @@
 - name: "Run tasks for {{ host_os }}"
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
+
+- name: Install packages using cargo
+  community.general.cargo:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - fnm
+
+- name: Clone ST terminal emulator
+  ansible.builtin.git:
+    update: false
+    version: main
+    dest: "{{ github_dir }}/st"
+    repo: "git@personal.github:pazbryant/st.git"
+  when: host_wm == "bspwm"
+
+- name: Build and install ST terminal emulator
+  become: true
+  command:
+    cmd: sudo make clean install
+    chdir: "{{ github_dir }}/st"
+    creates: /usr/local/bin/st
+  when: host_wm == "bspwm"
+
+- name: Symlink ST terminal emulator to xterm
+  become: true
+  ansible.builtin.file:
+    src: "/usr/local/bin/st"
+    dest: "/usr/bin/xterm"
+    state: link
+  when: host_wm == "bspwm"
