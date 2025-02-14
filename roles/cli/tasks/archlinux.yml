@@ -67,6 +67,7 @@
     - python-pipx
     - imagemagick
     - speedtest-cli
+    - python-poetry
     - networkmanager
     - translate-shell
     - telegram-desktop
