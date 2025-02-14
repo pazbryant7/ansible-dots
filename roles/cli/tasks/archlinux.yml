@@ -22,7 +22,6 @@
     - code
     - yarn
     - tmux
-    - zbar
     - rofi
     - tree
     - less
