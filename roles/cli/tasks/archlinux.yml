@@ -34,6 +34,7 @@
     - pgcli
     - atuin
     - ffmpeg
+    - gopass
     - xcolor
     - bottom
     - zoxide
@@ -67,7 +68,6 @@
     - python-pipx
     - imagemagick
     - speedtest-cli
-    - python-poetry
     - networkmanager
     - translate-shell
     - telegram-desktop
@@ -86,3 +86,10 @@
     - ttf-maple
     - lazydocker
     - vesktop-bin
+
+- name: Install packages with pipx
+  community.general.pipx:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - poetry
