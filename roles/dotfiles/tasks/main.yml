@@ -15,5 +15,6 @@
     accept_newhostkey: true
     dest: "{{ dotfiles_dir }}"
     repo: "git@personal.github:pazbryant/dotfiles.git"
+  changed_when: true
   notify:
     - Setup dotfiles with stow
