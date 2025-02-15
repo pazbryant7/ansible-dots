@@ -6,6 +6,7 @@
   loop:
     - jq
     - go
+    - xh
     - fd
     - fzf
     - eza
