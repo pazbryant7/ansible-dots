@@ -13,3 +13,4 @@
     state: present
   loop:
     - fnm
+    - jql

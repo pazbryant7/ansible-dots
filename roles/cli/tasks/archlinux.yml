@@ -5,67 +5,69 @@
     state: present
   loop:
     - jq
-    - fd
     - go
+    - xh
+    - fd
     - fzf
-    - git
-    - mpc
-    - imv
-    - mpv
-    - mpd
     - eza
     - bob
+    - mpd
     - bat
-    - stow
-    - pass
-    - yazi
-    - code
-    - yarn
-    - tmux
-    - rofi
-    - tree
+    - imv
+    - mpc
+    - git
+    - mpv
     - less
+    - tree
     - 7zip
-    - dust
     - maim
-    - rsync
-    - lua51
+    - dust
+    - rofi
+    - tmux
+    - hurl
+    - stow
+    - yarn
+    - yazi
+    - pass
+    - code
     - pgcli
+    - lua51
+    - rsync
     - atuin
-    - ffmpeg
-    - gopass
-    - xcolor
-    - bottom
-    - zoxide
     - rclone
-    - polybar
-    - poppler
-    - ripgrep
-    - udiskie
-    - pcmanfm
-    - lazygit
-    - ncmpcpp
+    - bottom
+    - xcolor
+    - zoxide
+    - gopass
+    - ffmpeg
     - calibre
     - zathura
-    - starship
-    - obsidian
-    - chromium
+    - ncmpcpp
+    - lazygit
+    - pcmanfm
+    - udiskie
+    - poppler
+    - polybar
+    - ripgrep
     - pass-otp
     - libpulse
+    - chromium
     - luarocks
+    - starship
+    - obsidian
+    - fastfetch
+    - bandwhich
+    - screenkey
+    - hyperfine
     - syncthing
     - unclutter
     - alacritty
-    - hyperfine
-    - bandwhich
-    - fastfetch
-    - screenkey
     - python-pip
-    - qbittorrent
-    - pavucontrol
     - imagemagick
     - python-pipx
     - imagemagick
+    - qbittorrent
+    - pavucontrol
     - speedtest-cli
     - networkmanager
     - translate-shell
