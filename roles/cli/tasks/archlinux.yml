@@ -4,7 +4,6 @@
     name: "{{ item }}"
     state: present
   loop:
-    - jq
     - go
     - xh
     - fd
@@ -49,7 +48,6 @@
     - poppler
     - polybar
     - ripgrep
-    - pass-otp
     - libpulse
     - chromium
     - luarocks
