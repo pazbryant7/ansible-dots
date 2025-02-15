@@ -6,173 +6,177 @@ BECOME_FILE_PASSWORD=".secrets/.become_password"
 ANSIBLE_VAULT_FILE_PASSWORD=".secrets/.passphrase"
 
 validate_secrets() {
-  [ -f "$BECOME_FILE_PASSWORD" ] || {
-    echo "Error: $BECOME_FILE_PASSWORD is needed"
-    exit 1
-  }
-  [ -f "$ANSIBLE_VAULT_FILE_PASSWORD" ] || {
-    echo "Error: $ANSIBLE_VAULT_FILE_PASSWORD is needed"
-    exit 1
-  }
+	[ -f "$BECOME_FILE_PASSWORD" ] || {
+		echo "Error: $BECOME_FILE_PASSWORD is needed"
+		exit 1
+	}
+	[ -f "$ANSIBLE_VAULT_FILE_PASSWORD" ] || {
+		echo "Error: $ANSIBLE_VAULT_FILE_PASSWORD is needed"
+		exit 1
+	}
 }
 
 detect_os() {
-  if [ -f /etc/os-release ]; then
-    . /etc/os-release
-    echo "$ID"
-  else
-    uname -s | tr '[:upper:]' '[:lower:]'
-  fi
+	if [ -f /etc/os-release ]; then
+		. /etc/os-release
+		echo "$ID"
+	else
+		uname -s | tr '[:upper:]' '[:lower:]'
+	fi
 }
 
 install_ansible_galaxy() {
-  os="$1"
-  requirements_file="requirements/${os}.yml"
-  if [ -f "$requirements_file" ]; then
-    ansible-galaxy collection install -r "$requirements_file"
-  else
-    echo "No OS-specific requirements file found for $os. Skipping ansible-galaxy installation."
-  fi
+	os="$1"
+	requirements_file="requirements/${os}.yml"
+	if [ -f "$requirements_file" ]; then
+		ansible-galaxy collection install -r "$requirements_file"
+	else
+		echo "No OS-specific requirements file found for $os. Skipping ansible-galaxy installation."
+	fi
 }
 
 setup_archlinux() {
-  if ! command -v ansible >/dev/null 2>&1; then
-    sudo pacman -S --noconfirm ansible ansible-core ansible-lint
-  fi
+	if ! command -v ansible >/dev/null 2>&1; then
+		sudo pacman -S --noconfirm ansible ansible-core ansible-lint
+	fi
 }
 
 setup_ubuntu() {
-  if ! dpkg -s ansible >/dev/null 2>&1; then
-    sudo apt-get update
-    sudo apt-get install -y ansible ansible-core ansible-lint
-  fi
+	if ! dpkg -s ansible >/dev/null 2>&1; then
+		sudo apt-get update
+		sudo apt-get install -y ansible ansible-core ansible-lint
+	fi
 }
 
 setup_ssh_keys() {
-  key_path="$HOME/.ssh/private/personal_github"
+	key_path="$HOME/.ssh/private/personal_github"
 
-  if [ ! -f "$key_path" ]; then
-    echo "Error: SSH key not found at $key_path" >&2
-    exit 1
-  fi
+	if [ ! -f "$key_path" ]; then
+		echo "Error: SSH key not found at $key_path" >&2
+		exit 1
+	fi
 
-  if [ -z "${SSH_AUTH_SOCK:-}" ]; then
-    echo "No SSH agent detected in the current shell. Starting ssh-agent..."
-    eval "$(ssh-agent -s)" >/dev/null
-    if [ -z "${SSH_AUTH_SOCK:-}" ]; then
-      echo "Error: Failed to start ssh-agent." >&2
-      exit 1
-    fi
-  fi
-  # NOTE: here is better to use the sha but by personal reasons I use the email.
-  key_fingerprint=$(ssh-keygen -lf "$key_path" | awk '{print $3}')
+	if [ -z "${SSH_AUTH_SOCK:-}" ]; then
+		echo "No SSH agent detected in the current shell. Starting ssh-agent..."
+		eval "$(ssh-agent -s)" >/dev/null
+		if [ -z "${SSH_AUTH_SOCK:-}" ]; then
+			echo "Error: Failed to start ssh-agent." >&2
+			exit 1
+		fi
+	fi
+	# NOTE: here is better to use the sha but by personal reasons I use the email.
+	key_fingerprint=$(ssh-keygen -lf "$key_path" | awk '{print $3}')
 
-  if ssh-add -l 2>/dev/null | rg "$key_fingerprint"; then
-    echo "SSH key is already added."
-  else
-    echo "Adding SSH key..."
-    if ! ssh-add "$key_path" >/dev/null 2>&1; then
-      echo "Error: Failed to add SSH key." >&2
-      exit 1
-    else
-      echo "SSH key added successfully."
-    fi
-  fi
+	if ssh-add -l 2>/dev/null | rg "$key_fingerprint"; then
+		echo "SSH key is already added."
+	else
+		echo "Adding SSH key..."
+		if ! ssh-add "$key_path" >/dev/null 2>&1; then
+			echo "Error: Failed to add SSH key." >&2
+			exit 1
+		else
+			echo "SSH key added successfully."
+		fi
+	fi
 }
 
 remove_ansible_dots() {
-  ansible_dots="$HOME/ansible-dots"
-  if [ -d "$ansible_dots" ]; then
-    rm -rf "$ansible_dots"
-    echo "Removed ansible-dots directory."
-  fi
+	ansible_dots="$HOME/ansible-dots"
+	if [ -d "$ansible_dots" ]; then
+		rm -rf "$ansible_dots"
+		echo "Removed ansible-dots directory."
+	fi
 }
 
 get_media_from_usb() {
-  books_path="/run/media/bryant/tiagovault/backups/books/2024-11-06"
-  music_path="/run/media/bryant/tiagovault/backups/music/2024-11-06"
+	books_path="/run/media/bryant/tiagovault/backups/books/2024-11-06"
+	music_path="/run/media/bryant/tiagovault/backups/music/2024-11-06"
 
-  rsync -avh --progress --delete "$music_path/" "$HOME/Music"
-  rsync -avh --progress --delete "$books_path/" "$HOME/Documents/books"
+	rsync -avh --progress --delete "$music_path/" "$HOME/Music"
+	rsync -avh --progress --delete "$books_path/" "$HOME/Documents/books"
 }
 
 get_docker_images() {
-  if ! command -v docker >/dev/null 2>&1; then
-    echo "Docker is not installed. Skipping docker image pulls."
-    return
-  fi
+	if ! command -v docker >/dev/null 2>&1; then
+		echo "Docker is not installed. Skipping docker image pulls."
+		return
+	fi
 
-  docker pull node:alpine
-  docker pull redis:alpine
-  docker pull nginx:alpine
-  docker pull alpine:latest
-  docker pull ubuntu:latest
-  docker pull postgres:alpine
+	docker pull node:alpine
+	docker pull redis:alpine
+	docker pull nginx:alpine
+	docker pull alpine:latest
+	docker pull ubuntu:latest
+	docker pull postgres:alpine
 }
 
 print_remaining_to_be_done() {
-  echo "Remaining tasks to be completed:"
-  echo "  - Setup RCLONE with MEGA"
-  echo "  - Set GTK theme using LXAppearance GUI"
-  echo "  - Log in to Firefox, Outlook, Bitwarden, GitHub, Google, Twitch"
-  echo "  - Import and trust your private GPG key at $HOME/.gnupg/private_key.asc"
+	echo "Remaining tasks to be completed:"
+	echo "  - Setup RCLONE with MEGA"
+	echo "  - Set GTK theme using LXAppearance GUI"
+	echo "  - Log in to Firefox, Outlook, Bitwarden, GitHub, Google, Twitch"
+	echo "  - Import and trust your private GPG key at $HOME/.gnupg/private_key.asc"
 }
 
 executing_custom_scripts() {
-  if [ -x "$HOME/bin/global/update-software" ]; then
-    "$HOME/bin/global/update-software"
-  fi
-  if [ -x "$HOME/bin/global/update-firefox-ui" ]; then
-    "$HOME/bin/global/update-firefox-ui"
-  fi
+	if [ -x "$HOME/bin/global/update-software" ]; then
+		"$HOME/bin/global/update-software"
+	fi
+	if [ -x "$HOME/bin/global/update-firefox-ui" ]; then
+		"$HOME/bin/global/update-firefox-ui"
+	fi
 }
 
 setup_post_installation() {
-  echo "Executing post installation tasks..."
-  get_docker_images
-  get_media_from_usb
-  remove_ansible_dots
-  executing_custom_scripts
-  print_remaining_to_be_done
+	echo "Executing post installation tasks..."
+	get_docker_images
+	get_media_from_usb
+	remove_ansible_dots
+	executing_custom_scripts
+	print_remaining_to_be_done
 }
 
 run_ansible_playbooks() {
-  ansible-playbook "$PLAYBOOK_FILE" \
-    --become-password-file="$BECOME_FILE_PASSWORD" \
-    --tags ssh && setup_ssh_keys
+	ansible-playbook "$PLAYBOOK_FILE" \
+		--become-password-file="$BECOME_FILE_PASSWORD" \
+		--tags ssh && setup_ssh_keys
 
-  ansible-playbook "$PLAYBOOK_FILE" "$@" \
-    --become-password-file="$BECOME_FILE_PASSWORD" \
-    --skip-tags ssh
+	ansible-playbook "$PLAYBOOK_FILE" \
+		--become-password-file="$BECOME_FILE_PASSWORD" \
+		--tags common
 
-  echo "Ansible playbooks executed successfully."
+	ansible-playbook "$PLAYBOOK_FILE" "$@" \
+		--become-password-file="$BECOME_FILE_PASSWORD" \
+		--skip-tags ssh,common
+
+	echo "Ansible playbooks executed successfully."
 }
 
 setup_os_dependencies() {
-  system_os=$(detect_os)
+	system_os=$(detect_os)
 
-  if [ -z "$system_os" ]; then
-    echo "Error: System OS not recognized."
-    exit 1
-  fi
+	if [ -z "$system_os" ]; then
+		echo "Error: System OS not recognized."
+		exit 1
+	fi
 
-  case "$system_os" in
-  "$ARCHLINUX")
-    setup_archlinux
-    ;;
-  *)
-    setup_ubuntu
-    ;;
-  esac
+	case "$system_os" in
+	"$ARCHLINUX")
+		setup_archlinux
+		;;
+	*)
+		setup_ubuntu
+		;;
+	esac
 
-  install_ansible_galaxy "$system_os"
+	install_ansible_galaxy "$system_os"
 }
 
 main() {
-  validate_secrets
-  setup_os_dependencies
-  run_ansible_playbooks "$@"
-  setup_post_installation
+	validate_secrets
+	setup_os_dependencies
+	run_ansible_playbooks "$@"
+	setup_post_installation
 }
 
 main "$@"
