@@ -139,11 +139,11 @@ setup_post_installation() {
 run_ansible_playbooks() {
 	ansible-playbook "$PLAYBOOK_FILE" \
 		--become-password-file="$BECOME_FILE_PASSWORD" \
-		--tags ssh && setup_ssh_keys
+		--tags common
 
 	ansible-playbook "$PLAYBOOK_FILE" \
 		--become-password-file="$BECOME_FILE_PASSWORD" \
-		--tags common
+		--tags ssh && setup_ssh_keys
 
 	ansible-playbook "$PLAYBOOK_FILE" "$@" \
 		--become-password-file="$BECOME_FILE_PASSWORD" \

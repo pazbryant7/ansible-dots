@@ -5,4 +5,6 @@
     name: "{{ item }}"
     state: present
   loop:
+    - ripgrep
+    - openssh-client
     - fonts-noto-color-emoji
