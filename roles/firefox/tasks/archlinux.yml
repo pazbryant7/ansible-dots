@@ -5,15 +5,3 @@
     state: present
   loop:
     - firefox
-
-- name: Create firefox 'Personal' profile
-  ansible.builtin.command:
-    cmd: firefox -CreateProfile Personal
-  register: personal
-  changed_when: personal.rc != 0
-
-- name: Create firefox 'Work' profile
-  ansible.builtin.command:
-    cmd: firefox -CreateProfile Work
-  register: work
-  changed_when: work.rc != 0
