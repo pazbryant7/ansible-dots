@@ -106,7 +106,6 @@ get_docker_images() {
 	docker pull redis:alpine
 	docker pull nginx:alpine
 	docker pull alpine:latest
-	docker pull ubuntu:latest
 	docker pull postgres:alpine
 }
 
