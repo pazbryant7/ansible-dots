@@ -14,3 +14,4 @@
   loop:
     - fnm
     - jql
+  ignore_errors: true

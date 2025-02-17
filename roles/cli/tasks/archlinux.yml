@@ -85,6 +85,7 @@
     - ttf-maple
     - lazydocker
     - vesktop-bin
+  ignore_errors: true
 
 - name: Install packages with pipx
   community.general.pipx:
@@ -92,3 +93,4 @@
     state: present
   loop:
     - poetry
+  ignore_errors: true
