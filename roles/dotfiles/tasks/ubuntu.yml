@@ -1,7 +1,0 @@
-- name: Ensure stow is installed
-  become: true
-  ansible.builtin.apt:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - stow

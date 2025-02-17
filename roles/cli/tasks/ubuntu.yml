@@ -1,9 +1,0 @@
-- name: Ensure common cli tools are installed
-  become: true
-  ansible.builtin.apt:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - tree
-    - cargo
-    - gopass

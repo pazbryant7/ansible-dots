@@ -1,6 +1,0 @@
----
-- name: Ensure gnupg is installed
-  become: true
-  ansible.builtin.apt:
-    name: "gnupg"
-    state: present
