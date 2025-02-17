@@ -6,7 +6,6 @@
     state: present
   loop:
     - ufw
-    - pass
     - base
     - tmux
     - grub
