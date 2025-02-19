@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 
 ARCHLINUX="arch"
+FIRST_RUN="/tmp/first_run"
 PLAYBOOK_FILE="./local.yml"
 BECOME_FILE_PASSWORD=".secrets/.become_password"
 ANSIBLE_VAULT_FILE_PASSWORD=".secrets/.passphrase"
@@ -64,7 +65,7 @@ setup_ssh_keys() {
 			exit 1
 		fi
 	fi
-	# NOTE: here is better to use the sha but by personal reasons I use the email.
+	# NOTE: sha is better `{print $3}` but by personal reasons I use the email.
 	key_fingerprint=$(ssh-keygen -lf "$key_path" | awk '{print $3}')
 
 	if ssh-add -l 2>/dev/null | rg "$key_fingerprint"; then
@@ -80,12 +81,19 @@ setup_ssh_keys() {
 	fi
 }
 
-remove_ansible_dots() {
-	ansible_dots="$HOME/ansible-dots"
-	if [ -d "$ansible_dots" ]; then
-		rm -rf "$ansible_dots"
-		echo "Removed ansible-dots directory."
+export_display() {
+	# NOTE: without this, firefox cannot create profiles. Check firefox role
+	# fore more details
+	export DISPLAY=":0"
+}
+
+create_firefox_profiles() {
+	if ! command -v firefox >/dev/null 2>&1; then
+		echo "Firefox is not installed. Skipping profile creation."
+		return
 	fi
+	firefox -CreateProfile Work
+	firefox -CreateProfile Personal
 }
 
 get_media_from_usb() {
@@ -127,26 +135,71 @@ executing_custom_scripts() {
 }
 
 setup_post_installation() {
+	if [ ! -f "$FIRST_RUN" ]; then
+		echo "Post installation cannot be executed, need to restart first"
+		echo "$!" >>"$FIRST_RUN"
+	fi
+
 	echo "Executing post installation tasks..."
-	get_docker_images
-	get_media_from_usb
-	remove_ansible_dots
+	pids=""
+
+	get_docker_images &
+	pids="$pids $!"
+	get_media_from_usb &
+	pids="$pids $!"
+	create_firefox_profiles &
+	pids="$pids $!"
+
+	for pid in $pids; do
+		if ! wait "$pid"; then
+			echo "Task with PID $pid failed"
+			return 1
+		fi
+	done
+
 	executing_custom_scripts
 	print_remaining_to_be_done
 }
 
+get_user_compositor() {
+	while true; do
+		printf "Which environment would you like (xorg/wayland): " >/dev/tty
+		read -r answer
+		case "$answer" in
+		xorg | wayland)
+			echo "$answer"
+			return
+			;;
+		*)
+			echo "You have selected $answer"
+			;;
+		esac
+	done
+}
+
+export_display() {
+	# NOTE: without this, firefox cannot create profiles. Check firefox role
+	# fore more details
+	export DISPLAY=":0"
+}
+
 run_ansible_playbooks() {
+	user_compositor="$(get_user_compositor)"
+
 	ansible-playbook "$PLAYBOOK_FILE" \
 		--become-password-file="$BECOME_FILE_PASSWORD" \
 		--tags common
 
 	ansible-playbook "$PLAYBOOK_FILE" \
 		--become-password-file="$BECOME_FILE_PASSWORD" \
-		--tags ssh && setup_ssh_keys
+		--tags ssh && setup_ssh_keys && export_display
 
-	ansible-playbook "$PLAYBOOK_FILE" "$@" \
+	ansible-playbook "$PLAYBOOK_FILE" \
+		--become-password-file="$BECOME_FILE_PASSWORD"
+
+	ansible-playbook "$PLAYBOOK_FILE" \
 		--become-password-file="$BECOME_FILE_PASSWORD" \
-		--skip-tags ssh,common
+		--tags "$user_compositor"
 
 	echo "Ansible playbooks executed successfully."
 }
@@ -174,8 +227,8 @@ setup_os_dependencies() {
 main() {
 	validate_secrets
 	setup_os_dependencies
-	run_ansible_playbooks "$@"
+	run_ansible_playbooks
 	setup_post_installation
 }
 
-main "$@"
+main
