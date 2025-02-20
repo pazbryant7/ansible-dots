@@ -21,6 +21,17 @@
     - /usr/share/fonts/bryant-fonts/
     - /usr/share/kbd/keymaps/i386/dvorak/
 
+- name: Import paplay .desktop file
+  become: true
+  ansible.builtin.copy:
+    src: files/archlinux/paplay.desktop
+    dest: "/usr/share/applications/paplay.desktop"
+    owner: root
+    group: root
+    mode: "0644"
+    force: false
+
+
 - name: Import vconsole Engish keyboard
   become: true
   ansible.builtin.copy:
