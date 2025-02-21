@@ -39,6 +39,7 @@
     - gopass
     - ffmpeg
     - calibre
+    - poppler
     - zathura
     - ncmpcpp
     - lazygit
