@@ -85,6 +85,7 @@
     - ttf-maple
     - lazydocker
     - vesktop-bin
+    - zen-browser-bin
   ignore_errors: true
 
 - name: Install packages with pipx
