@@ -84,6 +84,7 @@
     - obinskit
     - ttf-maple
     - lazydocker
+    - postman-bin
     - vesktop-bin
     - zen-browser-bin
   ignore_errors: true
