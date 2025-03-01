@@ -7,6 +7,7 @@ default_roles:
   - system
   - github
   - systemd
+  - crontab
 
   # NOTE: When you execute the command `ansible-playbook local.yml`, the specified
   # roles will run. However, there is an exception: the `common` role will also

@@ -1,0 +1,23 @@
+- name: Ensure backup-notes cron job exists
+  ansible.builtin.cron:
+    name: "backup notes"
+    minute: "0"
+    hour: "*/2"
+    job: "{{ ansible_env.HOME }}/bin/crontab/backup-notes"
+    state: present
+
+- name: Ensure backup-books cron job exists
+  ansible.builtin.cron:
+    name: "backup books"
+    minute: "0"
+    hour: "*/5"
+    job: "{{ ansible_env.HOME }}/bin/crontab/backup-books"
+    state: present
+
+- name: Ensure backup-music cron job exists
+  ansible.builtin.cron:
+    name: "backup music"
+    minute: "0"
+    hour: "*/5"
+    job: "{{ ansible_env.HOME }}/bin/crontab/backup-music"
+    state: present
