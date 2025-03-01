@@ -1,8 +1,0 @@
-services:
-  ansible-arch:
-    build:
-      context: .
-      dockerfile: Dockerfile.archlinux
-    container_name: ansible-arch-dev
-    # environment:
-    tty: true
