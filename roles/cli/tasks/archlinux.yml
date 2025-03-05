@@ -50,7 +50,6 @@
     - polybar
     - ripgrep
     - libpulse
-    - chromium
     - luarocks
     - starship
     - obsidian
@@ -86,7 +85,8 @@
     - dragon-drop
     - postman-bin
     - vesktop-bin
-    - zen-browser-bin
+    - librewolf-bin
+    - ungoogled-chromium-bin
   ignore_errors: true
 
 - name: Install packages with pipx
