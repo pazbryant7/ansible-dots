@@ -14,4 +14,10 @@
   loop:
     - fnm
     - jql
-  ignore_errors: true
+
+- name: Install packages with pipx
+  community.general.pipx:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - poetry

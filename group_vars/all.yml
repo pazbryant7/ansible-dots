@@ -1,6 +1,7 @@
 ---
 default_roles:
   - cli
+  - ufw
   - gpg
   - zsh
   - docker
