@@ -8,6 +8,11 @@
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
 
+- name: Enable ufw
+  become: true
+  community.general.ufw:
+    state: enabled
+
 - name: Set default incoming policy to deny
   become: true
   community.general.ufw:
@@ -37,8 +42,3 @@
   community.general.ufw:
     rule: limit
     app: SSH
-
-- name: Enable ufw
-  become: true
-  community.general.ufw:
-    state: enabled
