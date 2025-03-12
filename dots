@@ -82,18 +82,18 @@ setup_ssh_keys() {
 }
 
 export_display() {
-	# NOTE: without this, firefox cannot create profiles. Check firefox role
+	# NOTE: without this, librewolf cannot create profiles. Check librewolf role
 	# fore more details
 	export DISPLAY=":0"
 }
 
-create_firefox_profiles() {
-	if ! command -v firefox >/dev/null 2>&1; then
+create_librewolf_profiles() {
+	if ! command -v librewolf >/dev/null 2>&1; then
 		echo "Firefox is not installed. Skipping profile creation."
 		return
 	fi
-	firefox -CreateProfile Work
-	firefox -CreateProfile Personal
+	librewolf -CreateProfile Work
+	librewolf -CreateProfile Personal
 }
 
 get_media_from_usb() {
@@ -129,8 +129,8 @@ executing_custom_scripts() {
 	if [ -x "$HOME/bin/global/update-software" ]; then
 		"$HOME/bin/global/update-software"
 	fi
-	if [ -x "$HOME/bin/global/update-firefox-ui" ]; then
-		"$HOME/bin/global/update-firefox-ui"
+	if [ -x "$HOME/bin/global/update-librewolf-ui" ]; then
+		"$HOME/bin/global/update-librewolf-ui"
 	fi
 }
 
@@ -147,7 +147,7 @@ setup_post_installation() {
 	pids="$pids $!"
 	get_media_from_usb &
 	pids="$pids $!"
-	create_firefox_profiles &
+	create_librewolf_profiles &
 	pids="$pids $!"
 
 	for pid in $pids; do
@@ -178,7 +178,7 @@ get_user_compositor() {
 }
 
 export_display() {
-	# NOTE: without this, firefox cannot create profiles. Check firefox role
+	# NOTE: without this, librewolf cannot create profiles. Check librewolf role
 	# fore more details
 	export DISPLAY=":0"
 }
