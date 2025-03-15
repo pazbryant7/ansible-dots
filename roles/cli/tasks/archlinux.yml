@@ -72,6 +72,7 @@
     - translate-shell
     - zathura-pdf-mupdf
     - ffmpegthumbnailer
+    - ttf-cascadia-code-nerd
 
 - name: Install aur packages using paru
   kewlfft.aur.aur:
@@ -88,4 +89,3 @@
     - vesktop-bin
     - librewolf-bin
     - thorium-browser-bin
-
