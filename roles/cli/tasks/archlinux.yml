@@ -5,68 +5,69 @@
     state: present
   loop:
     - uv
-    - go
     - xh
     - fd
-    - fzf
-    - eza
-    - bob
-    - mpd
-    - bat
-    - imv
+    - go
     - mpc
     - git
     - mpv
-    - less
-    - tree
-    - 7zip
-    - maim
-    - dust
-    - rofi
-    - tmux
+    - bat
+    - imv
+    - fzf
+    - mpd
+    - eza
+    - bob
     - hurl
+    - tmux
     - stow
-    - yarn
     - yazi
     - code
+    - yarn
+    - rofi
+    - 7zip
+    - maim
+    - less
+    - dust
+    - tree
+    - atuin
+    - rsync
+    - lua51
     - piper
     - pgcli
-    - lua51
-    - rsync
-    - atuin
-    - rclone
-    - bottom
+    - ffmpeg
+    - gopass
     - xcolor
     - zoxide
-    - gopass
-    - ffmpeg
-    - calibre
+    - rclone
+    - bottom
     - poppler
-    - zathura
-    - ncmpcpp
-    - lazygit
-    - pcmanfm
     - udiskie
-    - poppler
     - polybar
     - ripgrep
-    - libpulse
-    - luarocks
+    - pcmanfm
+    - lazygit
+    - ncmpcpp
+    - firefox
+    - poppler
+    - calibre
+    - zathura
     - starship
+    - luarocks
     - obsidian
+    - libpulse
+    - alacritty
+    - unclutter
+    - syncthing
+    - hyperfine
     - fastfetch
     - bandwhich
     - screenkey
-    - hyperfine
-    - syncthing
-    - unclutter
-    - alacritty
     - python-pip
+    - pavucontrol
+    - qbittorrent
+    - imagemagick
     - imagemagick
     - python-pipx
-    - imagemagick
-    - qbittorrent
-    - pavucontrol
     - speedtest-cli
     - networkmanager
     - translate-shell
@@ -88,3 +89,4 @@
     - postman-bin
     - vesktop-bin
     - thorium-browser-bin
+    - ungoogled-chromium-bin
