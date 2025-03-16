@@ -81,21 +81,6 @@ setup_ssh_keys() {
 	fi
 }
 
-export_display() {
-	# NOTE: without this, librewolf cannot create profiles. Check librewolf role
-	# fore more details
-	export DISPLAY=":0"
-}
-
-create_librewolf_profiles() {
-	if ! command -v librewolf >/dev/null 2>&1; then
-		echo "Firefox is not installed. Skipping profile creation."
-		return
-	fi
-	librewolf -CreateProfile Work
-	librewolf -CreateProfile Personal
-}
-
 get_media_from_usb() {
 	books_path="/run/media/bryant/tiagovault/backups/books/2024-11-06"
 	music_path="/run/media/bryant/tiagovault/backups/music/2024-11-06"
@@ -129,9 +114,6 @@ executing_custom_scripts() {
 	if [ -x "$HOME/bin/global/update-software" ]; then
 		"$HOME/bin/global/update-software"
 	fi
-	if [ -x "$HOME/bin/global/update-librewolf-ui" ]; then
-		"$HOME/bin/global/update-librewolf-ui"
-	fi
 }
 
 setup_post_installation() {
@@ -147,7 +129,6 @@ setup_post_installation() {
 	pids="$pids $!"
 	get_media_from_usb &
 	pids="$pids $!"
-	create_librewolf_profiles &
 	pids="$pids $!"
 
 	for pid in $pids; do
@@ -177,12 +158,6 @@ get_user_compositor() {
 	done
 }
 
-export_display() {
-	# NOTE: without this, librewolf cannot create profiles. Check librewolf role
-	# fore more details
-	export DISPLAY=":0"
-}
-
 run_ansible_playbooks() {
 	user_compositor="$(get_user_compositor)"
 
@@ -192,7 +167,7 @@ run_ansible_playbooks() {
 
 	ansible-playbook "$PLAYBOOK_FILE" \
 		--become-password-file="$BECOME_FILE_PASSWORD" \
-		--tags ssh && setup_ssh_keys && export_display
+		--tags ssh && setup_ssh_keys
 
 	ansible-playbook "$PLAYBOOK_FILE" \
 		--become-password-file="$BECOME_FILE_PASSWORD"
