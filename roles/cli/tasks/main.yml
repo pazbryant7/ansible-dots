@@ -20,4 +20,4 @@
     name: "{{ item }}"
     state: present
   loop:
-    - poetry
+    - litecli
