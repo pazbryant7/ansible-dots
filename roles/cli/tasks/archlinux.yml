@@ -42,7 +42,6 @@
     - rclone
     - bottom
     - poppler
-    - udiskie
     - polybar
     - ripgrep
     - pcmanfm
