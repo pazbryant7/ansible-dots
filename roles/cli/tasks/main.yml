@@ -13,7 +13,6 @@
     state: present
   loop:
     - fnm
-    - jql
 
 - name: Install packages with pipx
   community.general.pipx:
