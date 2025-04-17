@@ -31,6 +31,7 @@
     - less
     - dust
     - tree
+    - pnpm
     - atuin
     - rsync
     - lua51
