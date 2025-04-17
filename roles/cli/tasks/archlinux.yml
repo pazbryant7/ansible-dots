@@ -4,6 +4,7 @@
     name: "{{ item }}"
     state: present
   loop:
+    - jq
     - uv
     - xh
     - fd
