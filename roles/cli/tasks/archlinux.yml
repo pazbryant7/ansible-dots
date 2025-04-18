@@ -32,6 +32,7 @@
     - dust
     - tree
     - pnpm
+    - tokei
     - atuin
     - rsync
     - lua51
