@@ -31,7 +31,6 @@
     mode: "0644"
     force: false
 
-
 - name: Import vconsole Engish keyboard
   become: true
   ansible.builtin.copy:
@@ -124,12 +123,11 @@
 - name: Import custom personal fonts
   become: true
   ansible.builtin.copy:
-    src: files/archlinux/fonts
-    dest: "/usr/share/fonts/bryant-fonts"
+    src: files/archlinux/bryant-fonts
+    dest: "/usr/share/fonts"
     owner: root
     group: root
-    mode: "0644"
-    creates: "/usr/share/fonts/bryant-fonts/fonts"
+    mode: "0755"
     force: false
 
 - name: Refresh fonts cache
