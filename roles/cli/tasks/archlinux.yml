@@ -67,8 +67,8 @@
     - screenkey
     - python-pip
     - pavucontrol
+    - ripgrep-all
     - qbittorrent
-    - imagemagick
     - imagemagick
     - python-pipx
     - speedtest-cli
