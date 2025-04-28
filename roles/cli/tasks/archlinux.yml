@@ -18,6 +18,7 @@
     - mpd
     - eza
     - bob
+    - wget
     - hurl
     - rust
     - tmux
