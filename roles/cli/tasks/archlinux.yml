@@ -18,6 +18,7 @@
     - mpd
     - eza
     - bob
+    - sqlc
     - wget
     - hurl
     - rust
