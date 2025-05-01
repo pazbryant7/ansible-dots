@@ -17,9 +17,20 @@
     group: root
     mode: "0755"
   loop:
+    - /etc/udev/rules.d/
     - /etc/X11/xorg.conf.d/
     - /usr/share/fonts/bryant-fonts/
     - /usr/share/kbd/keymaps/i386/dvorak/
+
+- name: Import udev obinslab rules
+  become: true
+  ansible.builtin.copy:
+    src: files/archlinux/obinslab-starter.rules
+    dest: "/etc/udev/rules.d/obinslab-starter.rules"
+    owner: root
+    group: root
+    mode: "0644"
+    force: false
 
 - name: Import paplay .desktop file
   become: true
