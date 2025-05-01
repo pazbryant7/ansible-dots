@@ -90,9 +90,9 @@
     - bun-bin
     - ani-cli
     - ttf-maple
+    - brave-bin
     - lazydocker
-    - dragon-drop
-    - postman-bin
     - vesktop-bin
+    - postman-bin
+    - dragon-drop
     - thorium-browser-bin
-    - ungoogled-chromium-bin
