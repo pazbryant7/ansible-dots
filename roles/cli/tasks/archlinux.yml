@@ -73,7 +73,6 @@
     - ripgrep-all
     - qbittorrent
     - imagemagick
-    - python-pipx
     - speedtest-cli
     - android-tools
     - networkmanager
@@ -90,6 +89,8 @@
   loop:
     - wego
     - bun-bin
+    - fnm-bin
+    - litecli
     - ani-cli
     - ttf-maple
     - brave-bin
