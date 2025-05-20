@@ -88,14 +88,15 @@
     state: present
   loop:
     - wego
-    - bun-bin
-    - fnm-bin
     - litecli
+    - fnm-bin
     - ani-cli
-    - ttf-maple
+    - bun-bin
     - brave-bin
+    - ttf-maple
+    - lux-dl-bin
     - lazydocker
-    - vesktop-bin
     - postman-bin
+    - vesktop-bin
     - dragon-drop
     - thorium-browser-bin
