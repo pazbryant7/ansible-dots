@@ -18,6 +18,7 @@
     - mpd
     - eza
     - bob
+    - dust
     - sqlc
     - wget
     - fish
