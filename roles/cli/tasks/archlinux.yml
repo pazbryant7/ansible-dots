@@ -20,6 +20,8 @@
     - bob
     - sqlc
     - wget
+    - fish
+    - just
     - hurl
     - rust
     - tmux
@@ -32,7 +34,6 @@
     - 7zip
     - maim
     - less
-    - dust
     - tree
     - pnpm
     - tokei
@@ -88,15 +89,16 @@
     state: present
   loop:
     - wego
-    - litecli
-    - fnm-bin
     - ani-cli
+    - fnm-bin
     - bun-bin
-    - brave-bin
+    - litecli
     - ttf-maple
+    - brave-bin
     - lux-dl-bin
     - lazydocker
-    - postman-bin
+    - lux-dl-bin
     - vesktop-bin
+    - postman-bin
     - dragon-drop
     - thorium-browser-bin

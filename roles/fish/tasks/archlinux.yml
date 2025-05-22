@@ -1,0 +1,6 @@
+---
+- name: Ensure fish is installed
+  become: true
+  community.general.pacman:
+    name: "fish"
+    state: present
