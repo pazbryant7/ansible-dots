@@ -30,10 +30,10 @@ Dotfiles setup for archlinux and ubuntu
 
    ```bash
    # For Arch container
-   docker exec -it ansible-arch /usr/bin/fish
+   docker exec -it ansible-arch /usr/bin/zsh
 
    # For Ubuntu container
-   docker exec -it ansible-ubuntu  /usr/bin/fish
+   docker exec -it ansible-ubuntu  /usr/bin/zsh
    ```
 
 ## Project Structure
