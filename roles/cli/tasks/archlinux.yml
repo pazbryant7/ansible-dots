@@ -38,6 +38,7 @@
     - tree
     - pnpm
     - tokei
+    - nsxiv
     - atuin
     - rsync
     - lua51

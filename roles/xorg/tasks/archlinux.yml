@@ -4,7 +4,6 @@
     name: "{{ item }}"
     state: present
   loop:
-    - feh
     - sxhkd
     - picom
     - bspwm
