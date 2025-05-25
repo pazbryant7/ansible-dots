@@ -94,7 +94,6 @@
   loop:
     - wego
     - ani-cli
-    - fnm-bin
     - bun-bin
     - litecli
     - ttf-maple
