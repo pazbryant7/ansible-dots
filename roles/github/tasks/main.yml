@@ -7,9 +7,10 @@
     version: "{{ item.branch | default('main') }}"
     repo: "git@personal.github:pazbryant/{{ item.repo }}.git"
   loop:
+    - { repo: "dwm", branch: "main" }
     - { repo: "pass", branch: "main" }
-    - { repo: "media", branch: "main" }
     - { repo: "notes", branch: "main" }
+    - { repo: "media", branch: "main" }
     - { repo: "youtube", branch: "main" }
     - { repo: "leetcode", branch: "main" }
     - { repo: "portfolio", branch: "main" }
