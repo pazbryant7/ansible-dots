@@ -104,9 +104,8 @@ get_docker_images() {
 
 print_remaining_to_be_done() {
 	echo "Remaining tasks to be completed:"
-	echo "  - Setup RCLONE with MEGA"
 	echo "  - Set GTK theme using LXAppearance GUI"
-	echo "  - Log in to Firefox, Outlook, Bitwarden, GitHub, Google, Twitch"
+	echo "  - Log in to Browser, Outlook, Bitwarden, GitHub, Google, Twitch"
 	echo "  - Import and trust your private GPG key at $HOME/.gnupg/private_key.asc"
 }
 

@@ -4,12 +4,8 @@
     name: "{{ item }}"
     state: present
   loop:
-    - sxhkd
     - picom
-    - bspwm
     - xdotool
-    - polybar
-    - pcmanfm
     - xorg-xev
     - breeze-gtk
     - ueberzugpp

@@ -26,7 +26,6 @@
     - linux-headers
     - pipewire-alsa
     - terminus-font
-    - xdg-user-dirs
     - linux-firmware
     - zram-generator
     - pipewire-pulse
