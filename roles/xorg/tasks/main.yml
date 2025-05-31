@@ -27,3 +27,18 @@
     src: "/usr/local/bin/st"
     dest: "/usr/bin/xterm"
     state: link
+
+
+- name: Clone DWM tiling window manager
+  ansible.builtin.git:
+    update: false
+    version: main
+    dest: "{{ github_dir }}/dwm"
+    repo: "git@personal.github:pazbryant/dwm.git"
+
+- name: Build and install DWM tiling window manager
+  become: true
+  ansible.builtin.command:
+    cmd: sudo make clean install
+    chdir: "{{ github_dir }}/dwm"
+    creates: /usr/local/bin/dwm

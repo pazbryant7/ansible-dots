@@ -65,6 +65,7 @@ setup_ssh_keys() {
 			exit 1
 		fi
 	fi
+
 	# NOTE: sha is better `{print $3}` but by personal reasons I use the email.
 	key_fingerprint=$(ssh-keygen -lf "$key_path" | awk '{print $3}')
 
