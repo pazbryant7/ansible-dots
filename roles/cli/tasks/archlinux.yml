@@ -73,13 +73,15 @@
     state: present
   loop:
     - wego
-    - ani-cli
     - bun-bin
     - litecli
-    - ttf-maple
+    - ani-cli
+    - datagrip
     - brave-bin
+    - ttf-maple
+    - bruno-bin
     - lazydocker
-    - vesktop-bin
-    - postman-bin
     - dragon-drop
-    - thorium-browser-bin
+    - postman-bin
+    - vesktop-bin
+    - datagrip-jre
