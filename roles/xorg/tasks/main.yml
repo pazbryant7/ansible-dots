@@ -42,3 +42,18 @@
     cmd: sudo make clean install
     chdir: "{{ github_dir }}/dwm"
     creates: /usr/local/bin/dwm
+
+
+- name: Clone slstatus
+  ansible.builtin.git:
+    update: false
+    version: main
+    dest: "{{ github_dir }}/dwm"
+    repo: "git@personal.github:pazbryant/slstatus.git"
+
+- name: Build and install slstatus
+  become: true
+  ansible.builtin.command:
+    cmd: sudo make clean install
+    chdir: "{{ github_dir }}/slstatus"
+    creates: /usr/local/bin/slstatus
