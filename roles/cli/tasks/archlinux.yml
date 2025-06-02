@@ -52,6 +52,7 @@
     - alacritty
     - syncthing
     - fastfetch
+    - libnotify
     - screenkey
     - inter-font
     - streamlink
