@@ -61,6 +61,7 @@
     - qbittorrent
     - imagemagick
     - android-tools
+    - pacman-contrib
     - networkmanager
     - translate-shell
     - zathura-pdf-mupdf
