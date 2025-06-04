@@ -62,6 +62,16 @@
     mode: "0644"
     force: false
 
+- name: Import ROOT ENV
+  become: true
+  ansible.builtin.copy:
+    src: files/archlinux/etc/enviroment
+    dest: "/etc/environment"
+    owner: root
+    group: root
+    mode: "0644"
+    force: true
+
 - name: Setup system keyboard
   become: true
   ansible.builtin.copy:
