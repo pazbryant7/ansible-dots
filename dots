@@ -83,8 +83,8 @@ setup_ssh_keys() {
 }
 
 get_media_from_usb() {
-	books_path="/run/media/bryant/tiagovault/backups/books/2024-11-06"
-	music_path="/run/media/bryant/tiagovault/backups/music/2024-11-06"
+	books_path="/run/media/bryant/tiagovault/backups/books"
+	music_path="/run/media/bryant/tiagovault/backups/music"
 
 	rsync -avh --progress --delete "$music_path/" "$HOME/Music"
 	rsync -avh --progress --delete "$books_path/" "$HOME/Documents/books"
@@ -97,9 +97,6 @@ get_docker_images() {
 	fi
 
 	docker pull node:alpine
-	docker pull redis:alpine
-	docker pull nginx:alpine
-	docker pull alpine:latest
 	docker pull postgres:alpine
 }
 
