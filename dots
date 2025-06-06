@@ -111,6 +111,9 @@ executing_custom_scripts() {
 	if [ -x "$HOME/bin/global/update-software" ]; then
 		"$HOME/bin/global/update-software"
 	fi
+	if [ -x "$HOME/bin/global/fix-firefox-ui" ]; then
+		"$HOME/bin/global/fix-firefox-ui"
+	fi
 }
 
 setup_post_installation() {
