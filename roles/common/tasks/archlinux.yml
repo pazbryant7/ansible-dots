@@ -21,7 +21,6 @@
     - openresolv
     - base-devel
     - wireplumber
-    - otf-overpass
     - pipewire-jack
     - linux-headers
     - pipewire-alsa
