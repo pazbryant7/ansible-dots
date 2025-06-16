@@ -19,6 +19,7 @@
     - sqlc
     - wget
     - rust
+    - dust
     - tmux
     - stow
     - fish
