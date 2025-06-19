@@ -35,8 +35,8 @@
 - name: Import vconsole Engish keyboard
   become: true
   ansible.builtin.copy:
-    src: files/archlinux/xkb/bryant-dvorak.map
-    dest: "/usr/share/kbd/keymaps/i386/dvorak/bryant-dvorak.map"
+    src: files/archlinux/xkb/bryantd.map
+    dest: "/usr/share/kbd/keymaps/i386/dvorak/bryantd.map"
     owner: root
     group: root
     mode: "0644"
@@ -45,8 +45,8 @@
 - name: Import X11 English keyboard
   become: true
   ansible.builtin.copy:
-    src: files/archlinux/xkb/bryant-dvorak
-    dest: "/usr/share/X11/xkb/symbols/bryant-dvorak"
+    src: files/archlinux/xkb/bryantd
+    dest: "/usr/share/X11/xkb/symbols/bryantd"
     owner: root
     group: root
     mode: "0644"
@@ -55,8 +55,8 @@
 - name: Import X11 Spanish keyboard
   become: true
   ansible.builtin.copy:
-    src: files/archlinux/xkb/bryant-dvorak-itl
-    dest: "/usr/share/X11/xkb/symbols/bryant-dvorak-itl"
+    src: files/archlinux/xkb/bryantdi
+    dest: "/usr/share/X11/xkb/symbols/bryantdi"
     owner: root
     group: root
     mode: "0644"
