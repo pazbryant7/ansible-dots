@@ -1,11 +1,11 @@
-- name: "Get distribution"
-  ansible.builtin.stat:
-    path: "{{ role_path }}/tasks/{{ host_os }}.yml"
-  register: distribution_config
-
-- name: "Run tasks for {{ host_os }}"
-  ansible.builtin.include_tasks: "{{ host_os }}.yml"
-  when: distribution_config.stat.exists
+# - name: "Get distribution"
+#   ansible.builtin.stat:
+#     path: "{{ role_path }}/tasks/{{ host_os }}.yml"
+#   register: distribution_config
+#
+# - name: "Run tasks for {{ host_os }}"
+#   ansible.builtin.include_tasks: "{{ host_os }}.yml"
+#   when: distribution_config.stat.exists
 
 - name: Install packages using cargo
   community.general.cargo:
@@ -14,9 +14,9 @@
   loop:
     - fnm
 
-- name: Install packages with pipx
-  community.general.pipx:
+- name: Install packages using uv
+  moreati.uv.pip:
     name: "{{ item }}"
-    state: present
+    virtualenv: ~/venv
   loop:
     - spotdl
