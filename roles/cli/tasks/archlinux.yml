@@ -56,6 +56,7 @@
     - alacritty
     - syncthing
     - fastfetch
+    - bandwhich
     - libnotify
     - screenkey
     - streamlink
