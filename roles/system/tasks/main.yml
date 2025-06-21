@@ -20,7 +20,7 @@
     - /etc/udev/rules.d/
     - /etc/X11/xorg.conf.d/
     - /usr/share/fonts/bryant-fonts/
-    - /usr/share/kbd/keymaps/i386/dvorak/
+    - /usr/local/share/kbd/keymaps/
 
 - name: Import paplay .desktop file
   become: true
@@ -36,7 +36,7 @@
   become: true
   ansible.builtin.copy:
     src: files/archlinux/xkb/bryantd.map
-    dest: "/usr/share/kbd/keymaps/i386/dvorak/bryantd.map"
+    dest: "/usr/local/share/kbd/keymaps/bryantd.map"
     owner: root
     group: root
     mode: "0644"

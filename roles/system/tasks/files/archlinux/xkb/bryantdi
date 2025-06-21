@@ -1,6 +1,6 @@
 default
 partial alphanumeric_keys
-xkb_symbols "bryant-dvorak-itl" {
+xkb_symbols "bryantdi" {
     name[Group1]= "Bryant Dvorak International";
 
     key <TLDE> {[   dead_tilde,      dead_grave,        grave,                  asciitilde            ]};

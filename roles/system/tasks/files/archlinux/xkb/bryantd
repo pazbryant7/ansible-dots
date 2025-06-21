@@ -1,6 +1,6 @@
 default
 partial alphanumeric_keys
-xkb_symbols "bryant-dvorak" {
+xkb_symbols "bryantd" {
 
     name[Group1]= "English (Bryant Dvorak)";
 
