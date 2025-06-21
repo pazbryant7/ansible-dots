@@ -1,0 +1,56 @@
+# Static table lookup for hostnames.
+# See hosts(5) for details.
+127.0.0.1 localhost
+::1 localhost
+127.0.0.1 archlinux.localdomain archlinux
+
+# BLOCK SOCIAL MEDIA SITES - Added by User for Focus
+
+# Facebook & Instagram
+127.0.0.1   fb.com
+127.0.0.1   instagr.am
+127.0.0.1   www.fb.com
+127.0.0.1   facebook.com
+127.0.0.1   messenger.com
+127.0.0.1   instagram.com
+127.0.0.1   www.instagr.am
+127.0.0.1   l.facebook.com
+127.0.0.1   m.facebook.com
+127.0.0.1   api.facebook.com
+127.0.0.1   www.whatsapp.com
+127.0.0.1   www.facebook.com
+127.0.0.1   cdninstagram.com
+127.0.0.1   www.messenger.com
+127.0.0.1   www.instagram.com
+127.0.0.1   apps.facebook.com
+127.0.0.1   graph.facebook.com
+127.0.0.1   video.xx.fbcdn.net
+127.0.0.1   static.xx.fbcdn.net
+127.0.0.1   connect.facebook.net
+127.0.0.1   whatsapp.com # Included as it's Meta-owned, though primarily messaging
+
+# X (formerly Twitter)
+127.0.0.1   t.co
+127.0.0.1   x.com
+127.0.0.1   www.x.com
+127.0.0.1   twitter.com
+127.0.0.1   www.twitter.com
+127.0.0.1   mobile.twitter.com
+127.0.0.1   pbs.twimg.com # Twitter media CDN
+
+# TikTok
+127.0.0.1   tiktok.com
+127.0.0.1   m.tiktok.com
+127.0.0.1   www.tiktok.com
+127.0.0.1   byteoversea.com # Associated TikTok domain
+
+# Other common social/distraction sites
+127.0.0.1   twitch.tv
+127.0.0.1   comick.io
+127.0.0.1   mangadex.org
+127.0.0.1   www.comick.io
+127.0.0.1   www.twitch.tv
+127.0.0.1   monkeytype.com
+127.0.0.1   mastodon.social
+127.0.0.1   www.mangadex.org
+127.0.0.1   www.monkeytype.com

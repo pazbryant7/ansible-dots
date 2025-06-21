@@ -22,6 +22,23 @@
     - /usr/share/fonts/bryant-fonts/
     - /usr/local/share/kbd/keymaps/
 
+- name: Import custom personal fonts
+  become: true
+  ansible.builtin.copy:
+    src: files/archlinux/bryant-fonts
+    dest: "/usr/share/fonts"
+    owner: root
+    group: root
+    mode: "0755"
+    force: false
+
+- name: Refresh fonts cache
+  become: true
+  ansible.builtin.command:
+    cmd: fc-cache -f -v
+  register: fontcache
+  changed_when: fontcache.rc != 0
+
 - name: Import paplay .desktop file
   become: true
   ansible.builtin.copy:
@@ -131,19 +148,18 @@
   register: done
   changed_when: done.rc != 0
 
-- name: Import custom personal fonts
+- name: Import custom hosts file
   become: true
   ansible.builtin.copy:
-    src: files/archlinux/bryant-fonts
-    dest: "/usr/share/fonts"
+    src: files/archlinux/etc/hosts
+    dest: "/etc/hosts"
     owner: root
     group: root
-    mode: "0755"
-    force: false
+    mode: "0644"
+    force: true
 
-- name: Refresh fonts cache
+- name: Flush DNS cache (systemd-resolved)
   become: true
   ansible.builtin.command:
-    cmd: fc-cache -f -v
-  register: fontcache
-  changed_when: fontcache.rc != 0
+    cmd: systemd-resolve --flush-caches
+  changed_when: false
