@@ -6,28 +6,32 @@
     state: present
   loop:
     - ufw
-    - base
+    - sudo
     - tmux
     - grub
-    - xclip
+    - base
+    - dunst
     - linux
     - rtkit
-    - dunst
-    - cronie
+    - xclip
     - neovim
     - man-db
+    - cronie
     - pipewire
+    - libnotify
     - linux-lts
+    - efibootmgr
     - openresolv
     - base-devel
     - wireplumber
-    - pipewire-jack
-    - linux-headers
     - pipewire-alsa
+    - linux-headers
     - terminus-font
-    - linux-firmware
-    - zram-generator
+    - pipewire-jack
     - pipewire-pulse
+    - networkmanager
+    - zram-generator
+    - linux-firmware
     - noto-fonts-emoji
     - linux-lts-headers
     - gst-plugin-pipewire
