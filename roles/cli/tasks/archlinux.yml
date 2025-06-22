@@ -12,18 +12,17 @@
     - git
     - feh
     - mpv
+    - lua
     - fzf
     - mpd
     - eza
     - glow
     - sqlc
-    - wget
     - rust
     - dust
     - tmux
     - stow
     - fish
-    - pnpm
     - yazi
     - code
     - rofi
@@ -31,10 +30,10 @@
     - maim
     - less
     - tree
+    - aria2
     - nsxiv
     - atuin
     - rsync
-    - lua51
     - pgcli
     - ffmpeg
     - gopass
@@ -62,6 +61,7 @@
     - streamlink
     - python-pip
     - pavucontrol
+    - qutebrowser
     - qbittorrent
     - imagemagick
     - android-tools
