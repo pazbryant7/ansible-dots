@@ -4,18 +4,12 @@
     name: "{{ item }}"
     state: present
   loop:
-    - picom
     - xdotool
     - xorg-xev
-    - breeze-gtk
-    - ueberzugpp
     - xorg-xinit
     - xorg-xrandr
     - xorg-server
-    - breeze-icons
-    - lxappearance
     - xorg-xsetroot
-    - capitaine-cursors
 
 - name: Ensure remove wayland
   become: true

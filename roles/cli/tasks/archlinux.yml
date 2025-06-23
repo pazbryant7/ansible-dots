@@ -31,6 +31,7 @@
     - sqlc
     - rust
     - dust
+    - picom
     - rsync
     - pgcli
     - atuin
@@ -52,6 +53,7 @@
     - pcmanfm
     - ripgrep
     - luarocks
+    - nwg-look
     - libpulse
     - starship
     - screenkey
@@ -61,13 +63,17 @@
     - fastfetch
     - streamlink
     - python-pip
+    - breeze-gtk
+    - ueberzugpp
     - imagemagick
     - qbittorrent
     - qutebrowser
     - pavucontrol
+    - breeze-icons
     - android-tools
     - pacman-contrib
     - translate-shell
+    - capitaine-cursors
     - zathura-pdf-mupdf
     - ffmpegthumbnailer
     - ttf-cascadia-code-nerd
