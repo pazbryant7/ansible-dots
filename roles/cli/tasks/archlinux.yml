@@ -11,6 +11,7 @@
     - lua
     - mpd
     - eza
+    - xsv
     - mpv
     - fzf
     - mpc
