@@ -12,7 +12,7 @@
 - name: Import pacman hook
   become: true
   ansible.builtin.copy:
-    src: files/archlinux/update-software.hook
+    src: files/archlinux/etc/pacman.d/hooks/update-software.hook
     dest: "/etc/pacman.d/hooks/update-software.hook"
     owner: root
     group: root

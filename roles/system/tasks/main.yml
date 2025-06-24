@@ -25,7 +25,7 @@
 - name: Import custom personal fonts
   become: true
   ansible.builtin.copy:
-    src: files/archlinux/bryant-fonts
+    src: files/archlinux/usr/share/fonts/bryant-fonts
     dest: "/usr/share/fonts"
     owner: root
     group: root
@@ -42,7 +42,7 @@
 - name: Import paplay .desktop file
   become: true
   ansible.builtin.copy:
-    src: files/archlinux/paplay.desktop
+    src: files/archlinux/usr/share/applications/paplay.desktop
     dest: "/usr/share/applications/paplay.desktop"
     owner: root
     group: root
@@ -52,7 +52,7 @@
 - name: Import vconsole Engish keyboard
   become: true
   ansible.builtin.copy:
-    src: files/archlinux/xkb/bryantd.map
+    src: files/archlinux/usr/local/share/kbd/keymaps/bryantd.map
     dest: "/usr/local/share/kbd/keymaps/bryantd.map"
     owner: root
     group: root
@@ -62,7 +62,7 @@
 - name: Import X11 English keyboard
   become: true
   ansible.builtin.copy:
-    src: files/archlinux/xkb/bryantd
+    src: files/archlinux/usr/share/X11/xkb/symbols/bryantd
     dest: "/usr/share/X11/xkb/symbols/bryantd"
     owner: root
     group: root
@@ -72,7 +72,7 @@
 - name: Import X11 Spanish keyboard
   become: true
   ansible.builtin.copy:
-    src: files/archlinux/xkb/bryantdi
+    src: files/archlinux/usr/share/X11/xkb/symbols/bryantdi
     dest: "/usr/share/X11/xkb/symbols/bryantdi"
     owner: root
     group: root
@@ -92,7 +92,7 @@
 - name: Setup system keyboard
   become: true
   ansible.builtin.copy:
-    src: files/archlinux/etc/00-keyboard.conf
+    src: files/archlinux/etc/X11/xorg.conf.d/00-keyboard.conf
     dest: "/etc/X11/xorg.conf.d/00-keyboard.conf"
     mode: "0644"
     force: true
