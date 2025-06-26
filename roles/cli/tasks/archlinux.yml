@@ -44,6 +44,7 @@
     - ffmpeg
     - yt-dlp
     - gopass
+    - img2pdf
     - poppler
     - calibre
     - zathura
