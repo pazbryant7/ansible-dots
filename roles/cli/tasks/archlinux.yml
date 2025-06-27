@@ -58,6 +58,7 @@
     - luarocks
     - nwg-look
     - libpulse
+    - obsidian
     - starship
     - screenkey
     - syncthing
