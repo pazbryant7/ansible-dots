@@ -9,3 +9,4 @@ VISUAL=/usr/bin/nvim
 SUDO_EDITOR=/usr/bin/nvim
 PAGER=less
 MANPAGER=nvim +Man!
+QT_QPA_PLATFORMTHEME=qt6ct
