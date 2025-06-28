@@ -4,8 +4,9 @@
   connection: local
 
   vars:
-    dotfiles_dir: "{{ github_dir }}/dotfiles"
     downloads: "{{ ansible_user_dir }}/Downloads"
+    dotfiles_dir: "{{ ansible_user_dir }}/dotfiles"
+    xdg_config_dir: "{{ ansible_user_dir }}/.config"
     github_dir: "{{ ansible_user_dir }}/Documents/github"
 
   pre_tasks:
