@@ -16,8 +16,13 @@
     - { repo: "boilerplate", branch: "main" }
     - { repo: "ansible-dots", branch: "main" }
 
-- name: Ensure neovim symlink is created in github folder
-  ansible.builtin.file:
-    src: "{{ github_dir }}/dotfiles/.config/nvim"
-    dest: "{{ github_dir }}/nvim"
-    state: link
+- name: Ensure clone neovim configurations
+  ansible.builtin.git:
+    update: false
+    recursive: true
+    dest: "{{ xdg_config_dir }}/{{ item.repo }}"
+    version: "{{ item.branch | default('main') }}"
+    repo: "git@personal.github:pazbryant/{{ item.repo }}.git"
+  loop:
+    - { repo: "vim", branch: "main" }
+    - { repo: "nvim", branch: "main" }
