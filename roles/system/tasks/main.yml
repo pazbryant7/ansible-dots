@@ -39,16 +39,6 @@
   register: fontcache
   changed_when: fontcache.rc != 0
 
-- name: Import paplay .desktop file
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/usr/share/applications/paplay.desktop
-    dest: "/usr/share/applications/paplay.desktop"
-    owner: root
-    group: root
-    mode: "0644"
-    force: false
-
 - name: Import vconsole Engish keyboard
   become: true
   ansible.builtin.copy:

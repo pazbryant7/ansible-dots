@@ -1,6 +1,0 @@
-[Desktop Entry]
-Name=Paplay
-Exec=paplay %f
-Type=Application
-MimeType=audio/*;
-NoDisplay=true
