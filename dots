@@ -107,6 +107,7 @@ print_remaining_to_be_done() {
 	send_info "  - Set GTK theme using LXAppearance GUI"
 	send_info "  - Add ssh private key to agent $HOME/.ssh/private/*"
 	send_info "  - Log in to Browser, Outlook, Bitwarden, GitHub, Google, Twitch"
+	send_info "  - Disable tab preview in firefox, also enable tab switch last one used"
 	send_info "  - Import and trust your private GPG key at $HOME/.gnupg/private_key.asc"
 }
 
