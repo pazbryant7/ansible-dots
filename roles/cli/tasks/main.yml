@@ -13,6 +13,7 @@
     state: present
   loop:
     - fnm
+    - petname
 
 - name: Install packages using uv
   moreati.uv.pip:
