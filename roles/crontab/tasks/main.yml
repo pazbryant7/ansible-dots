@@ -2,14 +2,7 @@
   ansible.builtin.cron:
     name: "Backup notes"
     minute: "0"
-    hour: "*/2"
-    job: "{{ ansible_env.HOME }}/bin/crontab/backup-notes"
+    hour: "*"
+    job: "{{ ansible_env.HOME }}/bin/crontab/backup-notes > /tmp/cron-backup-notes 2>&1" # Added the redirection
     state: present
-
-- name: Ensure Backup media cron job exists
-  ansible.builtin.cron:
-    name: "Backup media"
-    minute: "0"
-    hour: "*/5"
-    job: "{{ ansible_env.HOME }}/bin/crontab/backup-media"
-    state: present
+    user: "{{ ansible_user_id }}"
