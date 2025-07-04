@@ -20,3 +20,4 @@
     virtualenv: ~/venv
   loop:
     - spotdl
+    - names-generator
