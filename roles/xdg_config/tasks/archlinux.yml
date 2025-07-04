@@ -1,0 +1,8 @@
+---
+- name: Ensure packages are installed
+  become: true
+  community.general.pacman:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - rclone
