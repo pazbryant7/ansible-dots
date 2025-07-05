@@ -5,9 +5,9 @@
 
   vars:
     downloads: "{{ ansible_user_dir }}/Downloads"
-    dotfiles_dir: "{{ ansible_user_dir }}/dotfiles"
     xdg_config_dir: "{{ ansible_user_dir }}/.config"
     github_dir: "{{ ansible_user_dir }}/Documents/github"
+    dotfiles_dir: "{{ github_dir }}/dotfiles"
 
   pre_tasks:
     - name: Detect host system

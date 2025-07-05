@@ -1,7 +1,9 @@
----
 - name: Setup dotfiles with stow
   ansible.builtin.command:
-    cmd: stow --adopt .
+    cmd: >
+      stow --dir="{{ dotfiles_dir }}"
+      --target="{{ ansible_user_dir }}"
+      --adopt --restow .
   args:
     chdir: "{{ dotfiles_dir }}"
   register: stowstdr

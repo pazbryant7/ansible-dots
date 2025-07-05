@@ -5,7 +5,7 @@
     recursive: true
     dest: "{{ github_dir }}/{{ item.repo }}"
     version: "{{ item.branch | default('main') }}"
-    repo: "git@personal.github:pazbryant/{{ item.repo }}.git"
+    repo: "git@personal.github:pazbryant7/{{ item.repo }}.git"
   loop:
     - { repo: "pass", branch: "main" }
     - { repo: "notes", branch: "main" }
@@ -22,7 +22,7 @@
     recursive: true
     dest: "{{ xdg_config_dir }}/{{ item.repo }}"
     version: "{{ item.branch | default('main') }}"
-    repo: "git@personal.github:pazbryant/{{ item.repo }}.git"
+    repo: "git@personal.github:pazbryant7/{{ item.repo }}.git"
   loop:
     - { repo: "vim", branch: "main" }
     - { repo: "nvim", branch: "main" }
