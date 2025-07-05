@@ -28,7 +28,6 @@
     dest: "/usr/bin/xterm"
     state: link
 
-
 - name: Clone DWM tiling window manager
   ansible.builtin.git:
     update: false
@@ -43,12 +42,11 @@
     chdir: "{{ github_dir }}/dwm"
     creates: /usr/local/bin/dwm
 
-
 - name: Clone slstatus
   ansible.builtin.git:
     update: false
     version: main
-    dest: "{{ github_dir }}/dwm"
+    dest: "{{ github_dir }}/slstatus"
     repo: "git@personal.github:pazbryant7/slstatus.git"
 
 - name: Build and install slstatus
