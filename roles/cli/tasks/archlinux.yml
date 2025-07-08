@@ -30,7 +30,6 @@
     - glow
     - sqlc
     - rust
-    - dust
     - qt6ct
     - picom
     - rsync
