@@ -137,19 +137,3 @@
     cmd: grub-mkconfig -o /boot/grub/grub.cfg
   register: done
   changed_when: done.rc != 0
-
-- name: Import custom hosts file
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/etc/hosts
-    dest: "/etc/hosts"
-    owner: root
-    group: root
-    mode: "0644"
-    force: true
-
-- name: Flush DNS cache (systemd-resolved)
-  become: true
-  ansible.builtin.command:
-    cmd: systemd-resolve --flush-caches
-  changed_when: false
