@@ -6,6 +6,7 @@
   loop:
     - jq
     - fd
+    - sl
     - go
     - uv
     - lua
@@ -104,8 +105,7 @@
 - name: Setup bandwhich to run without sudo
   become: true
   ansible.builtin.command:
-    cmd:
-      setcap cap_sys_ptrace,cap_dac_read_search,cap_net_raw,cap_net_admin+ep
+    cmd: setcap cap_sys_ptrace,cap_dac_read_search,cap_net_raw,cap_net_admin+ep
       $(command -v bandwhich)
   register: bandwhich_stdout
   changed_when: bandwhich_stdout.rc != 0
