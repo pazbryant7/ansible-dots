@@ -26,18 +26,18 @@
     dest: "{{ ansible_env.HOME }}/.ssh/known_hosts"
     mode: "0600"
 
+  # NOTE: The regex is to avoid instert a blank space at the end.
+  # with a blank space ssh private key will notify with an error.
 - name: Import ssh github personal private key
   ansible.builtin.copy:
     dest: "{{ ansible_env.HOME }}/.ssh/private/personal_github"
     mode: "0600"
-    content:
-      "{{ lookup('file', '.secrets/ssh/github/personal_github') |
+    content: "{{ lookup('file', '.secrets/ssh/github/personal_github') |
       regex_replace('\\s*$', '\n') }}"
 
 - name: Import ssh github work private key
   ansible.builtin.copy:
     dest: "{{ ansible_env.HOME }}/.ssh/private/work_github"
     mode: "0600"
-    content:
-      "{{ lookup('file', '.secrets/ssh/github/work_github') |
+    content: "{{ lookup('file', '.secrets/ssh/github/work_github') |
       regex_replace('\\s*$', '\n') }}"

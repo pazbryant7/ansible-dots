@@ -8,92 +8,17 @@
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
 
-- name: Ensure required directories exist
+- name: Set timezone to America/Merida
   become: true
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    owner: root
-    group: root
-    mode: "0755"
-  loop:
-    - /etc/udev/rules.d/
-    - /etc/X11/xorg.conf.d/
-    - /usr/share/fonts/bryant-fonts/
-    - /usr/local/share/kbd/keymaps/
+  community.general.timedatectl:
+    timezone: America/Merida
+    state: present
 
-- name: Import custom personal fonts
+- name: Enable NTP synchronization
   become: true
-  ansible.builtin.copy:
-    src: files/archlinux/usr/share/fonts/bryant-fonts
-    dest: "/usr/share/fonts"
-    owner: root
-    group: root
-    mode: "0755"
-    force: false
-
-- name: Refresh fonts cache
-  become: true
-  ansible.builtin.command:
-    cmd: fc-cache -f -v
-  register: fontcache
-  changed_when: fontcache.rc != 0
-
-- name: Import vconsole Engish keyboard
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/usr/local/share/kbd/keymaps/bryantd.map
-    dest: "/usr/local/share/kbd/keymaps/bryantd.map"
-    owner: root
-    group: root
-    mode: "0644"
-    force: false
-
-- name: Import X11 English keyboard
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/usr/share/X11/xkb/symbols/bryantd
-    dest: "/usr/share/X11/xkb/symbols/bryantd"
-    owner: root
-    group: root
-    mode: "0644"
-    force: false
-
-- name: Import X11 Spanish keyboard
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/usr/share/X11/xkb/symbols/bryantdi
-    dest: "/usr/share/X11/xkb/symbols/bryantdi"
-    owner: root
-    group: root
-    mode: "0644"
-    force: false
-
-- name: Import ROOT ENV
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/etc/enviroment
-    dest: "/etc/environment"
-    owner: root
-    group: root
-    mode: "0644"
-    force: true
-
-- name: Setup system keyboard
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/etc/X11/xorg.conf.d/00-keyboard.conf
-    dest: "/etc/X11/xorg.conf.d/00-keyboard.conf"
-    mode: "0644"
-    force: true
-
-- name: Setup vconsole keyboard
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/etc/vconsole.conf
-    dest: "/etc/vconsole.conf"
-    mode: "0644"
-    force: true
+  community.general.timedatectl:
+    ntp: true
+    state: present
 
 - name: Ensure GRUB_DEFAULT is set to 'saved'
   become: true
