@@ -4,12 +4,23 @@
     name: "{{ item }}"
     state: present
   loop:
+    - feh
+    - rofi
+    - maim
+    - picom
+    - nsxiv
+    - xcolor
     - xdotool
     - xorg-xev
+    - screenkey
+    - unclutter
     - xorg-xinit
-    - xorg-xrandr
+    - ueberzugpp
     - xorg-server
+    - xorg-xrandr
+    - dragon-drop
     - xorg-xsetroot
+    - rofi-greenclip
 
 - name: Ensure remove wayland
   become: true

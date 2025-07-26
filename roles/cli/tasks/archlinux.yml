@@ -5,82 +5,72 @@
     state: present
   loop:
     - jq
-    - fd
-    - sl
     - go
+    - sl
     - uv
-    - lua
-    - mpd
-    - eza
-    - xsv
-    - mpv
+    - fd
     - fzf
     - mpc
     - git
-    - feh
-    - yazi
-    - rofi
-    - lsof
-    - 7zip
-    - maim
-    - tree
-    - less
-    - dust
-    - fish
-    - tmux
+    - xsv
+    - mpv
+    - eza
+    - mpd
+    - lua
     - stow
     - glow
     - sqlc
     - rust
-    - qt6ct
-    - picom
-    - rsync
-    - pgcli
-    - atuin
+    - tmux
+    - fish
+    - tree
+    - less
+    - yazi
+    - dust
+    - lsof
+    - 7zip
     - aria2
-    - nsxiv
-    - bottom
-    - zoxide
-    - xcolor
-    - rclone
-    - ffmpeg
+    - atuin
+    - pgcli
+    - rsync
+    - qt6ct
     - yt-dlp
     - gopass
-    - img2pdf
+    - rclone
+    - ffmpeg
+    - zoxide
+    - bottom
+    - ncmpcpp
+    - ripgrep
+    - firefox
+    - zathura
+    - pcmanfm
     - poppler
     - calibre
-    - zathura
-    - firefox
-    - ncmpcpp
-    - poppler
-    - lazygit
-    - pcmanfm
-    - ripgrep
-    - luarocks
-    - nwg-look
-    - libpulse
+    - img2pdf
     - obsidian
     - starship
-    - screenkey
-    - syncthing
-    - bandwhich
-    - alacritty
+    - libpulse
+    - nwg-look
+    - luarocks
     - fastfetch
-    - streamlink
-    - python-pip
+    - alacritty
+    - bandwhich
+    - syncthing
     - breeze-gtk
-    - ueberzugpp
-    - imagemagick
-    - qbittorrent
+    - python-pip
+    - streamlink
     - qutebrowser
+    - qbittorrent
     - pavucontrol
+    - imagemagick
     - breeze-icons
     - android-tools
     - pacman-contrib
     - translate-shell
-    - capitaine-cursors
     - zathura-pdf-mupdf
     - ffmpegthumbnailer
+    - capitaine-cursors
     - ttf-cascadia-code-nerd
 
 - name: Install aur packages using paru
@@ -90,19 +80,17 @@
     state: present
   loop:
     - wego
-    - bun-bin
-    - litecli
     - ani-cli
+    - litecli
+    - bun-bin
     - datagrip
-    - bruno-bin
     - brave-bin
+    - bruno-bin
     - lazydocker
     - numbat-bin
-    - dragon-drop
-    - postman-bin
     - vesktop-bin
+    - postman-bin
     - datagrip-jre
-    - rofi-greenclip
 
 - name: Setup bandwhich to run without sudo
   become: true
