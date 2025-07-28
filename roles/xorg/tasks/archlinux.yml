@@ -20,7 +20,6 @@
     - xorg-xrandr
     - dragon-drop
     - xorg-xsetroot
-    - rofi-greenclip
 
 - name: Ensure remove wayland
   become: true
