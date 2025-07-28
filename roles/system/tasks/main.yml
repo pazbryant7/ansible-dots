@@ -10,15 +10,14 @@
 
 - name: Set timezone to America/Merida
   become: true
-  community.general.timedatectl:
-    timezone: America/Merida
-    state: present
+  community.general.timezone:
+    name: America/Merida
 
-- name: Enable NTP synchronization
+- name: Enable NTP synchronization using timedatectl
   become: true
-  community.general.timedatectl:
-    ntp: true
-    state: present
+  ansible.builtin.command:
+    cmd: timedatectl set-ntp true
+  changed_when: false
 
 - name: Ensure GRUB_DEFAULT is set to 'saved'
   become: true
