@@ -17,6 +17,7 @@
     - neovim
     - man-db
     - cronie
+    - ntfs-3g
     - pipewire
     - libnotify
     - linux-lts
