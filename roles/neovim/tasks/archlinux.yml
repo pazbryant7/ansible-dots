@@ -1,0 +1,26 @@
+---
+- name: Install Bob (Neovim version manager)
+  become: true
+  community.general.pacman:
+    name: bob
+    state: present
+
+- name: Verify Bob installation
+  ansible.builtin.command: bob --version
+  register: bob_version
+  changed_when: false
+  failed_when: bob_version.rc != 0
+
+- name: Install stable Neovim using Bob
+  ansible.builtin.command: bob use stable
+  args:
+    creates: "{{ ansible_env.HOME }}/.local/share/bob/nvim-bin/nvim"
+
+- name: Copy nvim.desktop file to applications directory
+  become: true
+  ansible.builtin.copy:
+    src: files/nvim.desktop
+    dest: /usr/share/applications/nvim.desktop
+    owner: root
+    group: root
+    mode: "0644"
