@@ -20,7 +20,6 @@
     - stow
     - glow
     - sqlc
-    - rust
     - tmux
     - fish
     - tree
@@ -35,6 +34,7 @@
     - rsync
     - qt6ct
     - yt-dlp
+    - rustup
     - gopass
     - rclone
     - ffmpeg
