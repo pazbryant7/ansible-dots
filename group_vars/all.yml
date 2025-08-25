@@ -5,6 +5,7 @@ default_roles:
   - gpg
   - zsh
   - docker
+  - neovim
   - system
   - github
   - systemd
