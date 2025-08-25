@@ -7,6 +7,14 @@
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
 
+- name: Install packages using uv
+  moreati.uv.pip:
+    name: "{{ item }}"
+    virtualenv: ~/venv
+  loop:
+    - spotdl
+    - names-generator
+
 - name: Install packages using cargo
   community.general.cargo:
     name: "{{ item }}"
@@ -15,10 +23,10 @@
     - fnm
     - petname
 
-- name: Install packages using uv
-  moreati.uv.pip:
-    name: "{{ item }}"
-    virtualenv: ~/venv
+- name: Install rustup components
+  ansible.builtin.command: rustup component add {{ item }}
   loop:
-    - spotdl
-    - names-generator
+    - rust-analyzer
+    - rustfmt
+  args:
+    creates: "{{ ansible_env.HOME }}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/{{ item }}"
