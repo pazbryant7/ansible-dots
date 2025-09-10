@@ -18,6 +18,7 @@
     - mpd
     - lua
     - stow
+    - just
     - glow
     - sqlc
     - tmux
