@@ -56,8 +56,10 @@
     - luarocks
     - fastfetch
     - alacritty
+    - watchexec
     - bandwhich
     - syncthing
+    - hyperfine
     - breeze-gtk
     - typescript
     - python-pip
@@ -67,13 +69,14 @@
     - pavucontrol
     - imagemagick
     - breeze-icons
+    - speedtest-cli
     - android-tools
     - pacman-contrib
     - translate-shell
     - zathura-pdf-mupdf
     - ffmpegthumbnailer
     - capitaine-cursors
-    - ttf-cascadia-code-nerd
+    - perl-image-exiftool
 
 - name: Install aur packages using paru
   kewlfft.aur.aur:
@@ -89,6 +92,7 @@
     - brave-bin
     - bruno-bin
     - lazydocker
+    - ventoy-bin
     - numbat-bin
     - vesktop-bin
     - postman-bin
