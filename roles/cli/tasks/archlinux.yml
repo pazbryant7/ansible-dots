@@ -62,6 +62,7 @@
     - hyperfine
     - breeze-gtk
     - typescript
+    - github-cli
     - python-pip
     - streamlink
     - qutebrowser
