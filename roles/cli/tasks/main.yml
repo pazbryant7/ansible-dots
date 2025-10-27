@@ -7,13 +7,14 @@
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
 
-- name: Install packages using uv
-  moreati.uv.pip:
-    name: "{{ item }}"
-    virtualenv: ~/venv
+- name: Install global CLI tools via uv
+  ansible.builtin.shell: "uv tool install {{ item }}"
   loop:
     - spotdl
+    - litecli
     - names-generator
+  args:
+    creates: "~/.local/share/uv/tools/{{ item }}"
 
 - name: Install packages using cargo
   community.general.cargo:

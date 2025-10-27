@@ -87,7 +87,6 @@
   loop:
     - wego
     - ani-cli
-    - litecli
     - bun-bin
     - datagrip
     - lazydocker
