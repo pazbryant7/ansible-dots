@@ -9,6 +9,7 @@
     - sl
     - uv
     - fd
+    - xh
     - fzf
     - mpc
     - git
@@ -19,6 +20,7 @@
     - mpd
     - lua
     - stow
+    - hurl
     - just
     - glow
     - sqlc
