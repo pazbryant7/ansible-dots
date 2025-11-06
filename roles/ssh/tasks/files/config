@@ -1,5 +1,6 @@
 # work github account
 Host work.github
+   User git
    HostName github.com
    AddKeysToAgent yes
    IdentityFile ~/.ssh/private/work_github
@@ -7,6 +8,15 @@ Host work.github
 
 # personal github account
 Host personal.github
+   User git
+   HostName github.com
+   AddKeysToAgent yes
+   IdentityFile ~/.ssh/private/personal_github
+   IdentitiesOnly yes
+
+# for github cli
+Host github.com
+   User git
    HostName github.com
    AddKeysToAgent yes
    IdentityFile ~/.ssh/private/personal_github
