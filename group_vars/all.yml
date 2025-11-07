@@ -10,7 +10,8 @@ default_roles:
   - github
   - systemd
   - crontab
-  - xdg_config
+  - xdg-base-dir
+  - network-manager
 
   # NOTE: When you execute the command `ansible-playbook local.yml`, the specified
   # roles will run. However, there is an exception: the `common` role will also

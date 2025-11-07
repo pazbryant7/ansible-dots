@@ -1,4 +1,3 @@
----
 - name: Ensure base development packages are installed
   become: true
   community.general.pacman:

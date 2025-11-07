@@ -1,57 +1,63 @@
-- name: "Get distribution"
+- name: Load OS-specific tasks if available
   ansible.builtin.stat:
     path: "{{ role_path }}/tasks/{{ host_os }}.yml"
   register: distribution_config
 
-- name: "Run tasks for {{ host_os }}"
+- name: Include OS-specific tasks
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
 
-- name: Clone ST terminal emulator
-  ansible.builtin.git:
-    update: false
-    version: main
-    dest: "{{ github_dir }}/st"
-    repo: "git@personal.github:pazbryant7/st.git"
+- name: Clone and build ST terminal emulator
+  block:
+    - name: Clone ST repository
+      ansible.builtin.git:
+        repo: "git@personal.github:pazbryant7/st.git"
+        dest: "{{ github_dir }}/st"
+        version: main
+        update: false
 
-- name: Build and install ST terminal emulator
-  become: true
-  ansible.builtin.command:
-    cmd: sudo make clean install
-    chdir: "{{ github_dir }}/st"
-    creates: /usr/local/bin/st
+    - name: Build and install ST
+      become: true
+      ansible.builtin.command:
+        cmd: make clean install
+        chdir: "{{ github_dir }}/st"
+        creates: /usr/local/bin/st
 
-- name: Symlink ST terminal emulator to xterm
-  become: true
-  ansible.builtin.file:
-    src: "/usr/local/bin/st"
-    dest: "/usr/bin/xterm"
-    state: link
+    - name: Symlink ST to xterm
+      become: true
+      ansible.builtin.file:
+        src: /usr/local/bin/st
+        dest: /usr/bin/xterm
+        state: link
 
-- name: Clone DWM tiling window manager
-  ansible.builtin.git:
-    update: false
-    version: main
-    dest: "{{ github_dir }}/dwm"
-    repo: "git@personal.github:pazbryant7/dwm.git"
+- name: Clone and build DWM window manager
+  block:
+    - name: Clone DWM repository
+      ansible.builtin.git:
+        repo: "git@personal.github:pazbryant7/dwm.git"
+        dest: "{{ github_dir }}/dwm"
+        version: main
+        update: false
 
-- name: Build and install DWM tiling window manager
-  become: true
-  ansible.builtin.command:
-    cmd: sudo make clean install
-    chdir: "{{ github_dir }}/dwm"
-    creates: /usr/local/bin/dwm
+    - name: Build and install DWM
+      become: true
+      ansible.builtin.command:
+        cmd: make clean install
+        chdir: "{{ github_dir }}/dwm"
+        creates: /usr/local/bin/dwm
 
-- name: Clone slstatus
-  ansible.builtin.git:
-    update: false
-    version: main
-    dest: "{{ github_dir }}/slstatus"
-    repo: "git@personal.github:pazbryant7/slstatus.git"
+- name: Clone and build slstatus
+  block:
+    - name: Clone slstatus repository
+      ansible.builtin.git:
+        repo: "git@personal.github:pazbryant7/slstatus.git"
+        dest: "{{ github_dir }}/slstatus"
+        version: main
+        update: false
 
-- name: Build and install slstatus
-  become: true
-  ansible.builtin.command:
-    cmd: sudo make clean install
-    chdir: "{{ github_dir }}/slstatus"
-    creates: /usr/local/bin/slstatus
+    - name: Build and install slstatus
+      become: true
+      ansible.builtin.command:
+        cmd: make clean install
+        chdir: "{{ github_dir }}/slstatus"
+        creates: /usr/local/bin/slstatus

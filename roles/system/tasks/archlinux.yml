@@ -1,32 +1,22 @@
-- name: Ensure required directories exist
+- name: Ensure pacman hooks directory exists
   become: true
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: /etc/pacman.d/hooks
     state: directory
-    owner: root
-    group: root
     mode: "0755"
-  loop:
-    - /etc/pacman.d/hooks/
 
-- name: Import pacman hook
+- name: Install pacman update hook
   become: true
   ansible.builtin.copy:
     src: files/archlinux/etc/pacman.d/hooks/update-software.hook
-    dest: "/etc/pacman.d/hooks/update-software.hook"
-    owner: root
-    group: root
+    dest: /etc/pacman.d/hooks/update-software.hook
     mode: "0644"
     force: false
 
-- name: Ensure pacman ParallelDownloads is set to '5'
+- name: Enable pacman ParallelDownloads
   become: true
   ansible.builtin.lineinfile:
-    dest: /etc/pacman.conf
-    regexp: "^#ParallelDownloads = 5"
+    path: /etc/pacman.conf
+    regexp: '^#?ParallelDownloads\s*='
     line: "ParallelDownloads = 5"
-    create: true
     backup: true
-    owner: root
-    group: root
-    mode: "0644"

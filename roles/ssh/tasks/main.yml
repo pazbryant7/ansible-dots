@@ -1,4 +1,3 @@
----
 - name: "Get distribution"
   ansible.builtin.stat:
     path: "{{ role_path }}/tasks/{{ host_os }}.yml"
@@ -8,36 +7,32 @@
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
 
-- name: Ensure ssh home dir exist
+- name: Ensure .ssh/private directory exists
   ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.ssh/private"
     state: directory
     mode: "0700"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_gid | default(ansible_user_id) }}"
 
-- name: Import ssh config file
+- name: Deploy SSH config files
   ansible.builtin.copy:
-    src: files/config
-    dest: "{{ ansible_env.HOME }}/.ssh/config"
+    src: "files/{{ item }}"
+    dest: "{{ ansible_env.HOME }}/.ssh/{{ item }}"
     mode: "0600"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_gid | default(ansible_user_id) }}"
+  loop:
+    - config
+    - known_hosts
 
-- name: Import ssh known_hosts file
+- name: Import SSH private keys
   ansible.builtin.copy:
-    src: files/known_hosts
-    dest: "{{ ansible_env.HOME }}/.ssh/known_hosts"
+    dest: "{{ ansible_env.HOME }}/.ssh/private/{{ item.name }}"
     mode: "0600"
-
-  # NOTE: The regex is to avoid instert a blank space at the end.
-  # with a blank space ssh private key will notify with an error.
-- name: Import ssh github personal private key
-  ansible.builtin.copy:
-    dest: "{{ ansible_env.HOME }}/.ssh/private/personal_github"
-    mode: "0600"
-    content: "{{ lookup('file', '.secrets/ssh/github/personal_github') |
-      regex_replace('\\s*$', '\n') }}"
-
-- name: Import ssh github work private key
-  ansible.builtin.copy:
-    dest: "{{ ansible_env.HOME }}/.ssh/private/work_github"
-    mode: "0600"
-    content: "{{ lookup('file', '.secrets/ssh/github/work_github') |
-      regex_replace('\\s*$', '\n') }}"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_gid | default(ansible_user_id) }}"
+    content: "{{ lookup('file', item.src) | regex_replace('\\s*$', '\n') }}"
+  loop:
+    - { name: "personal_github", src: ".secrets/ssh/github/personal_github" }
+    - { name: "work_github", src: ".secrets/ssh/github/work_github" }

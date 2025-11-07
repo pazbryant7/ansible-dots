@@ -7,15 +7,15 @@
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
 
-- name: Ensure xdg_config directory exist
+- name: Ensure rclone config directory exists
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.config"
+    path: "{{ ansible_env.HOME }}/.config/rclone"
     state: directory
     mode: "0700"
 
-- name: Import rclone config file
+- name: Deploy rclone configuration
   ansible.builtin.copy:
     dest: "{{ ansible_env.HOME }}/.config/rclone/rclone.conf"
-    mode: "0700"
+    mode: "0600"
     content: "{{ lookup('file', '.secrets/xdg_config/rclone/rclone.conf') }}"
     force: false

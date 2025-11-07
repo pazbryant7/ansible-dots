@@ -8,26 +8,32 @@
   when: distribution_config.stat.exists
 
 - name: Install global CLI tools via uv
+  become: false
   ansible.builtin.shell: "uv tool install {{ item }}"
   loop:
     - spotdl
     - litecli
     - names-generator
   args:
-    creates: "~/.local/share/uv/tools/{{ item }}"
+    executable: /bin/env sh
+    creates: "{{ ansible_env.HOME }}/.local/share/uv/tools/{{ item }}"
+  changed_when: false
 
-- name: Install packages using cargo
-  community.general.cargo:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - fnm
-    - petname
+- name: Setup Rust environment
+  become: false
+  block:
+    - name: Install packages using cargo
+      community.general.cargo:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - fnm
+        - petname
 
-- name: Install rustup components
-  ansible.builtin.command: rustup component add {{ item }}
-  loop:
-    - rust-analyzer
-    - rustfmt
-  args:
-    creates: "{{ ansible_env.HOME }}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/{{ item }}"
+    - name: Install rustup components
+      ansible.builtin.command: rustup component add {{ item }}
+      loop:
+        - rustfmt
+        - rust-analyzer
+      args:
+        creates: "{{ ansible_env.HOME }}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/{{ item }}"

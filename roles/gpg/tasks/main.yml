@@ -8,13 +8,34 @@
   when: distribution_config.stat.exists
 
 - name: Ensure gpg directory exists
+  become: false
   ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.gnupg"
     state: directory
     mode: "0700"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_gid | default(ansible_user_id) }}"
+
+- name: Check if private key file exists
+  become: false
+  ansible.builtin.stat:
+    path: ".secrets/gpg/private-key.asc"
+  register: gpg_key_file
 
 - name: Import gpg private key
+  become: false
   ansible.builtin.copy:
     dest: "{{ ansible_env.HOME }}/.gnupg/private_key.asc"
     mode: "0600"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_gid | default(ansible_user_id) }}"
     content: "{{ lookup('file', '.secrets/gpg/private-key.asc') }}"
+  when: gpg_key_file.stat.exists
+
+- name: Import private key into gpg keyring
+  become: false
+  ansible.builtin.command:
+    cmd: "gpg --import {{ ansible_env.HOME }}/.gnupg/private_key.asc"
+  args:
+    creates: "{{ ansible_env.HOME }}/.gnupg/secring.gpg"
+  when: gpg_key_file.stat.exists

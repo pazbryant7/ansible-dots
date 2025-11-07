@@ -1,106 +1,100 @@
-- name: Ensure install xorg packages
+- name: Setup Xorg environment
   become: true
-  community.general.pacman:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - feh
-    - rofi
-    - maim
-    - picom
-    - nsxiv
-    - xcolor
-    - xdotool
-    - xorg-xev
-    - screenkey
-    - unclutter
-    - xorg-xinit
-    - ueberzugpp
-    - xorg-server
-    - xorg-xrandr
-    - xorg-xsetroot
-    - xorg-server-xephyr
+  block:
+    - name: Install required Xorg packages
+      community.general.pacman:
+        name:
+          - feh
+          - rofi
+          - maim
+          - picom
+          - nsxiv
+          - xcolor
+          - xdotool
+          - xorg-xev
+          - screenkey
+          - unclutter
+          - xorg-xinit
+          - ueberzugpp
+          - xorg-server
+          - xorg-xrandr
+          - xorg-xsetroot
+          - xorg-server-xephyr
+        state: present
 
-- name: Ensure remove wayland
-  become: true
-  community.general.pacman:
-    name:
-      - waybar
-    state: absent
+    - name: Remove Wayland-related packages
+      community.general.pacman:
+        name: waybar
+        state: absent
 
-- name: Ensure required directories exist
+- name: Setup custom system configurations
   become: true
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    owner: root
-    group: root
-    mode: "0755"
-  loop:
-    - /etc/udev/rules.d/
-    - /etc/X11/xorg.conf.d/
-    - /usr/share/fonts/bryant-fonts/
-    - /usr/local/share/kbd/keymaps/
+  block:
+    - name: Ensure system directories exist
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+      loop:
+        - /etc/udev/rules.d
+        - /etc/X11/xorg.conf.d
+        - /usr/share/fonts/bryant-fonts
+        - /usr/local/share/kbd/keymaps
 
-- name: Import custom personal fonts
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/usr/share/fonts/bryant-fonts
-    dest: "/usr/share/fonts"
-    owner: root
-    group: root
-    mode: "0755"
-    force: false
+    - name: Deploy personal fonts
+      ansible.builtin.copy:
+        src: files/archlinux/usr/share/fonts/bryant-fonts/
+        dest: /usr/share/fonts/bryant-fonts/
+        owner: root
+        group: root
+        mode: "0755"
+        force: false
 
-- name: Import vconsole keyboard
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/usr/local/share/kbd/keymaps/bryantd.map
-    dest: "/usr/local/share/kbd/keymaps/bryantd.map"
-    owner: root
-    group: root
-    mode: "0644"
-    force: false
+    - name: Install vconsole keyboard map
+      ansible.builtin.copy:
+        src: files/archlinux/usr/local/share/kbd/keymaps/bryantd.map
+        dest: /usr/local/share/kbd/keymaps/bryantd.map
+        owner: root
+        group: root
+        mode: "0644"
+        force: false
 
-- name: Import X11 custom keyboards
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/usr/share/X11/xkb/symbols/
-    dest: "/usr/share/X11/xkb/symbols"
-    owner: root
-    group: root
-    mode: "0644"
-    force: false
+    - name: Deploy X11 custom keyboard layouts
+      ansible.builtin.copy:
+        src: files/archlinux/usr/share/X11/xkb/symbols/
+        dest: /usr/share/X11/xkb/symbols/
+        owner: root
+        group: root
+        mode: "0644"
+        force: false
 
-- name: Import ROOT ENV
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/etc/environment
-    dest: "/etc/environment"
-    owner: root
-    group: root
-    mode: "0644"
-    force: true
+    - name: Deploy system environment file
+      ansible.builtin.copy:
+        src: files/archlinux/etc/environment
+        dest: /etc/environment
+        owner: root
+        group: root
+        mode: "0644"
+        force: true
 
-- name: Refresh fonts cache
-  become: true
-  ansible.builtin.command:
-    cmd: fc-cache -f -v
-  register: fontcache
-  changed_when: fontcache.rc != 0
+    - name: Refresh font cache
+      ansible.builtin.command: fc-cache -f -v
+      register: fontcache
+      changed_when: false
+      failed_when: fontcache.rc != 0
 
-- name: Setup system keyboard
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/etc/X11/xorg.conf.d/00-keyboard.conf
-    dest: "/etc/X11/xorg.conf.d/00-keyboard.conf"
-    mode: "0644"
-    force: true
+    - name: Deploy X11 keyboard configuration
+      ansible.builtin.copy:
+        src: files/archlinux/etc/X11/xorg.conf.d/00-keyboard.conf
+        dest: /etc/X11/xorg.conf.d/00-keyboard.conf
+        mode: "0644"
+        force: true
 
-- name: Setup vconsole keyboard
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/etc/vconsole.conf
-    dest: "/etc/vconsole.conf"
-    mode: "0644"
-    force: true
+    - name: Deploy vconsole configuration
+      ansible.builtin.copy:
+        src: files/archlinux/etc/vconsole.conf
+        dest: /etc/vconsole.conf
+        mode: "0644"
+        force: true

@@ -7,33 +7,41 @@
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
 
-- name: Enable and start systemd-resolved service
-  ansible.builtin.systemd:
-    name: systemd-resolved.service
-    enabled: true
-    state: started
+- name: Enable and start essential system services
+  become: true
+  block:
+    - name: Enable and start systemd-resolved
+      ansible.builtin.systemd:
+        name: systemd-resolved.service
+        enabled: true
+        state: started
 
-- name: Enable and start cronie service
-  ansible.builtin.systemd:
-    name: cronie.service
-    enabled: true
-    state: started
+    - name: Enable and start cronie
+      ansible.builtin.systemd:
+        name: cronie.service
+        enabled: true
+        state: started
+
+    - name: Enable and start syncthing for user
+      ansible.builtin.systemd:
+        name: "syncthing@{{ host_user }}.service"
+        enabled: true
+        state: started
 
 - name: Enable mpd user service
   ansible.builtin.systemd:
-    name: mpd
+    name: mpd.service
     scope: user
-
-- name: Enable and start syncthing service
-  ansible.builtin.systemd:
-    name: syncthing@{{ host_user }}.service
     enabled: true
     state: started
 
-- name: Reread systemd configs
-  ansible.builtin.systemd_service:
-    daemon_reload: true
+- name: Reload and reexec systemd
+  become: true
+  block:
+    - name: Reload systemd manager configuration
+      ansible.builtin.systemd:
+        daemon_reload: true
 
-- name: Restart systemd
-  ansible.builtin.systemd_service:
-    daemon_reexec: true
+    - name: Reexec systemd
+      ansible.builtin.systemd:
+        daemon_reexec: true

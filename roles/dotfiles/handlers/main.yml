@@ -1,4 +1,5 @@
 - name: Setup dotfiles with stow
+  become: false
   ansible.builtin.command:
     cmd: >
       stow --dir="{{ dotfiles_dir }}"

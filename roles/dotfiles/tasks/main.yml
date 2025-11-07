@@ -8,6 +8,7 @@
   when: distribution_config.stat.exists
 
 - name: Ensure clone dotfiles
+  become: false
   ansible.builtin.git:
     update: false
     version: main
