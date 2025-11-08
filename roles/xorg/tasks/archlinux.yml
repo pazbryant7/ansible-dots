@@ -41,7 +41,7 @@
         - /etc/udev/rules.d
         - /etc/X11/xorg.conf.d
         - /usr/share/fonts/bryant-fonts
-        - /usr/local/share/kbd/keymaps
+        - /usr/share/kbd/keymaps
 
     - name: Deploy personal fonts
       ansible.builtin.copy:
@@ -54,8 +54,8 @@
 
     - name: Install vconsole keyboard map
       ansible.builtin.copy:
-        src: files/archlinux/usr/local/share/kbd/keymaps/bryantd.map
-        dest: /usr/local/share/kbd/keymaps/bryantd.map
+        src: files/archlinux/usr/share/kbd/keymaps/bryantd.map
+        dest: /usr/share/kbd/keymaps/bryantd.map
         owner: root
         group: root
         mode: "0644"
