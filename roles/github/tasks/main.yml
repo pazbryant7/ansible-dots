@@ -42,3 +42,13 @@
     accept_hostkey: true
   loop:
     - { repo: "nvim", branch: "main" }
+
+- name: Ensure tmux plugin manager is installed
+  become: false
+  ansible.builtin.git:
+    repo: "https://github.com/tmux-plugins/tpm"
+    dest: "{{ ansible_env.HOME }}/.tmux/plugins/tpm"
+    update: false
+    recursive: true
+    clone: yes
+    single_branch: true
