@@ -32,11 +32,3 @@
     owner: root
     group: root
     mode: "0644"
-
-- name: Make neovim binary system wide
-  become: true
-  ansible.builtin.file:
-    src: "{{ ansible_env.HOME }}/.local/share/bob/nvim-bin/nvim"
-    dest: /usr/bin/nvim"
-    state: link
-    force: true

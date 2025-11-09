@@ -4,9 +4,5 @@
 # Syntax: simple "KEY=VAL" pairs on separate lines
 #
 
-EDITOR=/usr/bin/nvim
-VISUAL=/usr/bin/nvim
-SUDO_EDITOR=/usr/bin/nvim
-PAGER=less
-MANPAGER=nvim +Man!
+PAGER=bat
 QT_QPA_PLATFORMTHEME=qt6ct
