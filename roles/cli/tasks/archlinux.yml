@@ -57,6 +57,7 @@
     - nwg-look
     - luarocks
     - fastfetch
+    - gammastep
     - alacritty
     - watchexec
     - bandwhich
