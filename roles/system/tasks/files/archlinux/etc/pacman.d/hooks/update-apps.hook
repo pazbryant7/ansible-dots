@@ -7,4 +7,4 @@ Target = *
 
 [Action]
 When = PostTransaction
-Exec = '/home/bryant/bin/global/update-software'
+Exec = '/home/bryant/bin/global/update-apps'

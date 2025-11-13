@@ -8,8 +8,8 @@
 - name: Install pacman update hook
   become: true
   ansible.builtin.copy:
-    src: files/archlinux/etc/pacman.d/hooks/update-software.hook
-    dest: /etc/pacman.d/hooks/update-software.hook
+    src: files/archlinux/etc/pacman.d/hooks/update-apps.hook
+    dest: /etc/pacman.d/hooks/update-apps.hook
     mode: "0644"
     force: false
 

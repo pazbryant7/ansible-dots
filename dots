@@ -92,19 +92,9 @@ get_media_from_usb() {
 	rsync -avh --progress --delete "$books_path/" "$HOME/Documents/books"
 }
 
-get_docker_images() {
-	if ! command -v docker >/dev/null 2>&1; then
-		send_info "Docker is not installed. Skipping docker image pulls."
-		return 1
-	fi
-
-	docker pull node:alpine
-	docker pull postgres:alpine
-}
-
 print_remaining_to_be_done() {
 	send_info "Remaining tasks to be completed:"
-	send_info "  - Set GTK theme using LXAppearance GUI"
+	send_info "  - Set GTK theme using nwg-look GUI"
 	send_info "  - Add ssh private key to agent $HOME/.ssh/private/*"
 	send_info "  - Log in to Browser, Outlook, Bitwarden, GitHub, Google, Twitch"
 	send_info "  - Disable tab preview in firefox, also enable tab switch last one used"
@@ -113,10 +103,10 @@ print_remaining_to_be_done() {
 
 executing_custom_scripts() {
 	if [ -x "$HOME/bin/global/update-software" ]; then
-		"$HOME/bin/global/update-software"
+		"$HOME/bin/global/update-apps"
 	fi
 	if [ -x "$HOME/bin/global/fix-firefox-ui" ]; then
-		"$HOME/bin/global/fix-firefox-ui"
+		"$HOME/bin/global/firefoxui"
 	fi
 }
 
@@ -130,7 +120,6 @@ setup_post_installation() {
 	echo "Executing post installation tasks..."
 	pids=""
 
-	get_docker_images &
 	pids="$pids $!"
 	get_media_from_usb &
 	pids="$pids $!"
