@@ -37,6 +37,7 @@
     - rsync
     - qt6ct
     - yt-dlp
+    - pastel
     - rustup
     - gopass
     - rclone
