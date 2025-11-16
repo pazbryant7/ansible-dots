@@ -67,7 +67,6 @@
     - breeze-gtk
     - typescript
     - github-cli
-    - difftastic
     - python-pip
     - streamlink
     - qutebrowser
