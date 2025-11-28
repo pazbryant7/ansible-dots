@@ -67,6 +67,7 @@
     - breeze-gtk
     - typescript
     - github-cli
+    - pandoc-cli
     - python-pip
     - streamlink
     - qutebrowser
