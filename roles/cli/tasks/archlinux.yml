@@ -57,6 +57,7 @@
     - starship
     - libpulse
     - luarocks
+    - patchelf
     - fastfetch
     - gammastep
     - alacritty
