@@ -32,6 +32,7 @@
     - dust
     - lsof
     - 7zip
+    - helix
     - aria2
     - atuin
     - pgcli
