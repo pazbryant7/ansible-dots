@@ -57,6 +57,7 @@
     - calibre
     - img2pdf
     - starship
+    - websocat
     - libpulse
     - luarocks
     - patchelf
@@ -82,6 +83,7 @@
     - android-tools
     - pacman-contrib
     - translate-shell
+    - tree-sitter-cli
     - zathura-pdf-mupdf
     - ffmpegthumbnailer
     - capitaine-cursors
@@ -100,6 +102,7 @@
     - lazydocker
     - ventoy-bin
     - numbat-bin
+    - grpcurl-bin
     - dragon-drop
     - datagrip-jre
     - thorium-browser-bin
