@@ -11,7 +11,6 @@
     - xh
     - fzf
     - mpc
-    - imv
     - git
     - bat
     - xsv
@@ -22,7 +21,6 @@
     - stow
     - hurl
     - just
-    - glow
     - sqlc
     - tmux
     - fish
@@ -32,7 +30,6 @@
     - dust
     - lsof
     - 7zip
-    - helix
     - aria2
     - atuin
     - pgcli
@@ -46,7 +43,6 @@
     - rclone
     - ffmpeg
     - zoxide
-    - bottom
     - ncmpcpp
     - ripgrep
     - firefox
@@ -73,13 +69,10 @@
     - github-cli
     - pandoc-cli
     - python-pip
-    - streamlink
-    - qutebrowser
     - qbittorrent
     - pavucontrol
     - imagemagick
     - breeze-icons
-    - speedtest-cli
     - android-tools
     - pacman-contrib
     - translate-shell
@@ -95,14 +88,10 @@
     name: "{{ item }}"
     state: present
   loop:
-    - wego
-    - ani-cli
     - bun-bin
-    - datagrip
     - lazydocker
     - ventoy-bin
     - numbat-bin
     - grpcurl-bin
     - dragon-drop
-    - datagrip-jre
     - thorium-browser-bin
