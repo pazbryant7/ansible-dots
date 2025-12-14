@@ -82,9 +82,9 @@
     - capitaine-cursors
     - perl-image-exiftool
 
-- name: Install aur packages using paru
+- name: Install AUR packages using yay
   kewlfft.aur.aur:
-    use: paru
+    use: yay
     name: "{{ item }}"
     state: present
   loop:
