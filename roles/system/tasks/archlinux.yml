@@ -20,3 +20,20 @@
     regexp: '^#?ParallelDownloads\s*='
     line: "ParallelDownloads = 5"
     backup: true
+
+- name: Enable pacman Color
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/pacman.conf
+    regexp: '^#?\s*Color\s*$'
+    line: "Color"
+    insertafter: '^\[options\]'
+    backup: true
+
+- name: Enable pacman ILoveCandy
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/pacman.conf
+    regexp: '^#?\s*ILoveCandy\s*$'
+    line: "ILoveCandy"
+    insertafter: '^\[options\]'
