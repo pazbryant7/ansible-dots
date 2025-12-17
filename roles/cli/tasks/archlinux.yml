@@ -74,6 +74,7 @@
     - imagemagick
     - breeze-icons
     - android-tools
+    - noto-fonts-cjk
     - pacman-contrib
     - translate-shell
     - tree-sitter-cli
