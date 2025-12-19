@@ -7,6 +7,22 @@
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
 
+- name: Ensure user local bin directory exist
+  become: true
+  ansible.builtin.file:
+    path: /usr/local/bin
+    state: directory
+    mode: "0755"
+
+- name: Copy binary to user directory
+  become: true
+  ansible.builtin.copy:
+    src: files/usr/local/bin/xdg_default
+    dest: /usr/local/bin/xdg_default
+    owner: root
+    group: root
+    mode: "0755"
+
 - name: Configure timezone and NTP
   become: true
   block:
