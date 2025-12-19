@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=ffplay
+Comment=Play audio/video using FFmpeg
+Exec=ffplay -autoexit %f
+Icon=multimedia-player
+Terminal=false
+Categories=AudioVideo;Player;
+MimeType=audio/mpeg;audio/mp3;audio/ogg;audio/wav;audio/flac;

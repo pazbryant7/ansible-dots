@@ -41,7 +41,6 @@
     - gopass
     - ccache
     - rclone
-    - ffmpeg
     - zoxide
     - ncmpcpp
     - ripgrep
@@ -79,7 +78,6 @@
     - translate-shell
     - tree-sitter-cli
     - zathura-pdf-mupdf
-    - ffmpegthumbnailer
     - capitaine-cursors
     - perl-image-exiftool
 

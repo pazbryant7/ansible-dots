@@ -1,0 +1,24 @@
+- name: Install ffmpeg
+  become: true
+  community.general.pacman:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - ffmpeg
+    - ffmpegthumbnailer
+
+- name: Ensure applications directory exists
+  become: true
+  ansible.builtin.file:
+    path: /usr/share/applications
+    state: directory
+    mode: "0755"
+
+- name: Copy ffplay.desktop file to applications directory
+  become: true
+  ansible.builtin.copy:
+    src: files/ffplay.desktop
+    dest: /usr/share/applications/ffplay.desktop
+    owner: root
+    group: root
+    mode: "0644"
