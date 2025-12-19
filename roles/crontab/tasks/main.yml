@@ -3,6 +3,9 @@
     name: "Backup notes"
     minute: "0"
     hour: "*"
-    job: "{{ ansible_env.HOME }}/bin/crontab/backup-notes > /tmp/cron-backup-notes 2>&1" # Added the redirection
+    job: >
+      {{ ansible_env.HOME }}/bin/crontab/backup-notes
+      > /tmp/cron-backup-notes
+      2>&1
     state: present
     user: "{{ ansible_user_id }}"
