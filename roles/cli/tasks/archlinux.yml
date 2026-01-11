@@ -9,6 +9,7 @@
     - uv
     - fd
     - xh
+    - bun
     - fzf
     - mpc
     - git
@@ -87,7 +88,6 @@
     name: "{{ item }}"
     state: present
   loop:
-    - bun-bin
     - lazydocker
     - ventoy-bin
     - numbat-bin
