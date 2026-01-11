@@ -33,7 +33,6 @@
     - 7zip
     - aria2
     - atuin
-    - pgcli
     - rsync
     - qt6ct
     - yt-dlp
@@ -93,4 +92,3 @@
     - numbat-bin
     - grpcurl-bin
     - dragon-drop
-    - thorium-browser-bin
