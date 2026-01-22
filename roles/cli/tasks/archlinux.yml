@@ -45,7 +45,6 @@
     - zoxide
     - ncmpcpp
     - ripgrep
-    - firefox
     - zathura
     - pcmanfm
     - jujutsu
@@ -94,3 +93,5 @@
     - numbat-bin
     - grpcurl-bin
     - dragon-drop
+    - waterfox-bin
+    - helium-browser-bin

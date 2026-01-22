@@ -105,7 +105,7 @@ executing_custom_scripts() {
 	if [ -x "$HOME/bin/global/update-software" ]; then
 		"$HOME/bin/global/update-apps"
 	fi
-	if [ -x "$HOME/bin/global/fix-firefox-ui" ]; then
+	if [ -x "$HOME/bin/global/firefoxui" ]; then
 		"$HOME/bin/global/firefoxui"
 	fi
 }
