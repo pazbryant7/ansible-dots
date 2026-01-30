@@ -36,6 +36,7 @@
     - atuin
     - rsync
     - qt6ct
+    - bottom
     - yt-dlp
     - pastel
     - rustup
