@@ -73,6 +73,7 @@
     - pavucontrol
     - imagemagick
     - breeze-icons
+    - bitwarden-cli
     - android-tools
     - noto-fonts-cjk
     - pacman-contrib
