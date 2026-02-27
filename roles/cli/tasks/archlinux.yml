@@ -72,6 +72,7 @@
     - qbittorrent
     - pavucontrol
     - imagemagick
+    - oath-toolkit
     - breeze-icons
     - bitwarden-cli
     - android-tools
