@@ -24,9 +24,9 @@
     - { repo: "notes", branch: "main" }
     - { repo: "media", branch: "main" }
     - { repo: "youtube", branch: "main" }
-    - { repo: "pass-dev", branch: "main" }
     - { repo: "portfolio", branch: "main" }
     - { repo: "boilerplate", branch: "main" }
+    - { repo: "pass-backup", branch: "main" }
     - { repo: "ansible-dots", branch: "main" }
 
 - name: Ensure clone neovim configurations
