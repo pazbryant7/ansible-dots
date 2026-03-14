@@ -1,9 +1,12 @@
 ---
+bootstrap_roles:
+  - common
+  - ssh
+
 default_roles:
   - cli
   - ufw
   - gpg
-  - zsh
   - docker
   - neovim
   - system
@@ -13,13 +16,18 @@ default_roles:
   - xdg-base-dir
   - network-manager
 
-  # NOTE: When you execute the command `ansible-playbook local.yml`, the specified
-  # roles will run. However, there is an exception: the `common` role will also
-  # execute because it is a dependency for the `cli` role. You can confirm this
-  # by reviewing the `main.yml` file located in the `meta` directory of the
-  # `cli` role.
+shell_roles:
+  - zsh
+  - fish
 
-  # NOTE: You can run roles that are not explicitly listed here by using the
-  # following command: `ansible-playbook local.yml --tags ssh` to execute
-  # only the `ssh` role. Keep in mind that if the role has `meta` constraints,
-  # they will be also executed.
+compositor_roles:
+  - xorg
+  - wayland
+
+dns_primary:
+  - 1.1.1.1
+  - 1.0.0.1
+
+dns_fallback:
+  - 9.9.9.9
+  - 149.112.112.112

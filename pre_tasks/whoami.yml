@@ -7,3 +7,9 @@
   ansible.builtin.set_fact:
     host_os: "{{ ansible_distribution | lower }}"
   when: host_os is not defined
+
+- name: Check if systemd is reachable
+  ansible.builtin.command: systemctl is-system-running
+  register: systemd_status
+  changed_when: false
+  failed_when: false

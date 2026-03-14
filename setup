@@ -1,0 +1,226 @@
+#!/usr/bin/env sh
+
+# Ensure the script always runs from its own directory
+cd "$(dirname "$0")" || {
+	echo "ERROR: Failed to cd to script directory"
+	exit 1
+}
+
+STATE_DIR="$HOME/.local/state/ansible_setup"
+FIRST_RUN_FILE="$STATE_DIR/first_run_completed"
+
+PLAYBOOK_FILE="./local.yml"
+BECOME_PASSWORD_FILE=".secrets/.become_password"
+VAULT_PASSWORD_FILE=".secrets/.passphrase"
+
+# ---------------------------------------------------------------------------
+# Logging
+# ---------------------------------------------------------------------------
+
+send_error() {
+	printf "ERROR: %s\n" "$1" >&2
+}
+
+send_info() {
+	printf "INFO: %s\n" "$1" >&2
+}
+
+# ---------------------------------------------------------------------------
+# Secrets
+# ---------------------------------------------------------------------------
+
+prompt_secrets() {
+	mkdir -p .secrets
+	chmod 700 .secrets
+
+	if [ ! -f "$BECOME_PASSWORD_FILE" ]; then
+		printf "Enter your sudo (become) password: " >/dev/tty
+		read -r become_pass </dev/tty
+		printf "%s" "$become_pass" >"$BECOME_PASSWORD_FILE"
+		chmod 600 "$BECOME_PASSWORD_FILE"
+	fi
+
+	if [ ! -f "$VAULT_PASSWORD_FILE" ]; then
+		printf "Enter your ansible-vault passphrase: " >/dev/tty
+		read -r vault_pass </dev/tty
+		printf "%s" "$vault_pass" >"$VAULT_PASSWORD_FILE"
+		chmod 600 "$VAULT_PASSWORD_FILE"
+	fi
+}
+
+# ---------------------------------------------------------------------------
+# Validation
+# ---------------------------------------------------------------------------
+
+validate_secrets() {
+	if [ ! -f "$BECOME_PASSWORD_FILE" ]; then
+		send_error "$BECOME_PASSWORD_FILE is required but missing."
+		exit 1
+	fi
+	if [ ! -f "$VAULT_PASSWORD_FILE" ]; then
+		send_error "$VAULT_PASSWORD_FILE is required but missing."
+		exit 1
+	fi
+	chmod 600 "$BECOME_PASSWORD_FILE" "$VAULT_PASSWORD_FILE"
+	chmod 700 .secrets
+}
+
+# ---------------------------------------------------------------------------
+# OS detection & dependency setup
+# ---------------------------------------------------------------------------
+
+detect_os() {
+	if [ -f /etc/os-release ]; then
+		. /etc/os-release
+		printf "%s" "$ID"
+	else
+		uname -s | tr '[:upper:]' '[:lower:]'
+	fi
+}
+
+install_ansible_arch() {
+	sudo pacman -S --noconfirm ansible ansible-core ansible-lint
+}
+
+install_ansible_ubuntu() {
+	sudo apt-get update -qq
+	sudo apt-get install -y software-properties-common
+	sudo add-apt-repository --yes --update ppa:ansible/ansible
+	sudo apt-get install -y ansible ansible-lint
+}
+
+install_ansible_macos() {
+	if ! command -v brew >/dev/null 2>&1; then
+		send_error "Homebrew is required on macOS but was not found. Install it from https://brew.sh"
+		exit 1
+	fi
+	brew install ansible ansible-lint
+}
+
+install_ansible() {
+	if command -v ansible >/dev/null 2>&1; then
+		return 0
+	fi
+	os="$1"
+	send_info "Installing Ansible for $os..."
+	case "$os" in
+	arch) install_ansible_arch ;;
+	ubuntu) install_ansible_ubuntu ;;
+	darwin) install_ansible_macos ;;
+	esac
+}
+
+install_ansible_galaxy() {
+	os="$1"
+	requirements_file="requirements/${os}.yml"
+	if [ -f "$requirements_file" ]; then
+		send_info "Installing Ansible Galaxy collections for $os..."
+		ansible-galaxy collection install -r "$requirements_file"
+	else
+		send_info "No Galaxy requirements file found for '$os'. Skipping."
+	fi
+}
+
+setup_os_dependencies() {
+	system_os=$(detect_os)
+
+	if [ -z "$system_os" ]; then
+		send_error "Could not detect OS."
+		exit 1
+	fi
+
+	case "$system_os" in
+	arch | ubuntu | darwin) ;;
+	*)
+		send_error "Unsupported OS: '$system_os'. Ansible must be installed manually."
+		exit 1
+		;;
+	esac
+
+	install_ansible "$system_os"
+	install_ansible_galaxy "$system_os"
+}
+
+# ---------------------------------------------------------------------------
+# User prompts
+# ---------------------------------------------------------------------------
+
+prompt_choice() {
+	label="$1"
+	options="$2" # e.g. "zsh/fish"
+	valid1="${3}"
+	valid2="${4}"
+	while true; do
+		printf "Which %s would you like (%s): " "$label" "$options" >/dev/tty
+		read -r answer </dev/tty
+		case "$answer" in
+		"$valid1" | "$valid2")
+			printf "%s" "$answer"
+			return 0
+			;;
+		*)
+			send_error "Invalid selection. Please enter '$valid1' or '$valid2'."
+			;;
+		esac
+	done
+}
+
+# ---------------------------------------------------------------------------
+# Ansible playbooks
+# ---------------------------------------------------------------------------
+
+run_playbook() {
+	extra_vars="$1"
+	send_info "Running playbook..."
+	ansible-playbook "$PLAYBOOK_FILE" \
+		--become-password-file="$BECOME_PASSWORD_FILE" \
+		--vault-password-file="$VAULT_PASSWORD_FILE" \
+		--extra-vars "$extra_vars"
+}
+
+run_ansible_playbooks() {
+	shell="$(prompt_choice "shell" "zsh/fish" "zsh" "fish")"
+	compositor="$(prompt_choice "compositor" "xorg/wayland" "xorg" "wayland")"
+
+	run_playbook "chosen_shell=${shell} chosen_compositor=${compositor}"
+
+	send_info "Ansible playbooks completed successfully."
+}
+
+# ---------------------------------------------------------------------------
+# Post-installation
+# ---------------------------------------------------------------------------
+
+print_remaining_tasks() {
+	send_info "=== Manual tasks remaining ==="
+	send_info "  - Set GTK theme using nwg-look GUI"
+	send_info "  - Log in to Browser, Outlook, Bitwarden, GitHub, Google, Twitch"
+	send_info "  - Disable tab preview in Firefox; enable 'switch to last used tab'"
+}
+
+setup_post_installation() {
+	mkdir -p "$STATE_DIR"
+
+	if [ ! -f "$FIRST_RUN_FILE" ]; then
+		send_info "First run detected. Please reboot, then run this script again to complete post-installation."
+		touch "$FIRST_RUN_FILE"
+		exit 0
+	fi
+
+	send_info "Running post-installation tasks..."
+	print_remaining_tasks
+}
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
+
+main() {
+	prompt_secrets
+	validate_secrets
+	setup_os_dependencies
+	run_ansible_playbooks
+	setup_post_installation
+}
+
+main

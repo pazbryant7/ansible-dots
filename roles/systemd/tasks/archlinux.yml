@@ -1,10 +1,9 @@
 - name: Ensure install packages
   become: true
   community.general.pacman:
-    name: "{{ item }}"
+    name:
+      - mpd
+      - cronie
+      - systemd
+      - syncthing
     state: present
-  loop:
-    - mpd
-    - cronie
-    - systemd
-    - syncthing

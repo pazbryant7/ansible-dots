@@ -1,9 +1,9 @@
-- name: "Get distribution"
+- name: Get distribution
   ansible.builtin.stat:
     path: "{{ role_path }}/tasks/{{ host_os }}.yml"
   register: distribution_config
 
-- name: "Run tasks for {{ host_os }}"
+- name: Run tasks for {{ host_os }}
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
 
@@ -28,11 +28,35 @@
 
 - name: Import SSH private keys
   ansible.builtin.copy:
+    src: "{{ item.src }}"
     dest: "{{ ansible_env.HOME }}/.ssh/private/{{ item.name }}"
     mode: "0600"
     owner: "{{ ansible_user_id }}"
     group: "{{ ansible_user_gid | default(ansible_user_id) }}"
-    content: "{{ lookup('file', item.src) | regex_replace('\\s*$', '\n') }}"
   loop:
     - { name: "personal_github", src: ".secrets/ssh/github/personal_github" }
     - { name: "work_github", src: ".secrets/ssh/github/work_github" }
+
+- name: Start ssh-agent if not running
+  ansible.builtin.shell:
+    cmd: |
+      if [ -z "$SSH_AUTH_SOCK" ]; then
+        eval $(ssh-agent -s)
+        echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK"
+        echo "SSH_AGENT_PID=$SSH_AGENT_PID"
+      fi
+  register: ssh_agent_env
+  changed_when: false
+
+- name: Add SSH keys to agent
+  ansible.builtin.shell:
+    cmd: ssh-add {{ ansible_env.HOME }}/.ssh/private/{{ item }}
+  environment:
+    SSH_AUTH_SOCK:
+      "{{ ssh_agent_env.stdout | regex_search('SSH_AUTH_SOCK=([^\\n]+)', '\\1')
+      | first | default(ansible_env.SSH_AUTH_SOCK | default('')) }}"
+  loop:
+    - personal_github
+    - work_github
+  changed_when: false
+  ignore_errors: true

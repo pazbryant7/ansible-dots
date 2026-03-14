@@ -21,12 +21,13 @@
     accept_hostkey: true
   loop:
     - { repo: "pass", branch: "main" }
-    - { repo: "notes", branch: "main" }
+    - { repo: "pass", branch: "main" }
     - { repo: "media", branch: "main" }
+    - { repo: "notes", branch: "main" }
     - { repo: "youtube", branch: "main" }
     - { repo: "portfolio", branch: "main" }
-    - { repo: "boilerplate", branch: "main" }
     - { repo: "pass-backup", branch: "main" }
+    - { repo: "boilerplate", branch: "main" }
     - { repo: "ansible-dots", branch: "main" }
 
 - name: Ensure clone neovim configurations

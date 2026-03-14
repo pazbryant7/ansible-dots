@@ -7,30 +7,47 @@
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
 
-- name: Install global CLI tools via uv
+- name: Setup UV environment
   become: false
-  ansible.builtin.shell: "uv tool install {{ item }}"
-  loop:
-    - names-generator
-  args:
-    executable: /bin/env sh
-    creates: "{{ ansible_env.HOME }}/.local/share/uv/tools/{{ item }}"
-  changed_when: false
+  block:
+    - name: Install global CLI tools via uv
+      ansible.builtin.shell:
+        cmd: "uv tool install {{ tool_item }}"
+        creates: "{{ ansible_env.HOME }}/.local/share/uv/tools/{{ tool_item }}"
+      loop:
+        - names-generator
+      loop_control:
+        loop_var: tool_item
 
 - name: Setup Rust environment
   become: false
   block:
-    - name: Install packages using cargo
-      community.general.cargo:
-        name: "{{ item }}"
-        state: present
-      loop:
-        - fnm
+    - name: Install stable toolchain
+      ansible.builtin.command:
+        cmd: rustup toolchain install stable
+        creates:
+          "{{ ansible_env.HOME
+          }}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu"
 
     - name: Install rustup components
-      ansible.builtin.command: rustup component add {{ item }}
+      ansible.builtin.command:
+        cmd: "rustup component add {{ rust_item }}"
+        creates:
+          "{{ ansible_env.HOME
+          }}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/{{ rust_item
+          }}"
       loop:
         - rustfmt
         - rust-analyzer
-      args:
-        creates: "{{ ansible_env.HOME }}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/{{ item }}"
+      loop_control:
+        loop_var: rust_item
+
+    - name: Install packages using cargo
+      community.general.cargo:
+        name: "{{ cargo_item }}"
+        state: present
+        executable: /usr/sbin/cargo
+      loop:
+        - fnm
+      loop_control:
+        loop_var: cargo_item

@@ -1,9 +1,8 @@
 - name: Install docker
   become: true
   community.general.pacman:
-    name: "{{ item }}"
+    name:
+      - docker
+      - docker-buildx
+      - docker-compose
     state: present
-  loop:
-    - docker
-    - docker-buildx
-    - docker-compose

@@ -1,24 +1,30 @@
-- name: Ensure NetworkManager is installed (Arch Linux)
+- name: Get distribution
+  ansible.builtin.stat:
+    path: "{{ role_path }}/tasks/{{ host_os }}.yml"
+  register: distribution_config
+
+- name: Run tasks for {{ host_os }}
+  ansible.builtin.include_tasks: "{{ host_os }}.yml"
+  when: distribution_config.stat.exists
+
+- name: Ensure NetworkManager is installed
   become: true
-  ansible.builtin.pacman:
+  community.general.pacman:
     name: networkmanager
     state: present
     update_cache: true
 
 - name: Ensure NetworkManager is running and enabled
   become: true
-  ansible.builtin.service:
-    name: NetworkManager
+  ansible.builtin.systemd:
+    name: NetworkManager.service
     state: started
     enabled: true
-
-- name: Set DNS variables
-  ansible.builtin.set_fact:
-    primary_dns: "1.1.1.1 1.0.0.1" # Cloudflare
-    fallback_dns: "9.9.9.9 149.112.112.112" # Quad9
+  when: systemd_status.rc == 0
 
 - name: Configure DNS for NetworkManager (Cloudflare + Quad9)
   become: true
+  when: systemd_status.rc == 0
   block:
     - name: Detect active NetworkManager connection
       ansible.builtin.command: nmcli -t -f NAME,DEVICE connection show --active
@@ -27,33 +33,28 @@
 
     - name: Extract first active connection name
       ansible.builtin.set_fact:
-        nm_connection_name: "{{ nm_active.stdout_lines[0].split(':')[0] | default('') }}"
+        nm_connection_name:
+          "{{ nm_active.stdout_lines[0].split(':')[0] | default('') }}"
 
     - name: Fail if no active NetworkManager connection found
       ansible.builtin.fail:
         msg: "No active NetworkManager connection detected."
       when: nm_connection_name == ""
 
+    - name: Check current DNS settings
+      ansible.builtin.command: >
+        nmcli -g ipv4.dns connection show "{{ nm_connection_name }}"
+      register: nm_current_dns
+      changed_when: false
+
     - name: Configure Cloudflare and Quad9 DNS servers
       ansible.builtin.command: >
-        nmcli connection modify "{{ nm_connection_name }}"
-        ipv4.dns "{{ primary_dns }} {{ fallback_dns }}"
-        ipv4.ignore-auto-dns yes
-      register: nm_modify
-      changed_when: nm_modify.rc == 0
+        nmcli connection modify "{{ nm_connection_name }}" ipv4.dns "{{
+        (dns_primary + dns_fallback) | join(' ') }}" ipv4.ignore-auto-dns yes
+      when: >
+        (dns_primary + dns_fallback) | difference(nm_current_dns.stdout.split())
+        | length > 0
+      notify: Bring up NetworkManager connection
 
-    - name: Bring connection up to apply DNS changes
-      ansible.builtin.command: nmcli connection up "{{ nm_connection_name }}"
-      register: nm_up
-      changed_when: nm_up.rc == 0
-
-    - name: Verify DNS settings
-      ansible.builtin.command: >
-        nmcli -f GENERAL.NAME,IP4.DNS connection show "{{ nm_connection_name }}"
-      register: nm_dns_check
-      changed_when: false
-      failed_when: nm_dns_check.rc != 0
-
-    - name: Show current DNS configuration
-      ansible.builtin.debug:
-        var: nm_dns_check.stdout
+    - name: Flush handlers to apply DNS changes immediately
+      ansible.builtin.meta: flush_handlers

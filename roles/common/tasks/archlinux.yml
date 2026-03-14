@@ -1,40 +1,39 @@
 - name: Ensure base development packages are installed
   become: true
   community.general.pacman:
-    name: "{{ item }}"
+    name:
+      - ufw
+      - sudo
+      - tmux
+      - grub
+      - base
+      - dunst
+      - linux
+      - rtkit
+      - xclip
+      - neovim
+      - man-db
+      - cronie
+      - ntfs-3g
+      - pipewire
+      - libnotify
+      - linux-lts
+      - efibootmgr
+      - openresolv
+      - base-devel
+      - wireplumber
+      - pipewire-alsa
+      - linux-headers
+      - terminus-font
+      - pipewire-jack
+      - pipewire-pulse
+      - networkmanager
+      - zram-generator
+      - linux-firmware
+      - noto-fonts-emoji
+      - linux-lts-headers
+      - gst-plugin-pipewire
     state: present
-  loop:
-    - ufw
-    - sudo
-    - tmux
-    - grub
-    - base
-    - dunst
-    - linux
-    - rtkit
-    - xclip
-    - neovim
-    - man-db
-    - cronie
-    - ntfs-3g
-    - pipewire
-    - libnotify
-    - linux-lts
-    - efibootmgr
-    - openresolv
-    - base-devel
-    - wireplumber
-    - pipewire-alsa
-    - linux-headers
-    - terminus-font
-    - pipewire-jack
-    - pipewire-pulse
-    - networkmanager
-    - zram-generator
-    - linux-firmware
-    - noto-fonts-emoji
-    - linux-lts-headers
-    - gst-plugin-pipewire
 
 - name: Create the `aur_builder` user
   become: true
@@ -52,10 +51,10 @@
     mode: "0644"
     validate: "visudo -cf %s"
 
-- name: Install paru using makepkg if it isn't installed already
+- name: Install yay using makepkg if it isn't installed already
   become: true
   kewlfft.aur.aur:
-    name: paru
+    name: yay
     use: makepkg
     state: present
   become_user: aur_builder

@@ -1,0 +1,75 @@
+#!/usr/bin/env sh
+
+# This script is safe to pipe directly into sh via curl.
+# It has one job: install git, clone the repo, and hand off to
+# the real setup script that lives inside it.
+#
+# Usage:
+#   curl -fsSL https://raw.githubusercontent.com/pazbryant7/ansible-dots/main/bootstrap | sh
+
+REPO_URL="https://github.com/pazbryant7/ansible-dots.git"
+REPO_DIR="$HOME/Documents/github/ansible-dots"
+
+send_error() {
+	printf "ERROR: %s\n" "$1" >&2
+}
+
+send_info() {
+	printf "INFO: %s\n" "$1" >&2
+}
+
+detect_os() {
+	if [ -f /etc/os-release ]; then
+		. /etc/os-release
+		printf "%s" "$ID"
+	else
+		uname -s | tr '[:upper:]' '[:lower:]'
+	fi
+}
+
+install_git_arch() { sudo pacman -S --noconfirm git; }
+install_git_ubuntu() { sudo apt-get update -qq && sudo apt-get install -y git; }
+install_git_macos() {
+	if ! command -v brew >/dev/null 2>&1; then
+		send_error "Homebrew is required on macOS. Install it from https://brew.sh"
+		exit 1
+	fi
+	brew install git
+}
+
+install_git() {
+	if command -v git >/dev/null 2>&1; then
+		return 0
+	fi
+	os="$1"
+	send_info "Installing git for $os..."
+	case "$os" in
+	arch) install_git_arch ;;
+	ubuntu) install_git_ubuntu ;;
+	darwin) install_git_macos ;;
+	*)
+		send_error "Cannot install git: unsupported OS '$os'. Install git manually and re-run."
+		exit 1
+		;;
+	esac
+}
+
+clone_repo() {
+	if [ -d "$REPO_DIR/.git" ]; then
+		send_info "Repository already exists at $REPO_DIR. Skipping clone."
+		return 0
+	fi
+	send_info "Cloning repository into $REPO_DIR..."
+	git clone "$REPO_URL" "$REPO_DIR"
+}
+
+main() {
+	os=$(detect_os)
+	install_git "$os"
+	clone_repo
+
+	send_info "Handing off to setup script..."
+	exec sh "$REPO_DIR/setup"
+}
+
+main

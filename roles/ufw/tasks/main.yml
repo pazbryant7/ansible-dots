@@ -1,37 +1,48 @@
-- name: "Get distribution"
+- name: Get distribution
   ansible.builtin.stat:
     path: "{{ role_path }}/tasks/{{ host_os }}.yml"
   register: distribution_config
 
-- name: "Run tasks for {{ host_os }}"
+- name: Run tasks for {{ host_os }}
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
 
+- name: Check if iptables is available
+  ansible.builtin.command: iptables -L
+  register: iptables_status
+  changed_when: false
+  failed_when: false
+  become: true
+
 - name: Configure UFW firewall
   become: true
+  when: iptables_status.rc == 0
   block:
     - name: Set default policies
       community.general.ufw:
-        direction: "{{ item.direction }}"
-        default: "{{ item.policy }}"
+        direction: "{{ ufw_item.direction }}"
+        default: "{{ ufw_item.policy }}"
       loop:
         - { direction: "incoming", policy: "deny" }
         - { direction: "outgoing", policy: "allow" }
+      loop_control:
+        loop_var: ufw_item
 
     - name: Allow LAN access
       community.general.ufw:
         rule: allow
         from_ip: 192.168.0.0/24
 
-    - name: Allow Port Forwarding
+    - name: Allow port forwarding
       community.general.ufw:
         rule: allow
         port: "17349"
-        proto: "{{ item }}"
+        proto: "{{ proto_item }}"
       loop:
         - tcp
         - udp
-      become: true
+      loop_control:
+        loop_var: proto_item
 
     - name: Allow Deluge
       community.general.ufw:

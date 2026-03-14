@@ -1,7 +1,6 @@
 - name: Ensure install packages
   become: true
   community.general.pacman:
-    name: "{{ item }}"
+    name:
+      - networkmanager
     state: present
-  loop:
-    - networkmanager

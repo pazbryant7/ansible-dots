@@ -1,9 +1,9 @@
-- name: "Get distribution"
+- name: Get distribution
   ansible.builtin.stat:
     path: "{{ role_path }}/tasks/{{ host_os }}.yml"
   register: distribution_config
 
-- name: "Run tasks for {{ host_os }}"
+- name: Run tasks for {{ host_os }}
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
 
@@ -22,7 +22,7 @@
     path: ".secrets/gpg/private-key.asc"
   register: gpg_key_file
 
-- name: Import gpg private key
+- name: Copy GPG private key to keyring directory
   become: false
   ansible.builtin.copy:
     dest: "{{ ansible_env.HOME }}/.gnupg/private_key.asc"
@@ -32,10 +32,28 @@
     content: "{{ lookup('file', '.secrets/gpg/private-key.asc') }}"
   when: gpg_key_file.stat.exists
 
-- name: Import private key into gpg keyring
+- name: Import private key into GPG keyring
   become: false
   ansible.builtin.command:
-    cmd: "gpg --import {{ ansible_env.HOME }}/.gnupg/private_key.asc"
-  args:
-    creates: "{{ ansible_env.HOME }}/.gnupg/secring.gpg"
+    cmd: gpg --batch --import {{ ansible_env.HOME }}/.gnupg/private_key.asc
+  register: gpg_import
+  changed_when: "'secret key imported' in gpg_import.stderr"
+  when: gpg_key_file.stat.exists
+
+- name: Get GPG key fingerprint
+  become: false
+  ansible.builtin.shell:
+    cmd: >
+      gpg --with-colons --import-options show-only --import {{ ansible_env.HOME
+      }}/.gnupg/private_key.asc | awk -F: '$1 == "fpr" { print $10; exit }'
+  register: gpg_fingerprint
+  changed_when: false
+  when: gpg_key_file.stat.exists
+
+- name: Set ultimate trust on GPG key
+  become: false
+  ansible.builtin.shell:
+    cmd:
+      echo "{{ gpg_fingerprint.stdout }}:6:" | gpg --batch --import-ownertrust
+  changed_when: false
   when: gpg_key_file.stat.exists
