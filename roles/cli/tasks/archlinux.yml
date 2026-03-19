@@ -68,6 +68,7 @@
       - pandoc-cli
       - python-pip
       - qbittorrent
+      - jre-openjdk
       - pavucontrol
       - imagemagick
       - oath-toolkit
