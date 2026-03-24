@@ -55,6 +55,7 @@
       - libpulse
       - luarocks
       - patchelf
+      - reflector
       - fastfetch
       - gammastep
       - alacritty
@@ -67,6 +68,7 @@
       - github-cli
       - pandoc-cli
       - python-pip
+      - cargo-cache
       - qbittorrent
       - jre-openjdk
       - pavucontrol

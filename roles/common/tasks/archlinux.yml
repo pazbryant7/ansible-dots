@@ -35,6 +35,20 @@
       - gst-plugin-pipewire
     state: present
 
+- name: Install CPU-specific microcode
+  become: yes
+  tasks:
+    - name: Install CPU microcode for Arch
+      community.general.pacman:
+        name: "{{ cpu_ucode }}"
+        state: present
+      vars:
+        cpu_ucode: >-
+          {{ 'intel-ucode' if 'Intel' in ansible_facts['processor'] | join(' ')
+             else 'amd-ucode' if 'AMD' in ansible_facts['processor'] | join(' ')
+             else '' }}
+      when: cpu_ucode != ''
+
 - name: Create the `aur_builder` user
   become: true
   ansible.builtin.user:
