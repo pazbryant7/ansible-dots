@@ -92,7 +92,6 @@
     name: "{{ item }}"
     state: present
   loop:
-    - anki-bin
     - lazydocker
     - ventoy-bin
     - numbat-bin
