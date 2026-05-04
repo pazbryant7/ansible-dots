@@ -44,10 +44,14 @@
 
     - name: Install packages using cargo
       community.general.cargo:
-        name: "{{ cargo_item }}"
+        name: "{{ cargo_item.name }}"
         state: present
         executable: /usr/sbin/cargo
+        features: "{{ cargo_item.features | default(omit) }}"
       loop:
-        - fnm
+        - name: fnm
+        - name: himalaya
+          features:
+            - oauth2
       loop_control:
         loop_var: cargo_item
