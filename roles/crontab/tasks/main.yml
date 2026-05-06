@@ -4,8 +4,18 @@
     minute: "0"
     hour: "*"
     job: >
-      {{ ansible_env.HOME }}/bin/crontab/backup-notes
-      > /tmp/cron-backup-notes
+      {{ ansible_env.HOME }}/bin/crontab/backup-notes > /tmp/cron-backup-notes
       2>&1
+    state: present
+    user: "{{ ansible_user_id }}"
+
+- name: Ensure himalaya-cron-refresh cron job exists
+  ansible.builtin.cron:
+    name: "Himalaya token refresh"
+    minute: "0"
+    hour: "*"
+    job: >
+      {{ ansible_env.HOME }}/bin/crontab/himalaya-cron-refresh >
+      /tmp/cron-himalaya-cron-refresh 2>&1
     state: present
     user: "{{ ansible_user_id }}"
