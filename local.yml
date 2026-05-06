@@ -2,10 +2,12 @@
   hosts: localhost
   connection: local
   vars:
+    chosen_shell: "zsh"
+    chosen_compositor: "xorg"
+    dotfiles_dir: "{{ github_dir }}/dotfiles"
     downloads: "{{ ansible_user_dir }}/Downloads"
     xdg_config_dir: "{{ ansible_user_dir }}/.config"
     github_dir: "{{ ansible_user_dir }}/Documents/github"
-    dotfiles_dir: "{{ github_dir }}/dotfiles"
   pre_tasks:
     - name: Detect host system
       ansible.builtin.import_tasks: pre_tasks/whoami.yml
@@ -48,8 +50,7 @@
               (
                 ansible_run_tags | list | difference(['all', 'always'])
                 if ansible_run_tags | list | difference(['all', 'always']) |
-          length
-          > 0
+          length > 0
                 else default_roles | list
               )
               + [chosen_shell, chosen_compositor]
