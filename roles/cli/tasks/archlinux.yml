@@ -18,6 +18,7 @@
       - mpd
       - lua
       - zbar
+      - glow
       - stow
       - hurl
       - just
