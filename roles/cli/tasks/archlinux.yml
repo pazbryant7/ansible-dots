@@ -6,7 +6,6 @@
       - go
       - uv
       - fd
-      - xh
       - bun
       - fzf
       - mpc
@@ -20,9 +19,7 @@
       - zbar
       - glow
       - stow
-      - hurl
       - just
-      - sqlc
       - tmux
       - fish
       - tree
@@ -35,7 +32,6 @@
       - atuin
       - rsync
       - qt6ct
-      - bottom
       - yt-dlp
       - pastel
       - rustup
@@ -46,7 +42,7 @@
       - ncmpcpp
       - ripgrep
       - zathura
-      - pcmanfm
+      - lazygit
       - jujutsu
       - poppler
       - calibre
@@ -60,24 +56,21 @@
       - fastfetch
       - gammastep
       - alacritty
-      - watchexec
       - bandwhich
       - syncthing
       - hyperfine
       - breeze-gtk
+      - lazydocker
       - typescript
       - github-cli
-      - pandoc-cli
       - python-pip
       - cargo-cache
       - qbittorrent
-      - jre-openjdk
       - pavucontrol
       - imagemagick
       - oath-toolkit
       - breeze-icons
       - bitwarden-cli
-      - android-tools
       - noto-fonts-cjk
       - pacman-contrib
       - translate-shell
@@ -93,10 +86,8 @@
     name: "{{ item }}"
     state: present
   loop:
-    - lazydocker
     - ventoy-bin
     - numbat-bin
     - grpcurl-bin
     - dragon-drop
-    - waterfox-bin
     - helium-browser-bin
