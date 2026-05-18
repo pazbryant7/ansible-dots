@@ -1,0 +1,67 @@
+- name: Get distribution
+  ansible.builtin.stat:
+    path: "{{ role_path }}/tasks/{{ host_os }}.yml"
+  register: distribution_config
+
+- name: Run tasks for {{ host_os }}
+  ansible.builtin.include_tasks: "{{ host_os }}.yml"
+  when: distribution_config.stat.exists
+
+- name: Local gopass store
+  become: false
+  vars:
+    gopass_store_name: "local"
+    gopass_store_path: "{{ ansible_env.HOME }}/.local/share/gopass/stores/local"
+    gopass_gpg_id_file:
+      "{{ ansible_env.HOME }}/.local/share/gopass/stores/local/.gpg-id"
+  block:
+    - name: Ensure local store directory exists
+      ansible.builtin.file:
+        path: "{{ gopass_store_path }}"
+        state: directory
+        mode: "0700"
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+
+    - name: Check if local store is already initialised
+      ansible.builtin.stat:
+        path: "{{ gopass_gpg_id_file }}"
+      register: local_store_init
+
+    - name: Initialise local gopass store
+      when: not local_store_init.stat.exists
+      ansible.builtin.command:
+        cmd: >
+          gopass init --store {{ gopass_store_name }} --path {{
+          gopass_store_path }} {{ local_gpg_fingerprint }}
+      changed_when: true
+
+    - name: Check if local mount is already registered
+      ansible.builtin.shell:
+        cmd: |
+          gopass mounts | grep -c '{{ gopass_store_name }}'
+      register: local_mount_check
+      changed_when: false
+      failed_when: false
+
+    - name: Mount local store in gopass
+      when: local_mount_check.stdout == "0"
+      ansible.builtin.command:
+        cmd: gopass mounts add {{ gopass_store_name }} {{ gopass_store_path }}
+      changed_when: true
+
+    - name: Check current encryption key for local store
+      ansible.builtin.shell:
+        cmd: |
+          cat {{ gopass_gpg_id_file }}
+      register: local_store_key
+      changed_when: false
+      failed_when: false
+
+    - name: Reencrypt local store if key has drifted
+      when:
+        - local_store_init.stat.exists
+        - local_store_key.stdout != local_gpg_fingerprint
+      ansible.builtin.command:
+        cmd: gopass reencrypt --store {{ gopass_store_name }}
+      changed_when: true

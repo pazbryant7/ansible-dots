@@ -8,6 +8,7 @@ default_roles:
   - ufw
   - gpg
   - docker
+  - gopass
   - neovim
   - system
   - github

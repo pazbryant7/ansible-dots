@@ -21,7 +21,6 @@
     accept_hostkey: true
   loop:
     - { repo: "pass", branch: "main" }
-    - { repo: "pass", branch: "main" }
     - { repo: "media", branch: "main" }
     - { repo: "notes", branch: "main" }
     - { repo: "youtube", branch: "main" }
