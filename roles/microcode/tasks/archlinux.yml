@@ -1,0 +1,12 @@
+- name: Install CPU-specific microcode
+  become: true
+  vars:
+    cpu_ucode_map:
+      Intel: intel-ucode
+      AMD: amd-ucode
+  community.general.pacman:
+    name: "{{ cpu_ucode_map[item] }}"
+    state: present
+  loop:
+    "{{ cpu_ucode_map.keys() | select('in', ansible_facts['processor'] | join('
+    ')) | list }}"

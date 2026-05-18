@@ -18,6 +18,12 @@
   become: true
   when: iptables_status.rc == 0
   block:
+    - name: Allow UFW forwarding for Docker
+      ansible.builtin.lineinfile:
+        path: /etc/default/ufw
+        regexp: "^DEFAULT_FORWARD_POLICY="
+        line: 'DEFAULT_FORWARD_POLICY="ACCEPT"'
+
     - name: Set default policies
       community.general.ufw:
         direction: "{{ ufw_item.direction }}"
@@ -32,6 +38,11 @@
       community.general.ufw:
         rule: allow
         from_ip: 192.168.0.0/24
+
+    - name: Allow Docker networks
+      community.general.ufw:
+        rule: allow
+        from_ip: 172.16.0.0/12
 
     - name: Allow port forwarding
       community.general.ufw:

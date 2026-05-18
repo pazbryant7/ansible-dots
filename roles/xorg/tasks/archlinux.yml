@@ -29,6 +29,11 @@
 
 - name: Setup custom system configurations
   become: true
+  vars:
+    sys_fonts_dir: /usr/share/fonts/bryant-fonts
+    sys_keymaps_dir: /usr/share/kbd/keymaps/bryant-fonts
+    sys_x11_conf_dir: /etc/X11/xorg.conf.d
+    files_base: files/archlinux
   block:
     - name: Ensure system directories exist
       ansible.builtin.file:
@@ -39,14 +44,14 @@
         mode: "0755"
       loop:
         - /etc/udev/rules.d
-        - /etc/X11/xorg.conf.d
-        - /usr/share/fonts/bryant-fonts
-        - /usr/share/kbd/keymaps/bryant-fonts
+        - "{{ sys_x11_conf_dir }}"
+        - "{{ sys_fonts_dir }}"
+        - "{{ sys_keymaps_dir }}"
 
     - name: Deploy personal fonts
       ansible.builtin.copy:
-        src: files/archlinux/usr/share/fonts/bryant-fonts/
-        dest: /usr/share/fonts/bryant-fonts/
+        src: "{{ files_base }}/usr/share/fonts/bryant-fonts/"
+        dest: "{{ sys_fonts_dir }}/"
         owner: root
         group: root
         mode: "0755"
@@ -54,8 +59,9 @@
 
     - name: Install vconsole keyboard map
       ansible.builtin.copy:
-        src: files/archlinux/usr/share/kbd/keymaps/bryant-fonts/bryantd.map.gz
-        dest: /usr/share/kbd/keymaps/bryant-fonts/bryantd.map.gz
+        src:
+          "{{ files_base }}/usr/share/kbd/keymaps/bryant-fonts/bryantd.map.gz"
+        dest: "{{ sys_keymaps_dir }}/bryantd.map.gz"
         owner: root
         group: root
         mode: "0644"
@@ -63,7 +69,7 @@
 
     - name: Deploy X11 custom keyboard layouts
       ansible.builtin.copy:
-        src: files/archlinux/usr/share/X11/xkb/symbols/
+        src: "{{ files_base }}/usr/share/X11/xkb/symbols/"
         dest: /usr/share/X11/xkb/symbols/
         owner: root
         group: root
@@ -72,7 +78,7 @@
 
     - name: Deploy system environment file
       ansible.builtin.copy:
-        src: files/archlinux/etc/environment
+        src: "{{ files_base }}/etc/environment"
         dest: /etc/environment
         owner: root
         group: root
@@ -87,14 +93,14 @@
 
     - name: Deploy X11 keyboard configuration
       ansible.builtin.copy:
-        src: files/archlinux/etc/X11/xorg.conf.d/00-keyboard.conf
-        dest: /etc/X11/xorg.conf.d/00-keyboard.conf
+        src: "{{ files_base }}/etc/X11/xorg.conf.d/00-keyboard.conf"
+        dest: "{{ sys_x11_conf_dir }}/00-keyboard.conf"
         mode: "0644"
         force: true
 
     - name: Deploy vconsole configuration
       ansible.builtin.copy:
-        src: files/archlinux/etc/vconsole.conf
+        src: "{{ files_base }}/etc/vconsole.conf"
         dest: /etc/vconsole.conf
         mode: "0644"
         force: true

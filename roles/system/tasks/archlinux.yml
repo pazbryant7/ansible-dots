@@ -1,39 +1,40 @@
-- name: Ensure pacman hooks directory exists
+- name: Setup pacman
   become: true
-  ansible.builtin.file:
-    path: /etc/pacman.d/hooks
-    state: directory
-    mode: "0755"
+  vars:
+    pacman_hooks_dir: /etc/pacman.d/hooks
+    pacman_conf: /etc/pacman.conf
+  block:
+    - name: Ensure pacman hooks directory exists
+      ansible.builtin.file:
+        path: "{{ pacman_hooks_dir }}"
+        state: directory
+        mode: "0755"
 
-- name: Install pacman update hook
-  become: true
-  ansible.builtin.copy:
-    src: files/archlinux/etc/pacman.d/hooks/update-apps.hook
-    dest: /etc/pacman.d/hooks/update-apps.hook
-    mode: "0644"
-    force: false
+    - name: Install pacman update hook
+      ansible.builtin.copy:
+        src: files/archlinux/etc/pacman.d/hooks/update-apps.hook
+        dest: "{{ pacman_hooks_dir }}/update-apps.hook"
+        mode: "0644"
+        force: false
 
-- name: Enable pacman ParallelDownloads
-  become: true
-  ansible.builtin.lineinfile:
-    path: /etc/pacman.conf
-    regexp: '^#?ParallelDownloads\s*='
-    line: "ParallelDownloads = 5"
-    backup: true
+    - name: Enable pacman ParallelDownloads
+      ansible.builtin.lineinfile:
+        path: "{{ pacman_conf }}"
+        regexp: '^#?ParallelDownloads\s*='
+        line: "ParallelDownloads = 5"
+        backup: true
 
-- name: Enable pacman Color
-  become: true
-  ansible.builtin.lineinfile:
-    path: /etc/pacman.conf
-    regexp: '^#?\s*Color\s*$'
-    line: "Color"
-    insertafter: '^\[options\]'
-    backup: true
+    - name: Enable pacman Color
+      ansible.builtin.lineinfile:
+        path: "{{ pacman_conf }}"
+        regexp: '^#?\s*Color\s*$'
+        line: "Color"
+        insertafter: '^\[options\]'
+        backup: true
 
-- name: Enable pacman ILoveCandy
-  become: true
-  ansible.builtin.lineinfile:
-    path: /etc/pacman.conf
-    regexp: '^#?\s*ILoveCandy\s*$'
-    line: "ILoveCandy"
-    insertafter: '^\[options\]'
+    - name: Enable pacman ILoveCandy
+      ansible.builtin.lineinfile:
+        path: "{{ pacman_conf }}"
+        regexp: '^#?\s*ILoveCandy\s*$'
+        line: "ILoveCandy"
+        insertafter: '^\[options\]'

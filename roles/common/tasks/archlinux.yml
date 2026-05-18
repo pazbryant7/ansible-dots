@@ -36,18 +36,8 @@
     state: present
 
 - name: Install CPU-specific microcode
-  become: yes
-  tasks:
-    - name: Install CPU microcode for Arch
-      community.general.pacman:
-        name: "{{ cpu_ucode }}"
-        state: present
-      vars:
-        cpu_ucode: >-
-          {{ 'intel-ucode' if 'Intel' in ansible_facts['processor'] | join(' ')
-             else 'amd-ucode' if 'AMD' in ansible_facts['processor'] | join(' ')
-             else '' }}
-      when: cpu_ucode != ''
+  ansible.builtin.include_role:
+    name: microcode
 
 - name: Create the `aur_builder` user
   become: true
@@ -67,8 +57,8 @@
 
 - name: Install yay using makepkg if it isn't installed already
   become: true
+  become_user: aur_builder
   kewlfft.aur.aur:
     name: yay
     use: makepkg
     state: present
-  become_user: aur_builder

@@ -9,11 +9,13 @@
 
 - name: Setup UV environment
   become: false
+  vars:
+    uv_tools_path: "{{ ansible_env.HOME }}/.local/share/uv/tools"
   block:
     - name: Install global CLI tools via uv
       ansible.builtin.shell:
         cmd: "uv tool install {{ tool_item }}"
-        creates: "{{ ansible_env.HOME }}/.local/share/uv/tools/{{ tool_item }}"
+        creates: "{{ uv_tools_path }}/{{ tool_item }}"
       loop:
         - names-generator
       loop_control:
@@ -21,21 +23,19 @@
 
 - name: Setup Rust environment
   become: false
+  vars:
+    rust_toolchain_path:
+      "{{ ansible_env.HOME }}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu"
   block:
     - name: Install stable toolchain
       ansible.builtin.command:
         cmd: rustup toolchain install stable
-        creates:
-          "{{ ansible_env.HOME
-          }}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu"
+        creates: "{{ rust_toolchain_path }}"
 
     - name: Install rustup components
       ansible.builtin.command:
         cmd: "rustup component add {{ rust_item }}"
-        creates:
-          "{{ ansible_env.HOME
-          }}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/{{ rust_item
-          }}"
+        creates: "{{ rust_toolchain_path }}/bin/{{ rust_item }}"
       loop:
         - rustfmt
         - rust-analyzer
@@ -50,8 +50,5 @@
         features: "{{ cargo_item.features | default(omit) }}"
       loop:
         - name: fnm
-        - name: himalaya
-          features:
-            - oauth2
       loop_control:
         loop_var: cargo_item

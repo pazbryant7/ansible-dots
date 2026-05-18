@@ -1,21 +1,12 @@
-- name: Ensure Backup-notes cron job exists
-  ansible.builtin.cron:
-    name: "Backup notes"
-    minute: "0"
-    hour: "*"
-    job: >
-      {{ ansible_env.HOME }}/bin/crontab/backup-notes > /tmp/cron-backup-notes
-      2>&1
-    state: present
-    user: "{{ ansible_user_id }}"
-
-- name: Ensure himalaya-cron-refresh cron job exists
-  ansible.builtin.cron:
-    name: "Himalaya token refresh"
-    minute: "*/30"
-    hour: "*"
-    job: >
-      {{ ansible_env.HOME }}/bin/crontab/himalaya-cron-refresh >
-      /tmp/cron-himalaya-cron-refresh 2>&1
-    state: present
-    user: "{{ ansible_user_id }}"
+- name: Setup cron jobs
+  vars:
+    crontab_path: "{{ ansible_env.HOME }}/bin/crontab"
+  block:
+    - name: Ensure Backup-notes cron job exists
+      ansible.builtin.cron:
+        name: "Backup notes"
+        minute: "0"
+        hour: "*"
+        job: "{{ crontab_path }}/backup-notes > /tmp/cron-backup-notes 2>&1"
+        state: present
+        user: "{{ ansible_user_id }}"

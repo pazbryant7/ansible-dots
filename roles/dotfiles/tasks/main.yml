@@ -1,21 +1,23 @@
-- name: "Get distribution"
+- name: Get distribution
   ansible.builtin.stat:
     path: "{{ role_path }}/tasks/{{ host_os }}.yml"
   register: distribution_config
 
-- name: "Run tasks for {{ host_os }}"
+- name: Run tasks for {{ host_os }}
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
 
 - name: Ensure clone dotfiles
   become: false
+  vars:
+    dotfiles_repo: "git@personal.github:pazbryant7/dotfiles.git"
   ansible.builtin.git:
     update: false
     version: main
     recursive: true
     accept_newhostkey: true
     dest: "{{ dotfiles_dir }}"
-    repo: "git@personal.github:pazbryant7/dotfiles.git"
+    repo: "{{ dotfiles_repo }}"
   changed_when: true
   notify:
     - Setup dotfiles with stow

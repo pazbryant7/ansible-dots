@@ -6,13 +6,3 @@
 - name: "Run tasks for {{ host_os }}"
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
-
-- name: "Set zsh as default shell"
-  vars:
-    user_shell: "/usr/bin/zsh"
-  block:
-    - name: "Set zsh as default shell for {{ host_user }}"
-      ansible.builtin.user:
-        name: "{{ host_user }}"
-        shell: "{{ user_shell }}"
-      become: true

@@ -7,13 +7,13 @@ default_roles:
   - cli
   - ufw
   - gpg
-  - docker
-  - gopass
+  - github
   - neovim
   - system
-  - github
-  - systemd
+  - docker
   - crontab
+  - systemd
+  - microcode
   - xdg-base-dir
   - network-manager
 

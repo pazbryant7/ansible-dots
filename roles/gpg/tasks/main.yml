@@ -61,15 +61,12 @@
 - name: Local passphrase-less GPG key
   become: false
   vars:
-    local_key_email: "pazbryant7@outlook.com"
-    local_key_name: "local"
-    local_key_comment: "passphrase-less key for local automated tasks"
-    local_key_expiry: "2y"
+    local_gpg_email: "pazbryant7@outlook.com"
   block:
     - name: Check if local key already exists
       ansible.builtin.shell:
         cmd: |
-          gpg --list-keys {{ local_key_email }} 2>/dev/null | grep -c '{{ local_key_name }}'
+          gpg --list-keys {{ local_gpg_email }} 2>/dev/null | grep -c 'local'
       register: local_key_check
       changed_when: false
       failed_when: false
@@ -86,27 +83,9 @@
           Subkey-Type: ECDH
           Subkey-Curve: cv25519
           Subkey-Usage: encrypt
-          Name-Real: {{ local_key_name }}
-          Name-Comment: {{ local_key_comment }}
-          Name-Email: {{ local_key_email }}
-          Expire-Date: {{ local_key_expiry }}
+          Name-Real: local
+          Name-Comment: passphrase-less key for local automated tasks
+          Name-Email: {{ local_gpg_email }}
+          Expire-Date: 2y
           EOF
       changed_when: true
-
-    - name: Get local key fingerprint
-      ansible.builtin.shell:
-        cmd: |
-          gpg --with-colons --list-keys {{ local_key_email }} \
-          | awk -F: '$1 == "fpr" { print $10; exit }'
-      register: local_key_fingerprint
-      changed_when: false
-
-    - name: Set ultimate trust on local key
-      ansible.builtin.shell:
-        cmd: |
-          echo "{{ local_key_fingerprint.stdout }}:6:" | gpg --batch --import-ownertrust
-      changed_when: false
-
-    - name: Expose local key fingerprint as fact
-      ansible.builtin.set_fact:
-        local_gpg_fingerprint: "{{ local_key_fingerprint.stdout }}"

@@ -8,10 +8,12 @@
   when: distribution_config.stat.exists
 
 - name: Clone and build ST terminal emulator
+  vars:
+    personal_github: "git@personal.github:pazbryant7"
   block:
     - name: Clone ST repository
       ansible.builtin.git:
-        repo: "git@personal.github:pazbryant7/st.git"
+        repo: "{{ personal_github }}/st.git"
         dest: "{{ github_dir }}/st"
         version: main
         update: false
@@ -31,10 +33,12 @@
         state: link
 
 - name: Clone and build DWM window manager
+  vars:
+    personal_github: "git@personal.github:pazbryant7"
   block:
     - name: Clone DWM repository
       ansible.builtin.git:
-        repo: "git@personal.github:pazbryant7/dwm.git"
+        repo: "{{ personal_github }}/dwm.git"
         dest: "{{ github_dir }}/dwm"
         version: main
         update: false
@@ -47,10 +51,12 @@
         creates: /usr/local/bin/dwm
 
 - name: Clone and build slstatus
+  vars:
+    personal_github: "git@personal.github:pazbryant7"
   block:
     - name: Clone slstatus repository
       ansible.builtin.git:
-        repo: "git@personal.github:pazbryant7/slstatus.git"
+        repo: "{{ personal_github }}/slstatus.git"
         dest: "{{ github_dir }}/slstatus"
         version: main
         update: false

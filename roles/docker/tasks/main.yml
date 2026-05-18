@@ -7,18 +7,19 @@
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
 
-- name: Ensure the docker group exists
+- name: Setup docker group
   become: true
-  ansible.builtin.group:
-    name: docker
-    state: present
+  block:
+    - name: Ensure the docker group exists
+      ansible.builtin.group:
+        name: docker
+        state: present
 
-- name: Ensure the user is in the docker group
-  become: true
-  ansible.builtin.user:
-    name: "{{ host_user }}"
-    groups: docker
-    append: true
+    - name: Ensure the user is in the docker group
+      ansible.builtin.user:
+        name: "{{ host_user }}"
+        groups: docker
+        append: true
 
 - name: Enable and start docker service
   become: true

@@ -1,5 +1,0 @@
-- name: Ensure gopass is installed
-  become: true
-  community.general.pacman:
-    name: gopass
-    state: present

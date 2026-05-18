@@ -1,0 +1,17 @@
+name: ansible-arch
+services:
+  ansible:
+    build:
+      context: ../../
+      dockerfile: docker/arch/Dockerfile
+      args:
+        TEST_USER: testuser
+    image: ansible-arch-dev:latest
+    container_name: ansible-arch-test
+    volumes:
+      - ../../:/ansible
+      - ../../.secrets:/ansible/.secrets:ro
+    tty: true
+    stdin_open: true
+    environment:
+      - ANSIBLE_FORCE_COLOR=1
