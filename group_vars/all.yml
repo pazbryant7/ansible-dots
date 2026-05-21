@@ -15,6 +15,7 @@ default_roles:
   - systemd
   - microcode
   - xdg-base-dir
+  - system-scripts
   - network-manager
 
 shell_roles:
