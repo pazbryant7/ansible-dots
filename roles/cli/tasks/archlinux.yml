@@ -70,6 +70,7 @@
       - oath-toolkit
       - breeze-icons
       - bitwarden-cli
+      - android-tools
       - noto-fonts-cjk
       - pacman-contrib
       - translate-shell
