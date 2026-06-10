@@ -21,11 +21,19 @@
         groups: docker
         append: true
 
-- name: Enable and start docker service
+- name: Configure Docker (On-Demand)
   become: true
-  ansible.builtin.systemd:
-    name: docker.service
-    enabled: true
-    state: started
-    daemon_reload: true
+  block:
+    - name: Ensure docker.service is disabled and stopped
+      ansible.builtin.systemd:
+        name: docker.service
+        enabled: false
+        state: stopped
+
+    - name: Enable and start docker.socket
+      ansible.builtin.systemd:
+        name: docker.socket
+        enabled: true
+        state: started
+        daemon_reload: true
   when: systemd_status.rc == 0
