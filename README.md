@@ -151,12 +151,12 @@ full run.
 
 ### Utilities
 
-| Recipe            | What it does               |
-| ----------------- | -------------------------- |
+| Recipe            | What it does             |
+| ----------------- | ------------------------ |
 | `just shell-exec` | sh session as `testuser` |
 | `just root`       | sh session as root       |
-| `just logs`       | Follow container logs      |
-| `just status`     | Show container state       |
+| `just logs`       | Follow container logs    |
+| `just status`     | Show container state     |
 
 ---
 
