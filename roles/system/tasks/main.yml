@@ -27,6 +27,15 @@
       register: ntp_result
       changed_when: ntp_result.rc == 0
 
+- name: Setup consolefont and keymap mkinitcpio.conf
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/mkinitcpio.conf
+    regexp: '^HOOKS=\((?!.*keymap)(?!.*consolefont)(.*)\)'
+    line: 'HOOKS=(\1 keymap consolefont)'
+    backrefs: true
+  notify: Regenerate mkinitcpio binary image
+
 - name: Flush DNS cache (systemd-resolved)
   become: true
   ansible.builtin.command:
