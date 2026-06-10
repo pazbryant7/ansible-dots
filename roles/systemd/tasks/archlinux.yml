@@ -5,5 +5,4 @@
       - mpd
       - cronie
       - systemd
-      - syncthing
     state: present

@@ -23,12 +23,6 @@
         enabled: true
         state: started
 
-    - name: Enable and start syncthing for user
-      ansible.builtin.systemd:
-        name: "syncthing@{{ host_user }}.service"
-        enabled: true
-        state: started
-
 - name: Enable mpd user service
   ansible.builtin.systemd:
     name: mpd.service

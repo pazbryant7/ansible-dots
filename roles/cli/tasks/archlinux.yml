@@ -56,7 +56,6 @@
       - gammastep
       - alacritty
       - bandwhich
-      - syncthing
       - hyperfine
       - breeze-gtk
       - lazydocker
