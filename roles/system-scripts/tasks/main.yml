@@ -11,10 +11,11 @@
   become: true
   vars:
     dir: "/usr/local/bin"
+    src_dir: "files/usr/local/bin"
   block:
     - name: Find all scripts in files directory
       ansible.builtin.find:
-        paths: "{{ role_path }}/files"
+        paths: "{{ role_path }}/{{ src_dir }}"
         file_type: file
       register: scripts
 
