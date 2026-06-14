@@ -85,9 +85,10 @@
     name: "{{ item }}"
     state: present
   loop:
-    - ventoy-bin
+    - downgrade
     - numbat-bin
-    - grpcurl-bin
+    - ventoy-bin
     - dragon-drop
+    - grpcurl-bin
     - brave-origin
     - helium-browser-bin
