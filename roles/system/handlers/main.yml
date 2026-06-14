@@ -1,4 +1,3 @@
-handlers:
-  - name: Regenerate mkinitcpio binary image
-    become: true
-    ansible.builtin.command: mkinitcpio -P
+- name: Regenerate mkinitcpio binary image
+  become: true
+  ansible.builtin.command: mkinitcpio -P
