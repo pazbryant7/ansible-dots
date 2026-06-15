@@ -5,22 +5,19 @@
       - ufw
       - sudo
       - tmux
-      - grub
       - base
       - dunst
       - linux
       - rtkit
       - xclip
-      - man-db
       - cronie
+      - man-db
       - ntfs-3g
       - pipewire
       - libnotify
       - linux-lts
       - efibootmgr
-      - openresolv
       - base-devel
-      - wireplumber
       - pipewire-alsa
       - linux-headers
       - terminus-font
@@ -32,6 +29,7 @@
       - noto-fonts-emoji
       - linux-lts-headers
       - gst-plugin-pipewire
+      - zram-generator
     state: present
 
 - name: Install CPU-specific microcode

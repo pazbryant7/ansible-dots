@@ -34,11 +34,13 @@
       - steam
       - qt6ct
       - yt-dlp
+      - gopass
       - pastel
       - rustup
       - ccache
       - rclone
       - zoxide
+      - numbat
       - ncmpcpp
       - ripgrep
       - zathura
@@ -87,7 +89,6 @@
     state: present
   loop:
     - downgrade
-    - numbat-bin
     - ventoy-bin
     - dragon-drop
     - grpcurl-bin
