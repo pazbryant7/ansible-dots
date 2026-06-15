@@ -19,5 +19,20 @@
     dest: "{{ dotfiles_dir }}"
     repo: "{{ dotfiles_repo }}"
   changed_when: true
-  notify:
-    - Setup dotfiles with stow
+
+- name: Stow dotfiles (adopting conflicting system files)
+  ansible.builtin.command:
+    cmd: stow --dir="{{ dotfiles_dir }}" --target="{{ ansible_user_dir }}" --adopt --restow .
+  args:
+    chdir: "{{ dotfiles_dir }}"
+  register: stow_result
+  changed_when: false
+  failed_when: stow_result.rc != 0
+
+- name: Discard adopted system files so dotfiles repo versions win
+  ansible.builtin.command:
+    cmd: git restore .
+  args:
+    chdir: "{{ dotfiles_dir }}"
+  register: git_result
+  changed_when: false
