@@ -23,25 +23,29 @@
 
     - name: Deploy SSH config files
       ansible.builtin.copy:
-        src: "files/{{ item }}"
-        dest: "{{ ssh_dir }}/{{ item }}"
+        src: "files/{{ ssh_file }}"
+        dest: "{{ ssh_dir }}/{{ ssh_file }}"
         mode: "0600"
         owner: "{{ ansible_user_id }}"
         group: "{{ ansible_user_gid | default(ansible_user_id) }}"
       loop:
         - config
         - known_hosts
+      loop_control:
+        loop_var: ssh_file
 
     - name: Import SSH private keys
       ansible.builtin.copy:
-        src: "{{ ssh_secrets_dir }}/{{ item.name }}"
-        dest: "{{ ssh_private_dir }}/{{ item.name }}"
+        src: "{{ ssh_secrets_dir }}/{{ ssh_key.name }}"
+        dest: "{{ ssh_private_dir }}/{{ ssh_key.name }}"
         mode: "0600"
         owner: "{{ ansible_user_id }}"
         group: "{{ ansible_user_gid | default(ansible_user_id) }}"
       loop:
         - name: personal_github
         - name: work_github
+      loop_control:
+        loop_var: ssh_key
 
     - name: Start ssh-agent if not running
       ansible.builtin.shell:
@@ -56,7 +60,7 @@
 
     - name: Add SSH keys to agent
       ansible.builtin.shell:
-        cmd: ssh-add {{ ssh_private_dir }}/{{ item }}
+        cmd: ssh-add {{ ssh_private_dir }}/{{ ssh_key }}
       environment:
         SSH_AUTH_SOCK:
           "{{ ssh_agent_env.stdout | regex_search('SSH_AUTH_SOCK=([^\\n]+)',
@@ -64,5 +68,7 @@
       loop:
         - personal_github
         - work_github
+      loop_control:
+        loop_var: ssh_key
       changed_when: false
       ignore_errors: true
