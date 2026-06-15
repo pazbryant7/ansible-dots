@@ -25,6 +25,7 @@
     - { repo: "media", branch: "main" }
     - { repo: "notes", branch: "main" }
     - { repo: "youtube", branch: "main" }
+    - { repo: "leetcode", branch: "main" }
     - { repo: "portfolio", branch: "main" }
     - { repo: "pass-backup", branch: "main" }
     - { repo: "boilerplate", branch: "main" }
