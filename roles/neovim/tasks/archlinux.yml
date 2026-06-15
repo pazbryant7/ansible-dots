@@ -1,7 +1,7 @@
 - name: Setup Bob and Neovim
   vars:
-    nvim_bin_path: "{{ ansible_env.HOME }}/.local/share/bob/nvim-bin/nvim"
     applications_dir: /usr/share/applications
+    nvim_bin_path: "{{ ansible_env.HOME }}/.local/share/bob/nvim-bin/nvim"
   block:
     - name: Install Bob (Neovim version manager)
       become: true
@@ -16,11 +16,12 @@
       changed_when: false
       failed_when: bob_version.rc != 0
 
-    - name: Install stable Neovim using Bob
+    - name: Install and activate latest stable Neovim using Bob
       become: false
       ansible.builtin.command: bob use stable
-      args:
-        creates: "{{ nvim_bin_path }}"
+      register: bob_use
+      # Bob prints "Already using stable" when nothing changed
+      changed_when: "'Already using' not in bob_use.stdout"
 
     - name: Ensure applications directory exists
       become: true
