@@ -1,12 +1,12 @@
 - name: Setup cron jobs
   vars:
-    crontab_path: "{{ ansible_env.HOME }}/bin/crontab"
+    src_dir: "{{ role_path }}/tasks/files/"
   block:
-    - name: Ensure Backup-notes cron job exists
+    - name: Ensure backup notes cron job exists
       ansible.builtin.cron:
         name: "Backup notes"
         minute: "0"
         hour: "*"
-        job: "{{ crontab_path }}/backup-notes > /tmp/cron-backup-notes 2>&1"
+        job: "{{ src_dir }}/backup-notes > /tmp/cron-backup-notes 2>&1"
         state: present
         user: "{{ ansible_user_id }}"
