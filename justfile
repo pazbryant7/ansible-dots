@@ -6,13 +6,12 @@
 #
 # Supported targets:
 #   arch    → docker/arch/   (archlinux:base)
-#   ubuntu  → docker/ubuntu/ (ubuntu:24.04)
 
 # Examples:
 #   just build                              # build arch (default)
-#   just os=ubuntu build                    # build ubuntu
+#   just os=arch build                      # build arch
 #   just shell=fish compositor=wayland run  # run with overrides
-#   just os=ubuntu run-role role=cli        # single role on ubuntu
+#   just os=arch run-role role=cli          # single role on arch
 # ────────────────────────────────────────────────────────────────────────────
 
 # ── Variables ─────────────────────────────────────────────────────────────────
@@ -71,7 +70,6 @@ pull:
     #!/usr/bin/env sh
     case "{{ os }}" in
         arch)   docker pull archlinux:base ;;
-        ubuntu) docker pull ubuntu:24.04 ;;
         *)      echo "ERROR: unknown os '{{ os }}'"; exit 1 ;;
     esac
     just os={{ os }} build
@@ -93,7 +91,6 @@ clean:
 # Remove containers + images for ALL targets
 clean-all:
     just os=arch clean
-    just os=ubuntu clean
 
 # ── Playbook execution ────────────────────────────────────────────────────────
 

@@ -52,14 +52,6 @@ install_ansible() {
 	info "Installing Ansible for $1..."
 	case "$1" in
 	arch) sudo pacman -S --noconfirm ansible ansible-core ansible-lint ;;
-	ubuntu) sudo apt-get update -qq &&
-		sudo apt-get install -y software-properties-common &&
-		sudo add-apt-repository --yes --update ppa:ansible/ansible &&
-		sudo apt-get install -y ansible ansible-lint ;;
-	darwin)
-		command -v brew >/dev/null 2>&1 || die "Homebrew required — https://brew.sh"
-		brew install ansible ansible-lint
-		;;
 	*) die "Unsupported OS '$1' — install Ansible manually" ;;
 	esac
 }
@@ -124,6 +116,8 @@ post() {
 	printf "               GitHub, Google, Twitch\n"
 	printf "  • Retrive backups: Music,Brave,Books,\n"
 	printf "  • Bitwarden: login and paste new token session in gopass\n"
+	printf "  • YAY: Install downgrade,ventoy-bin,dragon-drop,brave-origin\n"
+	printf "               grpcurl-bin, helium-browser-bin\n"
 	printf "═══════════════════════════════════════════════\n"
 }
 

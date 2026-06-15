@@ -15,7 +15,7 @@ the `docker/` internals directly.
 │  your repo/  ──bind-mount──►  /ansible  (container)        │
 │  .secrets/   ──bind-mount──►  /ansible/.secrets  (ro)      │
 │                                                             │
-│  just [os=arch|ubuntu] <recipe>                             │
+│  just [os=arch] <recipe>                             │
 │       └─► docker compose -f docker/<os>/docker-compose.yml │
 │                 └─► ansible-playbook local.yml              │
 └─────────────────────────────────────────────────────────────┘
@@ -34,12 +34,8 @@ The `os` variable in the justfile routes every command to the right
 │   ├── arch/
 │   │   ├── Dockerfile          # archlinux:base + ansible + galaxy (arch)
 │   │   └── docker-compose.yml
-│   └── ubuntu/
-│       ├── Dockerfile          # ubuntu:24.04 + ansible + galaxy (ubuntu)
-│       └── docker-compose.yml
 ├── requirements/
 │   ├── arch.yml                # kewlfft.aur + moreati.uv
-│   └── ubuntu.yml              # moreati.uv only
 ├── roles/
 ├── local.yml
 └── justfile                    ← single entrypoint for everything
@@ -86,7 +82,6 @@ baked into any image.
 
 ```sh
 just build              # arch (default)
-just os=ubuntu build    # ubuntu
 ```
 
 Galaxy collections are installed during the build step, so subsequent runs are
@@ -98,7 +93,6 @@ long gap (Arch packages drift on rolling release).
 ```sh
 just run                                    # arch, zsh, xorg
 just shell=fish compositor=wayland run      # override defaults
-just os=ubuntu run                          # ubuntu target
 ```
 
 The manual tasks that cannot be automated are always printed at the end of every
@@ -166,14 +160,14 @@ All variables can be overridden on the command line:
 
 | Variable     | Default     | Description                                   |
 | ------------ | ----------- | --------------------------------------------- |
-| `os`         | `arch`      | Target OS (`arch` or `ubuntu`)                |
+| `os`         | `arch`      | Target OS (`arch`)                |
 | `shell`      | `zsh`       | Passed as `chosen_shell` to the playbook      |
 | `compositor` | `xorg`      | Passed as `chosen_compositor` to the playbook |
 | `playbook`   | `local.yml` | Playbook file to run                          |
 
 ```sh
-just os=ubuntu shell=fish compositor=wayland run
-just os=ubuntu run-role role=neovim
+just os=arch shell=fish compositor=wayland run
+just os=arch run-role role=neovim
 ```
 
 ---
@@ -195,14 +189,14 @@ working on:
 
 ```sh
 just run-role role=neovim
-just os=ubuntu run-role role=cli
+just os=arch run-role role=cli
 ```
 
 **Checking before applying** — always a good idea for destructive roles:
 
 ```sh
 just check
-just os=ubuntu check
+just os=arch check
 ```
 
 **Arch package drift** — rolling release means cached layers go stale. If

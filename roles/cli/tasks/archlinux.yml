@@ -81,16 +81,3 @@
       - capitaine-cursors
       - perl-image-exiftool
     state: present
-
-- name: Install AUR packages using yay
-  kewlfft.aur.aur:
-    use: yay
-    name: "{{ item }}"
-    state: present
-  loop:
-    - downgrade
-    - ventoy-bin
-    - dragon-drop
-    - grpcurl-bin
-    - brave-origin
-    - helium-browser-bin
