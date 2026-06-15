@@ -55,7 +55,6 @@
       - libpulse
       - luarocks
       - patchelf
-      - reflector
       - fastfetch
       - gammastep
       - alacritty
