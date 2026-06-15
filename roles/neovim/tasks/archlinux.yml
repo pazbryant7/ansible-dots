@@ -23,6 +23,13 @@
       # Bob prints "Already using stable" when nothing changed
       changed_when: "'Already using' not in bob_use.stdout"
 
+    - name: Symlink Neovim configuration
+      ansible.builtin.file:
+        src: "{{ github_dir }}/nvim"
+        dest: "{{ ansible_user_dir }}/.config/nvim"
+        state: link
+        force: true
+
     - name: Ensure applications directory exists
       become: true
       ansible.builtin.file:
