@@ -122,8 +122,8 @@ post() {
 	printf "  • Set GTK theme using nwg-look GUI\n"
 	printf "  • Log in to: Browser, Outlook, Bitwarden,\n"
 	printf "               GitHub, Google, Twitch\n"
-	printf "  • Firefox: disable tab preview;\n"
-	printf "             enable 'switch to last used tab'\n"
+	printf "  • Retrive backups: Music,Brave,Books,\n"
+	printf "  • Bitwarden: login and paste new token session in gopass\n"
 	printf "═══════════════════════════════════════════════\n"
 }
 
