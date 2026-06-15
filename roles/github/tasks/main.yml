@@ -21,6 +21,7 @@
     accept_hostkey: true
   loop:
     - { repo: "pass", branch: "main" }
+    - { repo: "nvim", branch: "main" }
     - { repo: "media", branch: "main" }
     - { repo: "notes", branch: "main" }
     - { repo: "youtube", branch: "main" }
@@ -28,20 +29,6 @@
     - { repo: "pass-backup", branch: "main" }
     - { repo: "boilerplate", branch: "main" }
     - { repo: "ansible-dots", branch: "main" }
-
-- name: Ensure clone neovim configurations
-  become: false
-  ansible.builtin.git:
-    repo: "git@personal.github:pazbryant7/{{ item.repo }}.git"
-    dest: "{{ xdg_config_dir }}/{{ item.repo }}"
-    version: "{{ item.branch | default('main') }}"
-    update: false
-    recursive: true
-    clone: true
-    single_branch: true
-    accept_hostkey: true
-  loop:
-    - { repo: "nvim", branch: "main" }
 
 - name: Ensure tmux plugin manager is installed
   become: false
