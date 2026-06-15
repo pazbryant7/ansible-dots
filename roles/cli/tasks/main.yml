@@ -52,3 +52,23 @@
         - name: fnm
       loop_control:
         loop_var: cargo_item
+
+
+- name: Setup fnm and Node.js
+  vars:
+    fnm_bin: "{{ ansible_env.HOME }}/.cargo/bin/fnm"
+  block:
+    - name: Verify fnm installation
+      ansible.builtin.command: "{{ fnm_bin }} --version"
+      register: fnm_version
+      changed_when: false
+      failed_when: fnm_version.rc != 0
+
+    - name: Install latest LTS Node.js using fnm
+      ansible.builtin.command: "{{ fnm_bin }} install --lts"
+      register: fnm_install
+      changed_when: "'already installed' not in fnm_install.stderr"
+
+    - name: Set latest LTS as default version
+      ansible.builtin.command: "{{ fnm_bin }} default lts-latest"
+      changed_when: false
