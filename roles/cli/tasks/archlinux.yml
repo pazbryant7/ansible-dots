@@ -49,6 +49,7 @@
       - poppler
       - calibre
       - img2pdf
+      - nwg-look
       - starship
       - websocat
       - libpulse
