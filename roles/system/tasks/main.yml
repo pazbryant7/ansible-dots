@@ -14,6 +14,16 @@
     state: directory
     mode: "0755"
 
+- name: Import custom hosts file
+  become: true
+  ansible.builtin.copy:
+    src: files/archlinux/etc/hosts
+    dest: "/etc/hosts"
+    owner: root
+    group: root
+    mode: "0644"
+    force: true
+
 - name: Configure timezone and NTP
   become: true
   when: systemd_status.rc == 0
