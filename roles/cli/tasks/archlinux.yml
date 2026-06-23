@@ -30,6 +30,7 @@
       - 7zip
       - aria2
       - atuin
+      - pcman
       - rsync
       - steam
       - qt6ct
