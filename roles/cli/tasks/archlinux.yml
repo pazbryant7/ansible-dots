@@ -35,6 +35,7 @@
       - steam
       - qt6ct
       - yt-dlp
+      - bottom
       - gopass
       - pastel
       - rustup
