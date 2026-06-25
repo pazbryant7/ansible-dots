@@ -42,7 +42,6 @@
       - ccache
       - rclone
       - zoxide
-      - numbat
       - ncmpcpp
       - ripgrep
       - zathura
