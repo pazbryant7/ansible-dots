@@ -81,4 +81,5 @@
       - zathura-pdf-mupdf
       - capitaine-cursors
       - perl-image-exiftool
+      - ttf-nerd-fonts-symbols
     state: present
