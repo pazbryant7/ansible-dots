@@ -6,7 +6,7 @@
       - go
       - uv
       - fd
-      - bun
+      - lf
       - fzf
       - mpc
       - git
@@ -16,30 +16,23 @@
       - eza
       - mpd
       - lua
-      - zbar
-      - glow
       - stow
       - just
-      - tmux
       - fish
-      - tree
       - less
-      - yazi
-      - dust
       - lsof
-      - 7zip
+      - tmux
       - aria2
       - atuin
+      - unzip
+      - unrar
       - pcman
       - rsync
       - steam
       - qt6ct
       - yt-dlp
-      - bottom
       - gopass
-      - pastel
       - rustup
-      - ccache
       - rclone
       - zoxide
       - ncmpcpp
@@ -49,24 +42,16 @@
       - jujutsu
       - poppler
       - calibre
-      - img2pdf
       - nwg-look
       - starship
-      - websocat
-      - libpulse
       - luarocks
-      - patchelf
       - fastfetch
       - gammastep
       - alacritty
-      - bandwhich
-      - hyperfine
       - breeze-gtk
       - lazydocker
-      - typescript
       - github-cli
       - python-pip
-      - cargo-cache
       - qbittorrent
       - pavucontrol
       - imagemagick
@@ -80,6 +65,5 @@
       - tree-sitter-cli
       - zathura-pdf-mupdf
       - capitaine-cursors
-      - perl-image-exiftool
       - ttf-nerd-fonts-symbols
     state: present

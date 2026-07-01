@@ -4,30 +4,27 @@
     name:
       - ufw
       - sudo
-      - tmux
       - base
-      - dunst
       - linux
       - rtkit
-      - xclip
-      - cronie
       - man-db
+      - cronie
       - ntfs-3g
       - pipewire
-      - libnotify
       - linux-lts
+      - libnotify
       - efibootmgr
       - base-devel
       - pipewire-alsa
-      - linux-headers
-      - terminus-font
       - pipewire-jack
-      - pipewire-pulse
-      - networkmanager
-      - zram-generator
+      - terminus-font
+      - linux-headers
       - linux-firmware
+      - zram-generator
+      - networkmanager
+      - pipewire-pulse
+      - zram-generator
       - noto-fonts-emoji
       - linux-lts-headers
       - gst-plugin-pipewire
-      - zram-generator
     state: present
