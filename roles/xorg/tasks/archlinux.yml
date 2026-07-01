@@ -15,7 +15,6 @@
           - screenkey
           - unclutter
           - xorg-xinit
-          - ueberzugpp
           - xorg-server
           - xorg-xrandr
           - xorg-xsetroot
