@@ -18,7 +18,6 @@
       - lua
       - stow
       - just
-      - fish
       - less
       - lsof
       - tmux

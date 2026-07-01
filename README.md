@@ -166,7 +166,7 @@ All variables can be overridden on the command line:
 | `playbook`   | `local.yml` | Playbook file to run                          |
 
 ```sh
-just os=arch shell=fish compositor=wayland run
+just os=arch shell=zsh compositor=wayland run
 just os=arch run-role role=neovim
 ```
 

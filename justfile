@@ -10,7 +10,7 @@
 # Examples:
 #   just build                              # build arch (default)
 #   just os=arch build                      # build arch
-#   just shell=fish compositor=wayland run  # run with overrides
+#   just shell=zsh compositor=wayland run  # run with overrides
 #   just os=arch run-role role=cli          # single role on arch
 # ────────────────────────────────────────────────────────────────────────────
 

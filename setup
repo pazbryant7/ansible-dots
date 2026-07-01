@@ -89,7 +89,7 @@ prompt() {
 # ── Playbook ──────────────────────────────────────────────────────────────────
 
 run() {
-	shell="$(prompt "shell" "zsh" "fish")"
+	shell="zsh"
 	compositor="$(prompt "compositor" "xorg" "wayland")"
 	info "Running playbook..."
 	ansible-playbook "$PLAYBOOK" \
