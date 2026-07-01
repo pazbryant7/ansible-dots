@@ -45,6 +45,7 @@
       - nwg-look
       - starship
       - luarocks
+      - trash-cli
       - fastfetch
       - gammastep
       - alacritty
