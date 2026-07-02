@@ -42,7 +42,6 @@
       - poppler
       - calibre
       - nwg-look
-      - starship
       - luarocks
       - trash-cli
       - hyperfine
