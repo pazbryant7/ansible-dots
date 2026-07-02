@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 die() {
   printf 'Error: %s\n' "$1" >&2

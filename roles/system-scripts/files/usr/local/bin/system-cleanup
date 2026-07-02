@@ -31,68 +31,68 @@ STEPS_OK=0
 # =============================================================================
 
 _timestamp() {
-	date '+%Y-%m-%d %H:%M:%S'
+  date '+%Y-%m-%d %H:%M:%S'
 }
 
 _log_raw() {
-	printf "[%s] %s\n" "$(_timestamp)" "$1" >>"$LOG_FILE"
+  printf "[%s] %s\n" "$(_timestamp)" "$1" >>"$LOG_FILE"
 }
 
 ok() {
-	printf "${GREEN}  ✔${NC}  %s\n" "$1"
-	_log_raw "[OK]   $1"
-	STEPS_OK=$((STEPS_OK + 1))
+  printf "${GREEN}  ✔${NC}  %s\n" "$1"
+  _log_raw "[OK]   $1"
+  STEPS_OK=$((STEPS_OK + 1))
 }
 
 info() {
-	printf "${CYAN}  ➜${NC}  %s\n" "$1"
-	_log_raw "[INFO] $1"
+  printf "${CYAN}  ➜${NC}  %s\n" "$1"
+  _log_raw "[INFO] $1"
 }
 
 warn() {
-	printf "${YELLOW}  ⚠${NC}  %s\n" "$1"
-	_log_raw "[WARN] $1"
-	WARNINGS=$((WARNINGS + 1))
+  printf "${YELLOW}  ⚠${NC}  %s\n" "$1"
+  _log_raw "[WARN] $1"
+  WARNINGS=$((WARNINGS + 1))
 }
 
 error() {
-	printf "${RED}  ✖${NC}  %s\n" "$1"
-	_log_raw "[ERR]  $1"
-	ERRORS=$((ERRORS + 1))
+  printf "${RED}  ✖${NC}  %s\n" "$1"
+  _log_raw "[ERR]  $1"
+  ERRORS=$((ERRORS + 1))
 }
 
 section() {
-	printf "\n${BOLD}━━━  %s  ━━━${NC}\n\n" "$1"
-	_log_raw "=== $1 ==="
-	_SECTION_START=$(date +%s)
+  printf "\n${BOLD}━━━  %s  ━━━${NC}\n\n" "$1"
+  _log_raw "=== $1 ==="
+  _SECTION_START=$(date +%s)
 }
 
 section_end() {
-	if [ "$SECTION_TIMERS_ENABLED" = "1" ] && [ -n "$_SECTION_START" ]; then
-		_elapsed=$(($(date +%s) - _SECTION_START))
-		printf "${DIM}     (completed in %ds)${NC}\n" "$_elapsed"
-		_log_raw "    section elapsed: ${_elapsed}s"
-	fi
+  if [ "$SECTION_TIMERS_ENABLED" = "1" ] && [ -n "$_SECTION_START" ]; then
+    _elapsed=$(($(date +%s) - _SECTION_START))
+    printf "${DIM}     (completed in %ds)${NC}\n" "$_elapsed"
+    _log_raw "    section elapsed: ${_elapsed}s"
+  fi
 }
 
 indent() {
-	while IFS= read -r line; do
-		printf "     ${DIM}%s${NC}\n" "$line"
-		printf "     %s\n" "$line" >>"$LOG_FILE"
-	done
+  while IFS= read -r line; do
+    printf "     ${DIM}%s${NC}\n" "$line"
+    printf "     %s\n" "$line" >>"$LOG_FILE"
+  done
 }
 
 confirm() {
-	printf "${YELLOW}  ?${NC}  %s [y/N]: " "$1"
-	read -r response
-	case "$response" in
-	[yY][eE][sS] | [yY]) return 0 ;;
-	*) return 1 ;;
-	esac
+  printf "${YELLOW}  ?${NC}  %s [y/N]: " "$1"
+  read -r response
+  case "$response" in
+  [yY][eE][sS] | [yY]) return 0 ;;
+  *) return 1 ;;
+  esac
 }
 
 has_cmd() {
-	command -v "$1" >/dev/null 2>&1
+  command -v "$1" >/dev/null 2>&1
 }
 
 # =============================================================================
@@ -100,19 +100,19 @@ has_cmd() {
 # =============================================================================
 
 check_root() {
-	if [ "$(id -u)" -ne 0 ]; then
-		error "This script must be run as root. Try: sudo $0"
-		exit 1
-	fi
+  if [ "$(id -u)" -ne 0 ]; then
+    error "This script must be run as root. Try: sudo $0"
+    exit 1
+  fi
 }
 
 check_internet() {
-	info "Checking internet connectivity..."
-	if ping -c 1 -W 3 archlinux.org >/dev/null 2>&1; then
-		ok "Internet connection is available."
-	else
-		warn "No internet connection detected. Some steps may fail or be skipped."
-	fi
+  info "Checking internet connectivity..."
+  if ping -c 1 -W 3 archlinux.org >/dev/null 2>&1; then
+    ok "Internet connection is available."
+  else
+    warn "No internet connection detected. Some steps may fail or be skipped."
+  fi
 }
 
 # =============================================================================
@@ -120,100 +120,100 @@ check_internet() {
 # =============================================================================
 
 upgrade_system() {
-	section "System Upgrade"
-	info "Running full system upgrade (pacman -Syu)..."
-	if pacman -Syu; then
-		ok "System upgrade complete."
-	else
-		error "System upgrade failed or was aborted."
-	fi
-	section_end
+  section "System Upgrade"
+  info "Running full system upgrade (pacman -Syu)..."
+  if pacman -Syu; then
+    ok "System upgrade complete."
+  else
+    error "System upgrade failed or was aborted."
+  fi
+  section_end
 }
 
 check_systemd() {
-	section "Systemd Health"
+  section "Systemd Health"
 
-	info "Checking for failed systemd services..."
-	failed=$(systemctl --failed --no-legend 2>/dev/null)
-	if [ -n "$failed" ]; then
-		warn "Failed systemd services detected:"
-		printf "%s\n" "$failed" | indent
-	else
-		ok "No failed systemd services."
-	fi
+  info "Checking for failed systemd services..."
+  failed=$(systemctl --failed --no-legend 2>/dev/null)
+  if [ -n "$failed" ]; then
+    warn "Failed systemd services detected:"
+    printf "%s\n" "$failed" | indent
+  else
+    ok "No failed systemd services."
+  fi
 
-	info "Checking systemd timers..."
-	systemctl list-timers --all --no-pager 2>/dev/null | indent
+  info "Checking systemd timers..."
+  systemctl list-timers --all --no-pager 2>/dev/null | indent
 
-	info "Checking for services in degraded state..."
-	state=$(systemctl is-system-running 2>/dev/null)
-	case "$state" in
-	running) ok "System state: running" ;;
-	degraded) warn "System state: degraded — check 'systemctl --failed'" ;;
-	*) warn "System state: $state" ;;
-	esac
+  info "Checking for services in degraded state..."
+  state=$(systemctl is-system-running 2>/dev/null)
+  case "$state" in
+  running) ok "System state: running" ;;
+  degraded) warn "System state: degraded — check 'systemctl --failed'" ;;
+  *) warn "System state: $state" ;;
+  esac
 
-	section_end
+  section_end
 }
 
 check_microcode() {
-	section "CPU Microcode"
-	info "Checking CPU microcode status..."
+  section "CPU Microcode"
+  info "Checking CPU microcode status..."
 
-	cpu_vendor=$(grep -m1 'vendor_id' /proc/cpuinfo 2>/dev/null | awk '{print $3}')
-	case "$cpu_vendor" in
-	GenuineIntel)
-		if pacman -Qq intel-ucode >/dev/null 2>&1; then
-			ok "intel-ucode is installed."
-		else
-			warn "intel-ucode is NOT installed. Install it for CPU security patches: pacman -S intel-ucode"
-		fi
-		;;
-	AuthenticAMD)
-		if pacman -Qq amd-ucode >/dev/null 2>&1; then
-			ok "amd-ucode is installed."
-		else
-			warn "amd-ucode is NOT installed. Install it for CPU security patches: pacman -S amd-ucode"
-		fi
-		;;
-	*)
-		info "Unknown CPU vendor: $cpu_vendor. Skipping microcode check."
-		;;
-	esac
+  cpu_vendor=$(grep -m1 'vendor_id' /proc/cpuinfo 2>/dev/null | awk '{print $3}')
+  case "$cpu_vendor" in
+  GenuineIntel)
+    if pacman -Qq intel-ucode >/dev/null 2>&1; then
+      ok "intel-ucode is installed."
+    else
+      warn "intel-ucode is NOT installed. Install it for CPU security patches: pacman -S intel-ucode"
+    fi
+    ;;
+  AuthenticAMD)
+    if pacman -Qq amd-ucode >/dev/null 2>&1; then
+      ok "amd-ucode is installed."
+    else
+      warn "amd-ucode is NOT installed. Install it for CPU security patches: pacman -S amd-ucode"
+    fi
+    ;;
+  *)
+    info "Unknown CPU vendor: $cpu_vendor. Skipping microcode check."
+    ;;
+  esac
 
-	if dmesg 2>/dev/null | grep -qi "microcode updated"; then
-		ok "Microcode update applied at boot."
-	elif dmesg 2>/dev/null | grep -qi "microcode"; then
-		info "Microcode present in dmesg (check manually with: dmesg | grep -i microcode)."
-	else
-		warn "No microcode update detected in dmesg. Ensure your bootloader loads the microcode initrd."
-	fi
+  if dmesg 2>/dev/null | grep -qi "microcode updated"; then
+    ok "Microcode update applied at boot."
+  elif dmesg 2>/dev/null | grep -qi "microcode"; then
+    info "Microcode present in dmesg (check manually with: dmesg | grep -i microcode)."
+  else
+    warn "No microcode update detected in dmesg. Ensure your bootloader loads the microcode initrd."
+  fi
 
-	section_end
+  section_end
 }
 
 check_kernel_updates() {
-	section "Kernel Status"
-	info "Checking running kernel vs installed kernel..."
+  section "Kernel Status"
+  info "Checking running kernel vs installed kernel..."
 
-	running_kernel=$(uname -r)
-	installed_kernel=$(pacman -Q linux 2>/dev/null | awk '{print $2}')
+  running_kernel=$(uname -r)
+  installed_kernel=$(pacman -Q linux 2>/dev/null | awk '{print $2}')
 
-	info "Running kernel : $running_kernel"
-	info "Installed linux: $installed_kernel"
+  info "Running kernel : $running_kernel"
+  info "Installed linux: $installed_kernel"
 
-	if echo "$running_kernel" | grep -q "$(echo "$installed_kernel" | cut -d. -f1-2)"; then
-		ok "Running kernel appears consistent with installed version."
-	else
-		warn "Kernel version mismatch — a reboot may be needed to use the newly installed kernel."
-	fi
+  if echo "$running_kernel" | grep -q "$(echo "$installed_kernel" | cut -d. -f1-2)"; then
+    ok "Running kernel appears consistent with installed version."
+  else
+    warn "Kernel version mismatch — a reboot may be needed to use the newly installed kernel."
+  fi
 
-	if has_cmd dkms; then
-		info "DKMS module status:"
-		dkms status 2>/dev/null | indent
-	fi
+  if has_cmd dkms; then
+    info "DKMS module status:"
+    dkms status 2>/dev/null | indent
+  fi
 
-	section_end
+  section_end
 }
 
 # =============================================================================
@@ -221,115 +221,115 @@ check_kernel_updates() {
 # =============================================================================
 
 remove_orphans() {
-	section "Orphaned Packages"
-	info "Scanning for orphaned packages..."
-	orphans=$(pacman -Qdtq 2>/dev/null || true)
-	if [ -n "$orphans" ]; then
-		warn "Found orphaned packages:"
-		printf "%s\n" "$orphans" | indent
-		if confirm "Remove all orphaned packages?"; then
-			# shellcheck disable=SC2086
-			pacman -Rns $orphans
-			ok "Orphaned packages removed."
-		else
-			info "Skipping orphan removal."
-		fi
-	else
-		ok "No orphaned packages found."
-	fi
-	section_end
+  section "Orphaned Packages"
+  info "Scanning for orphaned packages..."
+  orphans=$(pacman -Qdtq 2>/dev/null || true)
+  if [ -n "$orphans" ]; then
+    warn "Found orphaned packages:"
+    printf "%s\n" "$orphans" | indent
+    if confirm "Remove all orphaned packages?"; then
+      # shellcheck disable=SC2086
+      pacman -Rns $orphans
+      ok "Orphaned packages removed."
+    else
+      info "Skipping orphan removal."
+    fi
+  else
+    ok "No orphaned packages found."
+  fi
+  section_end
 }
 
 clean_pacman_cache() {
-	section "Pacman Cache"
+  section "Pacman Cache"
 
-	if has_cmd paccache; then
-		info "Removing old cached packages (keeping last $PACMAN_KEEP_VERSIONS versions)..."
-		paccache -rk"$PACMAN_KEEP_VERSIONS" | indent
-		ok "Old package versions pruned."
+  if has_cmd paccache; then
+    info "Removing old cached packages (keeping last $PACMAN_KEEP_VERSIONS versions)..."
+    paccache -rk"$PACMAN_KEEP_VERSIONS" | indent
+    ok "Old package versions pruned."
 
-		info "Removing all cached versions of uninstalled packages..."
-		paccache -ruk0 | indent
-		ok "Uninstalled package caches cleared."
-	else
-		warn "paccache not found — install 'pacman-contrib' for smarter cache management."
-		info "Falling back to clearing the entire package cache."
-		if confirm "Clear ALL of /var/cache/pacman/pkg/? (no version history kept)"; then
-			pacman -Sc --noconfirm
-			ok "Pacman cache cleared."
-		fi
-	fi
+    info "Removing all cached versions of uninstalled packages..."
+    paccache -ruk0 | indent
+    ok "Uninstalled package caches cleared."
+  else
+    warn "paccache not found — install 'pacman-contrib' for smarter cache management."
+    info "Falling back to clearing the entire package cache."
+    if confirm "Clear ALL of /var/cache/pacman/pkg/? (no version history kept)"; then
+      pacman -Sc --noconfirm
+      ok "Pacman cache cleared."
+    fi
+  fi
 
-	cache_size=$(du -sh /var/cache/pacman/pkg/ 2>/dev/null | cut -f1)
-	info "Current pacman cache size: ${cache_size:-unknown}"
+  cache_size=$(du -sh /var/cache/pacman/pkg/ 2>/dev/null | cut -f1)
+  info "Current pacman cache size: ${cache_size:-unknown}"
 
-	section_end
+  section_end
 }
 
 clean_aur_cache() {
-	section "AUR Cache"
-	aur_helper=""
+  section "AUR Cache"
+  aur_helper=""
 
-	has_cmd yay && aur_helper="yay"
-	has_cmd paru && aur_helper="paru"
+  has_cmd yay && aur_helper="yay"
+  has_cmd paru && aur_helper="paru"
 
-	if [ -n "$aur_helper" ]; then
-		info "AUR helper detected: $aur_helper"
-		info "Cleaning $aur_helper build files and caches..."
-		if [ "$aur_helper" = "yay" ]; then
-			yay -Yc --noconfirm 2>/dev/null | indent
-		elif [ "$aur_helper" = "paru" ]; then
-			paru -Sc --aur --noconfirm 2>/dev/null | indent
-		fi
-		ok "AUR cache cleaned."
-	else
-		info "No common AUR helper (yay/paru) detected. Skipping AUR cleanup."
-	fi
+  if [ -n "$aur_helper" ]; then
+    info "AUR helper detected: $aur_helper"
+    info "Cleaning $aur_helper build files and caches..."
+    if [ "$aur_helper" = "yay" ]; then
+      yay -Yc --noconfirm 2>/dev/null | indent
+    elif [ "$aur_helper" = "paru" ]; then
+      paru -Sc --aur --noconfirm 2>/dev/null | indent
+    fi
+    ok "AUR cache cleaned."
+  else
+    info "No common AUR helper (yay/paru) detected. Skipping AUR cleanup."
+  fi
 
-	section_end
+  section_end
 }
 
 update_mirrorlist() {
-	section "Mirror List"
-	if has_cmd reflector; then
-		info "Updating mirrorlist with reflector (fastest 10 HTTPS mirrors synced within 12h)..."
-		if reflector \
-			--latest 20 \
-			--protocol https \
-			--sort rate \
-			--age 12 \
-			--number 10 \
-			--save /etc/pacman.d/mirrorlist; then
-			ok "Mirrorlist updated."
-		else
-			warn "reflector failed to update mirrorlist. Check your connection."
-		fi
-	else
-		info "reflector not installed. Install it to auto-update mirrors: pacman -S reflector"
-		info "Current top mirrors in /etc/pacman.d/mirrorlist:"
-		grep '^Server' /etc/pacman.d/mirrorlist 2>/dev/null | head -5 | indent
-	fi
-	section_end
+  section "Mirror List"
+  if has_cmd reflector; then
+    info "Updating mirrorlist with reflector (fastest 10 HTTPS mirrors synced within 12h)..."
+    if reflector \
+      --latest 20 \
+      --protocol https \
+      --sort rate \
+      --age 12 \
+      --number 10 \
+      --save /etc/pacman.d/mirrorlist; then
+      ok "Mirrorlist updated."
+    else
+      warn "reflector failed to update mirrorlist. Check your connection."
+    fi
+  else
+    info "reflector not installed. Install it to auto-update mirrors: pacman -S reflector"
+    info "Current top mirrors in /etc/pacman.d/mirrorlist:"
+    grep '^Server' /etc/pacman.d/mirrorlist 2>/dev/null | head -5 | indent
+  fi
+  section_end
 }
 
 handle_pacnew_files() {
-	section "Pacnew / Pacsave Files"
-	info "Scanning /etc for .pacnew and .pacsave files..."
+  section "Pacnew / Pacsave Files"
+  info "Scanning /etc for .pacnew and .pacsave files..."
 
-	if has_cmd fd; then
-		pacnew_files=$(fd -H '\.pac(new|save)$' /etc 2>/dev/null || true)
-	else
-		pacnew_files=$(find /etc \( -name '*.pacnew' -o -name '*.pacsave' \) 2>/dev/null || true)
-	fi
+  if has_cmd fd; then
+    pacnew_files=$(fd -H '\.pac(new|save)$' /etc 2>/dev/null || true)
+  else
+    pacnew_files=$(find /etc \( -name '*.pacnew' -o -name '*.pacsave' \) 2>/dev/null || true)
+  fi
 
-	if [ -n "$pacnew_files" ]; then
-		warn "Found config files requiring manual review:"
-		printf "%s\n" "$pacnew_files" | indent
-		info "Use 'pacdiff' or 'vimdiff' to merge changes."
-	else
-		ok "No .pacnew or .pacsave files found."
-	fi
-	section_end
+  if [ -n "$pacnew_files" ]; then
+    warn "Found config files requiring manual review:"
+    printf "%s\n" "$pacnew_files" | indent
+    info "Use 'pacdiff' or 'vimdiff' to merge changes."
+  else
+    ok "No .pacnew or .pacsave files found."
+  fi
+  section_end
 }
 
 # =============================================================================
@@ -337,168 +337,168 @@ handle_pacnew_files() {
 # =============================================================================
 
 trim_ssd() {
-	section "SSD TRIM"
-	info "Checking for SSD/NVMe drives that support TRIM..."
+  section "SSD TRIM"
+  info "Checking for SSD/NVMe drives that support TRIM..."
 
-	if systemctl is-active --quiet fstrim.timer 2>/dev/null; then
-		ok "fstrim.timer is active — periodic TRIM is running automatically."
-		info "Last TRIM run info:"
-		systemctl status fstrim.timer --no-pager 2>/dev/null | grep -E 'Trigger|Last' | indent
-	else
-		warn "fstrim.timer is not active."
-		if confirm "Enable and start fstrim.timer for weekly automatic TRIM?"; then
-			systemctl enable --now fstrim.timer
-			ok "fstrim.timer enabled."
-		fi
-	fi
+  if systemctl is-active --quiet fstrim.timer 2>/dev/null; then
+    ok "fstrim.timer is active — periodic TRIM is running automatically."
+    info "Last TRIM run info:"
+    systemctl status fstrim.timer --no-pager 2>/dev/null | grep -E 'Trigger|Last' | indent
+  else
+    warn "fstrim.timer is not active."
+    if confirm "Enable and start fstrim.timer for weekly automatic TRIM?"; then
+      systemctl enable --now fstrim.timer
+      ok "fstrim.timer enabled."
+    fi
+  fi
 
-	if confirm "Run fstrim now on all mounted filesystems?"; then
-		fstrim -av 2>/dev/null | indent
-		ok "TRIM completed."
-	fi
-	section_end
+  if confirm "Run fstrim now on all mounted filesystems?"; then
+    fstrim -av 2>/dev/null | indent
+    ok "TRIM completed."
+  fi
+  section_end
 }
 
 clear_old_cache_files() {
-	section "User Cache Cleanup"
-	cache_size_before=$(du -sh "$HOME/.cache" 2>/dev/null | cut -f1)
-	info "User cache size before: ${cache_size_before:-unknown}"
+  section "User Cache Cleanup"
+  cache_size_before=$(du -sh "$HOME/.cache" 2>/dev/null | cut -f1)
+  info "User cache size before: ${cache_size_before:-unknown}"
 
-	info "Removing files older than ${CACHE_AGE_DAYS} days (max depth 4) from ~/.cache..."
-	if has_cmd fd; then
-		fd --type file --max-depth 4 --changed-before "${CACHE_AGE_DAYS}d" . "$HOME/.cache" -X rm 2>/dev/null || true
-	else
-		find "$HOME/.cache" -maxdepth 4 -type f -mtime +"$CACHE_AGE_DAYS" -delete 2>/dev/null || true
-	fi
+  info "Removing files older than ${CACHE_AGE_DAYS} days (max depth 4) from ~/.cache..."
+  if has_cmd fd; then
+    fd --type file --max-depth 4 --changed-before "${CACHE_AGE_DAYS}d" . "$HOME/.cache" -X rm 2>/dev/null || true
+  else
+    find "$HOME/.cache" -maxdepth 4 -type f -mtime +"$CACHE_AGE_DAYS" -delete 2>/dev/null || true
+  fi
 
-	cache_size_after=$(du -sh "$HOME/.cache" 2>/dev/null | cut -f1)
-	ok "Old cache files removed. Size after: ${cache_size_after:-unknown}"
+  cache_size_after=$(du -sh "$HOME/.cache" 2>/dev/null | cut -f1)
+  ok "Old cache files removed. Size after: ${cache_size_after:-unknown}"
 
-	section_end
+  section_end
 }
 
 clear_old_tmp_files() {
-	section "Temp File Cleanup"
-	if [ -d /tmp ]; then
-		info "Removing own files older than ${TMP_AGE_DAYS} days from /tmp..."
-		if has_cmd fd; then
-			fd --type file --changed-before "${TMP_AGE_DAYS}d" . "/tmp" -X rm 2>/dev/null || true
-		else
-			find "/tmp" -type f -user "$(id -u)" -mtime +"$TMP_AGE_DAYS" -delete 2>/dev/null || true
-		fi
-		ok "/tmp old files cleared."
-	fi
+  section "Temp File Cleanup"
+  if [ -d /tmp ]; then
+    info "Removing own files older than ${TMP_AGE_DAYS} days from /tmp..."
+    if has_cmd fd; then
+      fd --type file --changed-before "${TMP_AGE_DAYS}d" . "/tmp" -X rm 2>/dev/null || true
+    else
+      find "/tmp" -type f -user "$(id -u)" -mtime +"$TMP_AGE_DAYS" -delete 2>/dev/null || true
+    fi
+    ok "/tmp old files cleared."
+  fi
 
-	if [ -d "$HOME/.config/pulse" ]; then
-		info "Removing stale PulseAudio/PipeWire temp files..."
-		find "$HOME/.config/pulse" -name '*.tdb' -mtime +7 -delete 2>/dev/null || true
-	fi
+  if [ -d "$HOME/.config/pulse" ]; then
+    info "Removing stale PulseAudio/PipeWire temp files..."
+    find "$HOME/.config/pulse" -name '*.tdb' -mtime +7 -delete 2>/dev/null || true
+  fi
 
-	section_end
+  section_end
 }
 
 clear_all_cache() {
-	if confirm "Clear ALL user cache (~/.cache)? Safe, but first app launches may be slower."; then
-		rm -rf "${HOME:?}/.cache/"*
-		ok "Entire user cache cleared."
-	else
-		info "Skipping full user cache clear."
-	fi
+  if confirm "Clear ALL user cache (~/.cache)? Safe, but first app launches may be slower."; then
+    rm -rf "${HOME:?}/.cache/"*
+    ok "Entire user cache cleared."
+  else
+    info "Skipping full user cache clear."
+  fi
 }
 
 cleanup_coredumps() {
-	section "Coredumps"
-	info "Checking for coredump files..."
+  section "Coredumps"
+  info "Checking for coredump files..."
 
-	if has_cmd coredumpctl; then
-		coredump_count=$(coredumpctl list --no-pager 2>/dev/null | grep -c -v '^TIME' || true)
-		if [ "$coredump_count" -gt 0 ] 2>/dev/null; then
-			warn "$coredump_count coredump(s) found:"
-			coredumpctl list --no-pager 2>/dev/null | tail -10 | indent
-			if confirm "Clear all coredumps? (you'll lose crash debug info)"; then
-				journalctl --vacuum-size=1 >/dev/null 2>&1 || true
-				find /var/lib/systemd/coredump/ -type f -delete 2>/dev/null || true
-				ok "Coredumps cleared."
-			fi
-		else
-			ok "No coredumps found."
-		fi
-	else
-		core_files=$(find "$HOME" /tmp -maxdepth 3 -name 'core' -o -name 'core.*' 2>/dev/null | head -5)
-		if [ -n "$core_files" ]; then
-			warn "Raw core files found:"
-			printf "%s\n" "$core_files" | indent
-		else
-			ok "No coredump files found."
-		fi
-	fi
+  if has_cmd coredumpctl; then
+    coredump_count=$(coredumpctl list --no-pager 2>/dev/null | grep -c -v '^TIME' || true)
+    if [ "$coredump_count" -gt 0 ] 2>/dev/null; then
+      warn "$coredump_count coredump(s) found:"
+      coredumpctl list --no-pager 2>/dev/null | tail -10 | indent
+      if confirm "Clear all coredumps? (you'll lose crash debug info)"; then
+        journalctl --vacuum-size=1 >/dev/null 2>&1 || true
+        find /var/lib/systemd/coredump/ -type f -delete 2>/dev/null || true
+        ok "Coredumps cleared."
+      fi
+    else
+      ok "No coredumps found."
+    fi
+  else
+    core_files=$(find "$HOME" /tmp -maxdepth 3 -name 'core' -o -name 'core.*' 2>/dev/null | head -5)
+    if [ -n "$core_files" ]; then
+      warn "Raw core files found:"
+      printf "%s\n" "$core_files" | indent
+    else
+      ok "No coredump files found."
+    fi
+  fi
 
-	section_end
+  section_end
 }
 
 check_broken_symlinks() {
-	section "Broken Symlinks"
-	info "Scanning $HOME for broken symlinks..."
+  section "Broken Symlinks"
+  info "Scanning $HOME for broken symlinks..."
 
-	broken=""
-	if has_cmd fd; then
-		broken=$(fd --type l --base-directory "$HOME" . 2>/dev/null | while IFS= read -r link; do
-			full="$HOME/$link"
-			readlink -e "$full" >/dev/null 2>&1 || printf "%s\n" "$full"
-		done)
-	else
-		broken=$(find "$HOME" -xtype l 2>/dev/null)
-	fi
+  broken=""
+  if has_cmd fd; then
+    broken=$(fd --type l --base-directory "$HOME" . 2>/dev/null | while IFS= read -r link; do
+      full="$HOME/$link"
+      readlink -e "$full" >/dev/null 2>&1 || printf "%s\n" "$full"
+    done)
+  else
+    broken=$(find "$HOME" -xtype l 2>/dev/null)
+  fi
 
-	if [ -n "$broken" ]; then
-		warn "Broken symlinks found:"
-		printf "%s\n" "$broken" | indent
-	else
-		ok "No broken symlinks found in \$HOME."
-	fi
-	section_end
+  if [ -n "$broken" ]; then
+    warn "Broken symlinks found:"
+    printf "%s\n" "$broken" | indent
+  else
+    ok "No broken symlinks found in \$HOME."
+  fi
+  section_end
 }
 
 find_large_files() {
-	section "Large Files"
-	info "Finding top 20 largest files (>${LARGE_FILE_MB}MB) in \$HOME..."
+  section "Large Files"
+  info "Finding top 20 largest files (>${LARGE_FILE_MB}MB) in \$HOME..."
 
-	if has_cmd fd; then
-		results=$(fd --type file --size "+${LARGE_FILE_MB}M" --base-directory "$HOME" . -X ls -lh 2>/dev/null | sort -k5,5hr | head -n 20)
-	else
-		results=$(find "$HOME" -type f -size "+${LARGE_FILE_MB}M" -exec ls -lh {} \; 2>/dev/null | sort -k5,5hr | head -n 20)
-	fi
+  if has_cmd fd; then
+    results=$(fd --type file --size "+${LARGE_FILE_MB}M" --base-directory "$HOME" . -X ls -lh 2>/dev/null | sort -k5,5hr | head -n 20)
+  else
+    results=$(find "$HOME" -type f -size "+${LARGE_FILE_MB}M" -exec ls -lh {} \; 2>/dev/null | sort -k5,5hr | head -n 20)
+  fi
 
-	if [ -n "$results" ]; then
-		info "Large files found:"
-		printf "%s\n" "$results" | indent
-	else
-		ok "No files larger than ${LARGE_FILE_MB}MB found in \$HOME."
-	fi
-	section_end
+  if [ -n "$results" ]; then
+    info "Large files found:"
+    printf "%s\n" "$results" | indent
+  else
+    ok "No files larger than ${LARGE_FILE_MB}MB found in \$HOME."
+  fi
+  section_end
 }
 
 check_stale_desktop_entries() {
-	section "Stale Desktop Entries"
-	info "Checking ~/.local/share/applications for broken .desktop entries..."
+  section "Stale Desktop Entries"
+  info "Checking ~/.local/share/applications for broken .desktop entries..."
 
-	stale=""
-	for f in "$HOME/.local/share/applications/"*.desktop; do
-		[ -f "$f" ] || continue
-		exec_line=$(grep -m1 '^Exec=' "$f" 2>/dev/null | sed 's/^Exec=//' | awk '{print $1}')
-		exec_cmd=$(printf "%s" "$exec_line" | sed 's/ %.*//')
-		if [ -n "$exec_cmd" ] && ! has_cmd "$exec_cmd" && [ ! -f "$exec_cmd" ]; then
-			stale="$stale\n  $f  (Exec: $exec_cmd)"
-		fi
-	done
+  stale=""
+  for f in "$HOME/.local/share/applications/"*.desktop; do
+    [ -f "$f" ] || continue
+    exec_line=$(grep -m1 '^Exec=' "$f" 2>/dev/null | sed 's/^Exec=//' | awk '{print $1}')
+    exec_cmd=$(printf "%s" "$exec_line" | sed 's/ %.*//')
+    if [ -n "$exec_cmd" ] && ! has_cmd "$exec_cmd" && [ ! -f "$exec_cmd" ]; then
+      stale="$stale\n  $f  (Exec: $exec_cmd)"
+    fi
+  done
 
-	if [ -n "$stale" ]; then
-		warn "Potentially stale .desktop entries (executable not found):"
-		printf "%b\n" "$stale" | indent
-	else
-		ok "No stale .desktop entries found."
-	fi
-	section_end
+  if [ -n "$stale" ]; then
+    warn "Potentially stale .desktop entries (executable not found):"
+    printf "%b\n" "$stale" | indent
+  else
+    ok "No stale .desktop entries found."
+  fi
+  section_end
 }
 
 # =============================================================================
@@ -506,96 +506,96 @@ check_stale_desktop_entries() {
 # =============================================================================
 
 cleanup_docker() {
-	section "Docker Cleanup"
-	if has_cmd docker; then
-		if confirm "Prune unused Docker images, containers, volumes, and networks?"; then
-			docker system prune -a -f --volumes | indent
-			ok "Docker cleanup complete."
-		else
-			info "Skipping Docker cleanup."
-		fi
-	else
-		info "Docker not installed. Skipping."
-	fi
-	section_end
+  section "Docker Cleanup"
+  if has_cmd docker; then
+    if confirm "Prune unused Docker images, containers, volumes, and networks?"; then
+      docker system prune -a -f --volumes | indent
+      ok "Docker cleanup complete."
+    else
+      info "Skipping Docker cleanup."
+    fi
+  else
+    info "Docker not installed. Skipping."
+  fi
+  section_end
 }
 
 cleanup_flatpak() {
-	section "Flatpak Cleanup"
-	if has_cmd flatpak; then
-		info "Removing unused Flatpak runtimes and applications..."
-		flatpak uninstall --unused -y | indent
-		ok "Flatpak cleanup complete."
+  section "Flatpak Cleanup"
+  if has_cmd flatpak; then
+    info "Removing unused Flatpak runtimes and applications..."
+    flatpak uninstall --unused -y | indent
+    ok "Flatpak cleanup complete."
 
-		info "Checking for Flatpak updates..."
-		flatpak update -y | indent
-		ok "Flatpak packages updated."
-	else
-		info "Flatpak not installed. Skipping."
-	fi
-	section_end
+    info "Checking for Flatpak updates..."
+    flatpak update -y | indent
+    ok "Flatpak packages updated."
+  else
+    info "Flatpak not installed. Skipping."
+  fi
+  section_end
 }
 
 cleanup_snap() {
-	section "Snap Cleanup"
-	if has_cmd snap; then
-		info "Removing disabled/old Snap revisions..."
-		snap list --all 2>/dev/null | awk '/disabled/{print $1, $3}' | while read -r snapname revision; do
-			snap remove "$snapname" --revision="$revision" | indent
-		done
-		ok "Old Snap revisions removed."
-	else
-		info "Snap not installed. Skipping."
-	fi
-	section_end
+  section "Snap Cleanup"
+  if has_cmd snap; then
+    info "Removing disabled/old Snap revisions..."
+    snap list --all 2>/dev/null | awk '/disabled/{print $1, $3}' | while read -r snapname revision; do
+      snap remove "$snapname" --revision="$revision" | indent
+    done
+    ok "Old Snap revisions removed."
+  else
+    info "Snap not installed. Skipping."
+  fi
+  section_end
 }
 
 cleanup_dev_caches() {
-	section "Developer Tool Caches"
+  section "Developer Tool Caches"
 
-	if [ -d "$HOME/.cargo/registry" ]; then
-		cargo_size=$(du -sh "$HOME/.cargo/registry" 2>/dev/null | cut -f1)
-		info "Cargo registry cache size: ${cargo_size:-unknown}"
-		if has_cmd cargo; then
-			if confirm "Run 'cargo cache --autoclean' to clean Cargo cache? (install cargo-cache if needed)"; then
-				if has_cmd cargo-cache; then
-					cargo cache --autoclean | indent
-				else
-					info "cargo-cache not found. Install with: cargo install cargo-cache"
-				fi
-			fi
-		fi
-	fi
+  if [ -d "$HOME/.cargo/registry" ]; then
+    cargo_size=$(du -sh "$HOME/.cargo/registry" 2>/dev/null | cut -f1)
+    info "Cargo registry cache size: ${cargo_size:-unknown}"
+    if has_cmd cargo; then
+      if confirm "Run 'cargo cache --autoclean' to clean Cargo cache? (install cargo-cache if needed)"; then
+        if has_cmd cargo-cache; then
+          cargo cache --autoclean | indent
+        else
+          info "cargo-cache not found. Install with: cargo install cargo-cache"
+        fi
+      fi
+    fi
+  fi
 
-	if [ -d "$HOME/go/pkg/mod/cache" ]; then
-		go_size=$(du -sh "$HOME/go/pkg/mod/cache" 2>/dev/null | cut -f1)
-		info "Go module cache size: ${go_size:-unknown}"
-		if has_cmd go; then
-			if confirm "Clean Go module download cache (go clean -modcache)?"; then
-				go clean -modcache | indent
-				ok "Go module cache cleared."
-			fi
-		fi
-	fi
+  if [ -d "$HOME/go/pkg/mod/cache" ]; then
+    go_size=$(du -sh "$HOME/go/pkg/mod/cache" 2>/dev/null | cut -f1)
+    info "Go module cache size: ${go_size:-unknown}"
+    if has_cmd go; then
+      if confirm "Clean Go module download cache (go clean -modcache)?"; then
+        go clean -modcache | indent
+        ok "Go module cache cleared."
+      fi
+    fi
+  fi
 
-	if has_cmd npm; then
-		npm_cache=$(npm config get cache 2>/dev/null)
-		npm_size=$(du -sh "$npm_cache" 2>/dev/null | cut -f1)
-		info "npm cache size: ${npm_size:-unknown} at ${npm_cache:-~/.npm}"
-		if confirm "Clean npm cache?"; then
-			npm cache clean --force 2>/dev/null | indent
-			ok "npm cache cleared."
-		fi
-	fi
+  if has_cmd npm; then
+    npm_cache=$(npm config get cache 2>/dev/null)
+    npm_size=$(du -sh "$npm_cache" 2>/dev/null | cut -f1)
+    info "npm cache size: ${npm_size:-unknown} at ${npm_cache:-~/.npm}"
+    if confirm "Clean npm cache?"; then
+      npm cache clean --force 2>/dev/null | indent
+      ok "npm cache cleared."
+    fi
+  fi
 
-	if has_cmd pip; then
-		if confirm "Clean pip cache?"; then
-			pip cache purge 2>/dev/null | indent
-			ok "pip cache cleared."
-		fi
-	fi
+  if has_cmd pip; then
+    if confirm "Clean pip cache?"; then
+      pip cache purge 2>/dev/null | indent
+      ok "pip cache cleared."
+    fi
+  fi
 
-	section_end
+  section_end
 }
 
 # =============================================================================
@@ -603,77 +603,77 @@ cleanup_dev_caches() {
 # =============================================================================
 
 check_disk_usage() {
-	section "Disk Usage"
-	info "Filesystem usage:"
-	df -h --output=source,size,used,avail,pcent,target 2>/dev/null | grep -v 'tmpfs\|devtmpfs\|udev' | indent
+  section "Disk Usage"
+  info "Filesystem usage:"
+  df -h --output=source,size,used,avail,pcent,target 2>/dev/null | grep -v 'tmpfs\|devtmpfs\|udev' | indent
 
-	df -h 2>/dev/null | awk 'NR>1 && $5+0 > 85 {print $6, $5}' | while read -r mp pct; do
-		warn "Disk usage high on $mp: $pct"
-	done
+  df -h 2>/dev/null | awk 'NR>1 && $5+0 > 85 {print $6, $5}' | while read -r mp pct; do
+    warn "Disk usage high on $mp: $pct"
+  done
 
-	info "Top 10 largest directories in \$HOME:"
-	du -sh "$HOME"/.[!.]* "$HOME"/* 2>/dev/null | sort -hr | head -10 | indent
+  info "Top 10 largest directories in \$HOME:"
+  du -sh "$HOME"/.[!.]* "$HOME"/* 2>/dev/null | sort -hr | head -10 | indent
 
-	section_end
+  section_end
 }
 
 cleanup_journald() {
-	section "Systemd Journal"
-	journal_size=$(journalctl --disk-usage 2>/dev/null | grep -oP '\d+\.\d+ [A-Z]+')
-	info "Current journal disk usage: ${journal_size:-unknown}"
+  section "Systemd Journal"
+  journal_size=$(journalctl --disk-usage 2>/dev/null | grep -oP '\d+\.\d+ [A-Z]+')
+  info "Current journal disk usage: ${journal_size:-unknown}"
 
-	info "Vacuuming journal (keeping last $JOURNAL_VACUUM_TIME)..."
-	journalctl --vacuum-time="$JOURNAL_VACUUM_TIME" | indent
-	ok "Journal vacuum complete."
+  info "Vacuuming journal (keeping last $JOURNAL_VACUUM_TIME)..."
+  journalctl --vacuum-time="$JOURNAL_VACUUM_TIME" | indent
+  ok "Journal vacuum complete."
 
-	section_end
+  section_end
 }
 
 rebuild_initcpio() {
-	section "initcpio Rebuild"
-	if confirm "Rebuild initramfs (mkinitcpio -P)? Recommended after kernel/hook changes."; then
-		info "Rebuilding initramfs for all presets..."
-		mkinitcpio -P | indent
-		ok "initramfs rebuilt."
+  section "initcpio Rebuild"
+  if confirm "Rebuild initramfs (mkinitcpio -P)? Recommended after kernel/hook changes."; then
+    info "Rebuilding initramfs for all presets..."
+    mkinitcpio -P | indent
+    ok "initramfs rebuilt."
 
-		info "Restarting systemd-vconsole-setup..."
-		systemctl restart systemd-vconsole-setup.service
-		ok "Console setup reloaded."
-	else
-		info "Skipping initramfs rebuild."
-	fi
-	section_end
+    info "Restarting systemd-vconsole-setup..."
+    systemctl restart systemd-vconsole-setup.service
+    ok "Console setup reloaded."
+  else
+    info "Skipping initramfs rebuild."
+  fi
+  section_end
 }
 
 check_failed_crons() {
-	section "Cron / Timer Health"
-	if has_cmd crontab; then
-		info "User crontab:"
-		crontab -l 2>/dev/null | indent || info "No user crontab set."
-	fi
+  section "Cron / Timer Health"
+  if has_cmd crontab; then
+    info "User crontab:"
+    crontab -l 2>/dev/null | indent || info "No user crontab set."
+  fi
 
-	info "Anacron spool (recent jobs):"
-	ls -lh /var/spool/anacron/ 2>/dev/null | indent || info "No anacron spool found."
+  info "Anacron spool (recent jobs):"
+  ls -lh /var/spool/anacron/ 2>/dev/null | indent || info "No anacron spool found."
 
-	section_end
+  section_end
 }
 
 check_arch_news() {
-	section "Arch Linux News"
-	if has_cmd curl; then
-		info "Fetching latest Arch Linux news headlines..."
-		news=$(curl -s --max-time 10 "https://archlinux.org/feeds/news/" 2>/dev/null |
-			grep -oP '(?<=<title>)[^<]+' | grep -v '^Arch Linux' | head -5)
-		if [ -n "$news" ]; then
-			info "Latest news:"
-			printf "%s\n" "$news" | indent
-		else
-			info "Could not fetch news. Visit: https://archlinux.org/news/"
-		fi
-	else
-		info "curl not available. Check https://archlinux.org/news/ manually."
-	fi
-	section_end
+  section "Arch Linux News"
+  if has_cmd curl; then
+    info "Fetching latest Arch Linux news headlines..."
+    news=$(curl -s --max-time 10 "https://archlinux.org/feeds/news/" 2>/dev/null |
+      grep -oP '(?<=<title>)[^<]+' | grep -v '^Arch Linux' | head -5)
+    if [ -n "$news" ]; then
+      info "Latest news:"
+      printf "%s\n" "$news" | indent
+    else
+      info "Could not fetch news. Visit: https://archlinux.org/news/"
+    fi
+  else
+    info "curl not available. Check https://archlinux.org/news/ manually."
+  fi
+  section_end
 }
 
 # =============================================================================
@@ -681,26 +681,26 @@ check_arch_news() {
 # =============================================================================
 
 print_summary() {
-	printf "\n${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
-	printf "${BOLD}  Maintenance Complete — Summary${NC}\n"
-	printf "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n\n"
-	printf "  ${GREEN}✔ Passed  :${NC} %s\n" "$STEPS_OK"
-	printf "  ${YELLOW}⚠ Warnings:${NC} %s\n" "$WARNINGS"
-	printf "  ${RED}✖ Errors  :${NC} %s\n\n" "$ERRORS"
-	printf "  ${DIM}Full log saved to: %s${NC}\n\n" "$LOG_FILE"
+  printf "\n${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
+  printf "${BOLD}  Maintenance Complete — Summary${NC}\n"
+  printf "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n\n"
+  printf "  ${GREEN}✔ Passed  :${NC} %s\n" "$STEPS_OK"
+  printf "  ${YELLOW}⚠ Warnings:${NC} %s\n" "$WARNINGS"
+  printf "  ${RED}✖ Errors  :${NC} %s\n\n" "$ERRORS"
+  printf "  ${DIM}Full log saved to: %s${NC}\n\n" "$LOG_FILE"
 
-	if [ "$ERRORS" -gt 0 ]; then
-		printf "  ${RED}Action required — check errors above.${NC}\n"
-	elif [ "$WARNINGS" -gt 0 ]; then
-		printf "  ${YELLOW}Review warnings above for optional improvements.${NC}\n"
-	else
-		printf "  ${GREEN}All checks passed. System is in good shape!${NC}\n"
-	fi
+  if [ "$ERRORS" -gt 0 ]; then
+    printf "  ${RED}Action required — check errors above.${NC}\n"
+  elif [ "$WARNINGS" -gt 0 ]; then
+    printf "  ${YELLOW}Review warnings above for optional improvements.${NC}\n"
+  else
+    printf "  ${GREEN}All checks passed. System is in good shape!${NC}\n"
+  fi
 
-	printf "\n  ${CYAN}Remember to check Arch news for manual interventions:${NC}\n"
-	printf "  ${CYAN}https://archlinux.org/news/${NC}\n\n"
+  printf "\n  ${CYAN}Remember to check Arch news for manual interventions:${NC}\n"
+  printf "  ${CYAN}https://archlinux.org/news/${NC}\n\n"
 
-	_log_raw "=== SUMMARY: OK=$STEPS_OK WARN=$WARNINGS ERR=$ERRORS ==="
+  _log_raw "=== SUMMARY: OK=$STEPS_OK WARN=$WARNINGS ERR=$ERRORS ==="
 }
 
 # =============================================================================
@@ -708,51 +708,51 @@ print_summary() {
 # =============================================================================
 
 main() {
-	check_root
+  check_root
 
-	printf "# Arch Linux Maintenance Log\n# Started: %s\n# User: %s\n\n" \
-		"$(_timestamp)" "$(whoami)" >"$LOG_FILE"
+  printf "# Arch Linux Maintenance Log\n# Started: %s\n# User: %s\n\n" \
+    "$(_timestamp)" "$(whoami)" >"$LOG_FILE"
 
-	printf "\n${BOLD}╔══════════════════════════════════════════════════╗${NC}\n"
-	printf "${BOLD}║     Arch Linux System Maintenance Script          ║${NC}\n"
-	printf "${BOLD}╚══════════════════════════════════════════════════╝${NC}\n\n"
-	printf "  Started: %s\n" "$(_timestamp)"
-	printf "  Log:     %s\n" "$LOG_FILE"
+  printf "\n${BOLD}╔══════════════════════════════════════════════════╗${NC}\n"
+  printf "${BOLD}║     Arch Linux System Maintenance Script          ║${NC}\n"
+  printf "${BOLD}╚══════════════════════════════════════════════════╝${NC}\n\n"
+  printf "  Started: %s\n" "$(_timestamp)"
+  printf "  Log:     %s\n" "$LOG_FILE"
 
-	check_internet
+  check_internet
 
-	upgrade_system
-	check_systemd
-	check_microcode
-	check_kernel_updates
+  upgrade_system
+  check_systemd
+  check_microcode
+  check_kernel_updates
 
-	update_mirrorlist
-	remove_orphans
-	clean_pacman_cache
-	clean_aur_cache
-	handle_pacnew_files
+  update_mirrorlist
+  remove_orphans
+  clean_pacman_cache
+  clean_aur_cache
+  handle_pacnew_files
 
-	trim_ssd
-	clear_old_cache_files
-	clear_old_tmp_files
-	clear_all_cache
-	cleanup_coredumps
-	check_broken_symlinks
-	find_large_files
-	check_stale_desktop_entries
+  trim_ssd
+  clear_old_cache_files
+  clear_old_tmp_files
+  clear_all_cache
+  cleanup_coredumps
+  check_broken_symlinks
+  find_large_files
+  check_stale_desktop_entries
 
-	cleanup_docker
-	cleanup_flatpak
-	cleanup_snap
-	cleanup_dev_caches
+  cleanup_docker
+  cleanup_flatpak
+  cleanup_snap
+  cleanup_dev_caches
 
-	check_disk_usage
-	cleanup_journald
-	check_failed_crons
-	rebuild_initcpio
-	check_arch_news
+  check_disk_usage
+  cleanup_journald
+  check_failed_crons
+  rebuild_initcpio
+  check_arch_news
 
-	print_summary
+  print_summary
 }
 
 main
