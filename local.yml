@@ -2,7 +2,6 @@
   hosts: localhost
   connection: local
   vars:
-    chosen_shell: "zsh"
     chosen_compositor: "xorg"
     dotfiles_dir: "{{ github_dir }}/dotfiles"
     xdg_config_dir: "{{ ansible_user_dir }}/.config"
@@ -14,9 +13,6 @@
         - always
 
   tasks:
-    # ------------------------------------------------------------------
-    # Bootstrap: common + ssh always run first, unconditionally.
-    # ------------------------------------------------------------------
     - name: Run bootstrap roles
       ansible.builtin.include_role:
         name: "{{ item }}"
@@ -26,18 +22,10 @@
       tags:
         - always
 
-    # ------------------------------------------------------------------
-    # Main roles: default_roles plus the chosen shell and compositor.
-    # The unchosen alternatives from each mutually exclusive group are
-    # excluded so they never run even if somehow referenced.
-    # ------------------------------------------------------------------
-    - name: Resolve chosen shell and compositor
+    - name: Resolve chosen compositor
       ansible.builtin.set_fact:
         excluded_roles: >-
-          {{
-            (shell_roles | difference([chosen_shell]) | list) +
-            (compositor_roles | difference([chosen_compositor]) | list)
-          }}
+          {{ compositor_roles | difference([chosen_compositor]) | list }}
       tags:
         - always
 
@@ -52,7 +40,7 @@
           length > 0
                 else default_roles | list
               )
-              + [chosen_shell, chosen_compositor]
+              + [chosen_compositor]
             )
             | difference(excluded_roles)
             | difference(bootstrap_roles)

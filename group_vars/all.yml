@@ -5,30 +5,20 @@ bootstrap_roles:
 
 default_roles:
   - cli
-  - ufw
   - gpg
-  - github
-  - neovim
-  - system
-  - docker
-  - crontab
-  - systemd
-  - microcode
+  - zsh
+  - ufw
   - rclone
+  - docker
+  - system
+  - neovim
+  - github
+  - systemd
+  - crontab
+  - microcode
   - system-scripts
   - network-manager
-
-shell_roles:
-  - zsh
 
 compositor_roles:
   - xorg
   - wayland
-
-dns_primary:
-  - 1.1.1.1
-  - 1.0.0.1
-
-dns_fallback:
-  - 9.9.9.9
-  - 149.112.112.112
