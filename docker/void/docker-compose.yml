@@ -1,0 +1,17 @@
+name: ansible-void
+services:
+  ansible:
+    build:
+      context: ../../
+      dockerfile: docker/void/Dockerfile
+      args:
+        TEST_USER: testuser
+    image: ansible-void-dev:latest
+    container_name: ansible-void-test
+    volumes:
+      - ../../:/ansible
+      - ../../.secrets:/ansible/.secrets:ro
+    tty: true
+    stdin_open: true
+    environment:
+      - ANSIBLE_FORCE_COLOR=1
