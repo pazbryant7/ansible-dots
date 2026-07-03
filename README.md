@@ -160,7 +160,7 @@ All variables can be overridden on the command line:
 
 | Variable     | Default     | Description                                   |
 | ------------ | ----------- | --------------------------------------------- |
-| `os`         | `arch`      | Target OS (`arch`)                |
+| `os`         | `arch`      | Target OS (`arch`)                            |
 | `shell`      | `zsh`       | Passed as `chosen_shell` to the playbook      |
 | `compositor` | `xorg`      | Passed as `chosen_compositor` to the playbook |
 | `playbook`   | `local.yml` | Playbook file to run                          |

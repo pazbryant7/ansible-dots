@@ -53,7 +53,6 @@
       loop_control:
         loop_var: cargo_item
 
-
 - name: Setup fnm and Node.js
   vars:
     fnm_bin: "{{ ansible_env.HOME }}/.cargo/bin/fnm"
