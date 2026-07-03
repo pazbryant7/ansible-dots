@@ -1,7 +1,6 @@
----
-- name: Ensure common cli tools are installed
+- name: Ensure common cli tools are installed (Void Linux)
   become: true
-  community.general.pacman:
+  community.general.xbps:
     name:
       - jq
       - uv
@@ -25,7 +24,6 @@
       - atuin
       - unzip
       - unrar
-      - pcmanfm
       - rsync
       - steam
       - qt6ct
@@ -50,18 +48,15 @@
       - breeze-gtk
       - lazydocker
       - github-cli
-      - python-pip
       - qbittorrent
       - pavucontrol
-      - imagemagick
+      - ImageMagick
       - oath-toolkit
       - breeze-icons
-      - bitwarden-cli
       - android-tools
       - noto-fonts-cjk
-      - pacman-contrib
       - translate-shell
       - tree-sitter-cli
       - zathura-pdf-mupdf
-      - ttf-nerd-fonts-symbols
+      - nerd-fonts-symbols-ttf
     state: present
