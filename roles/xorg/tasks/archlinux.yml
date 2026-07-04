@@ -11,7 +11,6 @@
           - xdotool
           - xorg-xev
           - screenkey
-          - unclutter
           - xorg-xinit
           - xorg-server
           - xorg-xrandr
