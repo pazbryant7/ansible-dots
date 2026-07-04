@@ -1,0 +1,18 @@
+- name: Ensure packages are installed via xbps
+  become: true
+  community.general.xbps:
+    name:
+      - cronie
+      - chrony
+    state: present
+
+- name: Enable system services via runit
+  become: true
+  ansible.builtin.file:
+    src: "/etc/sv/{{ item }}"
+    dest: "/var/service/{{ item }}"
+    state: link
+  loop:
+    - dbus
+    - cronie
+    - chronyd
