@@ -55,6 +55,7 @@
       - pavucontrol
       - ImageMagick
       - oath-toolkit
+      - pinentry-gtk
       - breeze-icons
       - terminus-font
       - android-tools
