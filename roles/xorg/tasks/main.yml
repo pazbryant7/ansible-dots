@@ -14,7 +14,7 @@
     - name: Clone ST repository
       ansible.builtin.git:
         repo: "{{ personal_github }}/st.git"
-        dest: "{{ github_dir }}/st"
+        dest: "{{ repos_path }}/st"
         version: main
         update: false
 
@@ -22,7 +22,7 @@
       become: true
       ansible.builtin.command:
         cmd: make clean install
-        chdir: "{{ github_dir }}/st"
+        chdir: "{{ repos_path }}/st"
         creates: /usr/local/bin/st
 
     - name: Symlink ST to xterm
@@ -39,7 +39,7 @@
     - name: Clone DWM repository
       ansible.builtin.git:
         repo: "{{ personal_github }}/dwm.git"
-        dest: "{{ github_dir }}/dwm"
+        dest: "{{ repos_path }}/dwm"
         version: main
         update: false
 
@@ -47,7 +47,7 @@
       become: true
       ansible.builtin.command:
         cmd: make clean install
-        chdir: "{{ github_dir }}/dwm"
+        chdir: "{{ repos_path }}/dwm"
         creates: /usr/local/bin/dwm
 
 - name: Clone and build slstatus
@@ -57,7 +57,7 @@
     - name: Clone slstatus repository
       ansible.builtin.git:
         repo: "{{ personal_github }}/slstatus.git"
-        dest: "{{ github_dir }}/slstatus"
+        dest: "{{ repos_path }}/slstatus"
         version: main
         update: false
 
@@ -65,5 +65,55 @@
       become: true
       ansible.builtin.command:
         cmd: make clean install
-        chdir: "{{ github_dir }}/slstatus"
+        chdir: "{{ repos_path }}/slstatus"
         creates: /usr/local/bin/slstatus
+
+- name: Setup custom system configurations
+  vars:
+    files_base: files/common
+    fonts_dest: "{{ ansible_user_dir }}/.local/share/fonts"
+  block:
+    - name: Setup personal fonts
+      become: false
+      block:
+        - name: Ensure user font directory exists
+          ansible.builtin.file:
+            path: "{{ fonts_dest }}/bryant-fonts"
+            state: directory
+            mode: "0755"
+
+        - name: Deploy personal fonts
+          ansible.builtin.copy:
+            src: "{{ files_base }}/.local/share/fonts/"
+            dest: "{{ fonts_dest }}"
+            mode: "0644"
+          register: font_deployment
+
+        - name: Refresh user font cache
+          ansible.builtin.command: fc-cache -f -v
+          when: font_deployment.changed
+
+    - name: Setup system-wide configurations
+      become: true
+      block:
+        - name: Ensure system directories exist
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: directory
+            mode: "0755"
+          loop:
+            - /usr/share/X11/xkb/symbols
+            - /etc/X11/xorg.conf.d
+            - /usr/share/kbd/keymaps/i386/dvorak
+
+        - name: Deploy system configuration files
+          ansible.builtin.copy:
+            src: "{{ files_base }}{{ item.path }}"
+            dest: "{{ item.path }}"
+            mode: "0644"
+            force: "{{ item.force | default(true) }}"
+          loop:
+            - { path: "/etc/environment" }
+            - { path: "/etc/X11/xorg.conf.d/00-keyboard.conf" }
+            - { path: "/usr/share/X11/xkb/symbols/", force: false }
+            - { path: "/usr/share/kbd/keymaps/i386/dvorak/", force: false }

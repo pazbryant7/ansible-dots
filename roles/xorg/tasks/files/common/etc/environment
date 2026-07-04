@@ -4,5 +4,5 @@
 # Syntax: simple "KEY=VAL" pairs on separate lines
 #
 
-PAGER=bat
+PAGER=less
 QT_QPA_PLATFORMTHEME=qt6ct

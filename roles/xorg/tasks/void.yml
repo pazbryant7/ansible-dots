@@ -1,0 +1,31 @@
+- name: Setup Xorg environment
+  become: true
+  block:
+    - name: Install required Xorg packages (Void)
+      become: true
+      community.general.xbps:
+        name:
+          - maim
+          - picom
+          - xclip
+          - xcolor
+          - xdotool
+          - xsetroot
+          - unclutter
+          - screenkey
+        state: present
+
+    - name: Remove Wayland-related packages (Void)
+      become: true
+      community.general.xbps:
+        name: waybar
+        state: absent
+
+    - name: Deploy vconsole configuration
+      ansible.builtin.copy:
+        src: "files/void/etc/rc.conf"
+        dest: "/etc/rc.conf"
+        owner: root
+        group: root
+        mode: "0644"
+        force: true
