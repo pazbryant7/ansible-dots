@@ -8,19 +8,20 @@
   when: distribution_config.stat.exists
 
 - name: Setup rclone
+  become: false
   vars:
-    rclone_config_dir: "{{ ansible_env.HOME }}/.config/rclone"
-    rclone_secret_src: ".secrets/xdg_config/rclone/rclone.conf"
+    dir: "{{ xdg_path }}/rclone"
+    config_file: ".secrets/xdg_config/rclone/rclone.conf"
   block:
     - name: Ensure rclone config directory exists
       ansible.builtin.file:
-        path: "{{ rclone_config_dir }}"
+        path: "{{ dir }}"
         state: directory
         mode: "0700"
 
     - name: Deploy rclone configuration
       ansible.builtin.copy:
-        dest: "{{ rclone_config_dir }}/rclone.conf"
+        dest: "{{ dir }}/rclone.conf"
         mode: "0600"
-        content: "{{ lookup('file', rclone_secret_src) }}"
+        content: "{{ lookup('file', config_file) }}"
         force: false

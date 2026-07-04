@@ -1,0 +1,6 @@
+- name: Ensure packages are installed
+  become: true
+  community.general.xbps:
+    name:
+      - rclone
+    state: present
