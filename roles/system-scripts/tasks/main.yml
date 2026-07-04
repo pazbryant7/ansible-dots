@@ -6,3 +6,12 @@
 - name: "Run tasks for {{ host_os }}"
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
+
+- name: Deploy system scripts to sudo PATH
+  become: true
+  ansible.builtin.copy:
+    src: files/common/usr/local/bin/
+    dest: /usr/local/bin/
+    owner: root
+    group: root
+    mode: "0755"
