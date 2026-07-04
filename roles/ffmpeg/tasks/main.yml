@@ -6,3 +6,22 @@
 - name: "Run tasks for {{ host_os }}"
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
+
+- name: Setup ffmpeg
+  become: true
+  vars:
+    apps_path: /usr/share/applications
+  block:
+    - name: Ensure applications directory exists
+      ansible.builtin.file:
+        path: "{{ apps_path }}"
+        state: directory
+        mode: "0755"
+
+    - name: Copy ffplay.desktop file to applications directory
+      ansible.builtin.copy:
+        src: files/common/ffplay.desktop
+        dest: "{{ apps_path }}/ffplay.desktop"
+        owner: root
+        group: root
+        mode: "0644"

@@ -1,6 +1,6 @@
 - name: Setup ffmpeg
   become: true
-  community.general.pacman:
+  community.general.xbps:
     name:
       - ffmpeg
       - ffmpegthumbnailer
