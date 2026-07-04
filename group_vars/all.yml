@@ -2,23 +2,23 @@
 bootstrap_roles:
   - common
   - ssh
+  - gpg
 
 default_roles:
   - cli
-  - gpg
   - zsh
   - ufw
-  - rclone
+  - mise
   - docker
-  - system
-  - neovim
   - github
-  - systemd
+  - rclone
+  - system
   - crontab
+  - systemd
   - microcode
   - system-scripts
   - network-manager
 
-compositor_roles:
+display_server_roles:
   - xorg
   - wayland

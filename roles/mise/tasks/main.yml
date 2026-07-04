@@ -1,0 +1,25 @@
+- name: "Get distribution"
+  ansible.builtin.stat:
+    path: "{{ role_path }}/tasks/{{ host_os }}.yml"
+  register: distribution_config
+
+- name: "Run tasks for {{ host_os }}"
+  ansible.builtin.include_tasks: "{{ host_os }}.yml"
+  when: distribution_config.stat.exists
+
+- name: Setup tools via Mise and configure Neovim
+  block:
+    - name: Verify Mise installation
+      become: false
+      ansible.builtin.command: mise --version
+      register: m_version
+      changed_when: false
+      failed_when: m_version.rc != 0
+
+    - name: Install  global versions for development tools
+      become: false
+      ansible.builtin.command: >
+        mise use --global python@latest go@latest neovim@latest node@latest
+        rust@latest
+      register: mise
+      changed_when: "'installing' in mise.stderr | lower"

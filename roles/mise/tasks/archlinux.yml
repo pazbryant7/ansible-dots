@@ -1,0 +1,5 @@
+- name: Install mise (Arch Linux)
+  become: true
+  community.general.pacman:
+    name: mise
+    state: present
