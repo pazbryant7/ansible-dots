@@ -23,6 +23,7 @@
       - stow
       - rofi
       - aria2
+      - dunst
       - atuin
       - qt6ct
       - steam

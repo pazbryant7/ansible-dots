@@ -24,6 +24,7 @@
       - rofi
       - aria2
       - steam
+      - dunst
       - rsync
       - nsxiv
       - atuin
