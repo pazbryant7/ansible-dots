@@ -19,3 +19,37 @@
     - portfolio
     - pass-backup
     - boilerplate
+
+- name: "Setup neovim"
+  block:
+    - name: Check existing neovim configuration path
+      become: false
+      ansible.builtin.stat:
+        path: "{{ xdg_path }}/nvim"
+      register: nvim_dir_stat
+
+    - name: Remove neovim config folder if it exists as a standard directory
+      become: false
+      ansible.builtin.file:
+        path: "{{ xdg_path }}/nvim"
+        state: absent
+      when:
+        nvim_dir_stat.stat.exists and nvim_dir_stat.stat.isdir and not
+        nvim_dir_stat.stat.islnk
+
+    - name: Symlink neovim configuration
+      become: false
+      ansible.builtin.file:
+        src: "{{ repos_path }}/nvim"
+        dest: "{{ xdg_path }}/nvim"
+        state: link
+        force: true
+
+    - name: Copy nvim.desktop file to applications directory
+      become: true
+      ansible.builtin.copy:
+        src: files/common/nvim.desktop
+        dest: "/usr/share/applications/nvim.desktop"
+        owner: root
+        group: root
+        mode: "0644"
