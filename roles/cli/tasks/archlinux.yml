@@ -1,67 +1,71 @@
----
 - name: Ensure common cli tools are installed
   become: true
   community.general.pacman:
     name:
       - jq
-      - uv
-      - fd
       - lf
-      - fzf
-      - mpc
-      - git
-      - bat
-      - xsv
-      - mpv
+      - fd
+      - uv
       - eza
+      - mpv
       - mpd
       - lua
+      - fzf
+      - bat
+      - mpc
+      - xsv
+      - ufw
+      - git
       - stow
       - just
-      - less
-      - lsof
       - tmux
-      - aria2
+      - lsof
+      - less
+      - steam
+      - rsync
       - atuin
+      - aria2
       - unzip
       - unrar
-      - pcmanfm
-      - rsync
-      - steam
       - qt6ct
-      - yt-dlp
       - gopass
+      - yt-dlp
       - rclone
+      - cronie
       - zoxide
-      - ncmpcpp
-      - ripgrep
-      - zathura
       - lazygit
-      - jujutsu
       - poppler
       - calibre
+      - ntfs-3g
+      - zathura
+      - ripgrep
+      - jujutsu
+      - pcmanfm
+      - ncmpcpp
       - nwg-look
+      - pipewire
       - luarocks
+      - alacritty
+      - gammastep
       - trash-cli
       - hyperfine
       - fastfetch
-      - gammastep
-      - alacritty
       - breeze-gtk
-      - lazydocker
       - github-cli
+      - lazydocker
       - python-pip
-      - qbittorrent
       - pavucontrol
       - imagemagick
+      - qbittorrent
       - oath-toolkit
       - breeze-icons
-      - bitwarden-cli
       - android-tools
+      - terminus-font
       - noto-fonts-cjk
-      - pacman-contrib
+      - networkmanager
+      - zram-generator
       - translate-shell
       - tree-sitter-cli
-      - zathura-pdf-mupdf
+      - noto-fonts-emoji
       - ttf-nerd-fonts-symbols
     state: present
