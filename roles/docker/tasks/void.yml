@@ -1,0 +1,22 @@
+- name: Install Docker and components
+  become: true
+  community.general.xbps:
+    name:
+      - docker
+      - docker-buildx
+    state: present
+
+- name: Enable Docker service (Manual/On-Demand start only)
+  become: true
+  ansible.builtin.file:
+    src: /etc/sv/docker
+    dest: /var/service/docker
+    state: link
+
+- name: Ensure Docker doesn't autostart on boot
+  become: true
+  ansible.builtin.file:
+    path: /etc/sv/docker/down
+    state: touch
+    modification_time: preserve
+    access_time: preserve
