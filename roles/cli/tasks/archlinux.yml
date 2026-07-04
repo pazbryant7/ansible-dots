@@ -3,63 +3,63 @@
   community.general.pacman:
     name:
       - jq
-      - lf
-      - fd
       - uv
-      - eza
-      - mpv
-      - mpd
-      - lua
-      - fzf
-      - bat
+      - fd
+      - lf
       - mpc
       - xsv
-      - ufw
+      - bat
+      - feh
+      - fzf
+      - mpd
       - git
-      - stow
-      - just
-      - tmux
-      - lsof
+      - lua
+      - eza
+      - mpv
       - less
-      - steam
-      - rsync
-      - atuin
+      - lsof
+      - tmux
+      - just
+      - stow
+      - rofi
       - aria2
-      - unzip
-      - unrar
+      - atuin
       - qt6ct
-      - gopass
+      - steam
+      - nsxiv
+      - rsync
+      - zoxide
       - yt-dlp
       - rclone
-      - zoxide
-      - lazygit
-      - poppler
-      - calibre
-      - ntfs-3g
-      - zathura
-      - ripgrep
+      - gopass
       - jujutsu
+      - ripgrep
       - pcmanfm
       - ncmpcpp
-      - nwg-look
-      - pipewire
+      - zathura
+      - lazygit
+      - calibre
+      - ntfs-3g
+      - poppler
       - luarocks
-      - alacritty
-      - gammastep
-      - trash-cli
+      - pipewire
+      - nwg-look
       - hyperfine
       - fastfetch
-      - breeze-gtk
-      - github-cli
+      - trash-cli
+      - alacritty
+      - gammastep
       - lazydocker
+      - github-cli
       - python-pip
-      - pavucontrol
+      - breeze-gtk
       - imagemagick
       - qbittorrent
-      - oath-toolkit
+      - pavucontrol
       - breeze-icons
-      - android-tools
+      - oath-toolkit
       - terminus-font
+      - android-tools
       - noto-fonts-cjk
       - networkmanager
       - zram-generator

@@ -3,57 +3,62 @@
   community.general.xbps:
     name:
       - jq
-      - lf
-      - fd
       - uv
-      - eza
-      - mpd
-      - lua
-      - mpv
-      - xsv
-      - bat
-      - git
+      - fd
+      - lf
+      - feh
       - mpc
       - fzf
-      - tmux
+      - bat
+      - xsv
+      - git
+      - lua
+      - mpd
+      - eza
+      - mpv
+      - just
+      - stow
       - lsof
       - less
-      - stow
-      - just
-      - rsync
-      - steam
+      - tmux
+      - rofi
       - aria2
+      - steam
+      - rsync
+      - nsxiv
       - atuin
       - qt6ct
-      - zoxide
+      - yt-dlp
       - gopass
       - rclone
-      - yt-dlp
-      - lazygit
-      - calibre
-      - zathura
+      - zoxide
       - jujutsu
-      - ncmpcpp
       - ripgrep
-      - pipewire
+      - zathura
+      - ncmpcpp
+      - calibre
+      - lazygit
       - nwg-look
+      - pipewire
       - luarocks
+      - trash-cli
+      - alacritty
+      - hyperfine
       - gammastep
       - fastfetch
-      - alacritty
-      - trash-cli
-      - hyperfine
-      - lazydocker
       - breeze-gtk
+      - lazydocker
       - github-cli
-      - ImageMagick
       - qbittorrent
       - pavucontrol
-      - breeze-icons
+      - ImageMagick
       - oath-toolkit
+      - breeze-icons
+      - terminus-font
       - android-tools
       - noto-fonts-cjk
       - translate-shell
       - tree-sitter-cli
+      - noto-fonts-emoji
       - nerd-fonts-symbols-ttf
     state: present
