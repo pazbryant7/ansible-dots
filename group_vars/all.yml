@@ -9,12 +9,14 @@ default_roles:
   - zsh
   - ufw
   - mise
-  - docker
-  - github
-  - rclone
   - system
-  - crontab
+  - rclone
+  - ffmpeg
+  - github
+  - docker
   - systemd
+  - crontab
+  - dotfiles
   - microcode
   - system-scripts
   - network-manager
