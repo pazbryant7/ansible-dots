@@ -7,85 +7,49 @@
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
 
-- name: Main GPG key
+- name: Manage Main GPG Key
   become: false
   vars:
-    gnupg_dir: "{{ ansible_env.HOME }}/.gnupg"
-    gpg_key_source: ".secrets/gpg/private-key.asc"
-    gpg_key_dest: "{{ ansible_env.HOME }}/.gnupg/private_key.asc"
+    dir: "{{ ansible_env.HOME }}/.gnupg"
+    key: ".secrets/gpg/private-key.asc"
+    key_dest: "{{ dir }}/private_key.asc"
   block:
     - name: Ensure gpg directory exists
       ansible.builtin.file:
-        path: "{{ gnupg_dir }}"
+        path: "{{ dir }}"
         state: directory
         mode: "0700"
-        owner: "{{ ansible_user_id }}"
-        group: "{{ ansible_user_id }}"
+        owner: "{{ host_user }}"
+        group: "{{ host_user }}"
 
     - name: Check if private key file exists
       ansible.builtin.stat:
-        path: "{{ gpg_key_source }}"
-      register: gpg_key_file
+        path: "{{ key }}"
+      register: key_file
 
-    - name: Import main private key
-      when: gpg_key_file.stat.exists
+    - name: Import and trust main private key
+      when: key_file.stat.exists
       block:
-        - name: Copy GPG private key to keyring directory
+        - name: Copy GPG private key
           ansible.builtin.copy:
-            dest: "{{ gpg_key_dest }}"
+            dest: "{{ key_dest }}"
             mode: "0600"
-            owner: "{{ ansible_user_id }}"
-            group: "{{ ansible_user_id }}"
-            content: "{{ lookup('file', gpg_key_source) }}"
+            owner: "{{ host_user }}"
+            group: "{{ host_user }}"
+            content: "{{ lookup('file', key) }}"
 
-        - name: Import private key into GPG keyring
-          ansible.builtin.command:
-            cmd: gpg --batch --import {{ gpg_key_dest }}
-          register: gpg_import
-          changed_when: "'secret key imported' in gpg_import.stderr"
+        - name: Import private key into keyring
+          ansible.builtin.command: gpg --batch --import {{ key_dest }}
+          register: imported_key
+          changed_when: "'secret key imported' in imported_key.stderr"
 
         - name: Get main GPG key fingerprint
-          ansible.builtin.shell:
-            cmd: |
-              gpg --with-colons --import-options show-only --import {{ gpg_key_dest }} \
-              | awk -F: '$1 == "fpr" { print $10; exit }'
+          ansible.builtin.shell: |
+            gpg --with-colons --show-keys {{ key_dest }} 2>&1 | awk -F: '$1 == "fpr" { print $10; exit }'
           register: gpg_fingerprint
           changed_when: false
 
         - name: Set ultimate trust on main GPG key
-          ansible.builtin.shell:
-            cmd: |
-              echo "{{ gpg_fingerprint.stdout }}:6:" | gpg --batch --import-ownertrust
+          ansible.builtin.shell: |
+            echo "{{ gpg_fingerprint.stdout }}:6:" | gpg --batch --import-ownertrust
           changed_when: false
-
-- name: Local passphrase-less GPG key
-  become: false
-  vars:
-    local_gpg_email: "pazbryant7@outlook.com"
-  block:
-    - name: Check if local key already exists
-      ansible.builtin.shell:
-        cmd: |
-          gpg --list-keys {{ local_gpg_email }} 2>/dev/null | grep -c 'local'
-      register: local_key_check
-      changed_when: false
-      failed_when: false
-
-    - name: Generate local passphrase-less GPG key
-      when: local_key_check.stdout == "0"
-      ansible.builtin.shell:
-        cmd: |
-          gpg --batch --gen-key <<EOF
-          %no-protection
-          Key-Type: EdDSA
-          Key-Curve: ed25519
-          Key-Usage: sign
-          Subkey-Type: ECDH
-          Subkey-Curve: cv25519
-          Subkey-Usage: encrypt
-          Name-Real: local
-          Name-Comment: passphrase-less key for local automated tasks
-          Name-Email: {{ local_gpg_email }}
-          Expire-Date: 2y
-          EOF
-      changed_when: true

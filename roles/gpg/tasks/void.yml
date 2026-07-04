@@ -1,0 +1,5 @@
+- name: Ensure gnupg is installed
+  become: true
+  community.general.xbps:
+    name: gnupg
+    state: present
