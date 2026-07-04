@@ -1,6 +1,17 @@
-- name: Install ufw
+- name: Setup UFW firewall (Arch Linux)
   become: true
-  community.general.pacman:
-    name:
-      - ufw
-    state: present
+  block:
+    - name: Install ufw
+      community.general.pacman:
+        name: ufw
+        state: present
+
+    - name: Enable and start ufw service (systemd)
+      ansible.builtin.systemd:
+        name: ufw.service
+        enabled: true
+        state: started
+
+    - name: Ensure UFW is enabled and active
+      community.general.ufw:
+        state: enabled
