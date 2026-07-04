@@ -64,3 +64,44 @@
       - noto-fonts-emoji
       - nerd-fonts-symbols-ttf
     state: present
+
+- name: Download and install Bitwarden CLI
+  become: true
+  vars:
+    bw_tmp_dir: /tmp/bitwarden-cli
+  block:
+    - name: Ensure temporary download directory exists
+      ansible.builtin.file:
+        path: "{{ bw_tmp_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Download latest Bitwarden CLI zip (stable redirect URL)
+      ansible.builtin.get_url:
+        url: "https://vault.bitwarden.com/download/?app=cli&platform=linux"
+        dest: "{{ bw_tmp_dir }}/bw.zip"
+        mode: "0644"
+        force: true
+
+    - name: Unzip Bitwarden CLI archive
+      ansible.builtin.unarchive:
+        src: "{{ bw_tmp_dir }}/bw.zip"
+        dest: "{{ bw_tmp_dir }}"
+        remote_src: true
+
+    - name: Set execute permissions on bw binary
+      ansible.builtin.file:
+        path: "{{ bw_tmp_dir }}/bw"
+        mode: "0755"
+
+    - name: Move bw binary to /usr/local/bin
+      ansible.builtin.copy:
+        src: "{{ bw_tmp_dir }}/bw"
+        dest: /usr/local/bin/bw
+        mode: "0755"
+        remote_src: true
+
+    - name: Clean up temporary download directory
+      ansible.builtin.file:
+        path: "{{ bw_tmp_dir }}"
+        state: absent
