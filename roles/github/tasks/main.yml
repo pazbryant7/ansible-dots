@@ -1,42 +1,21 @@
-- name: Ensure github and config directories exist
-  become: false
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    mode: "0755"
-  loop:
-    - "{{ github_dir }}"
-    - "{{ xdg_config_dir }}"
-
 - name: Ensure clone github repositories
   become: false
   ansible.builtin.git:
-    repo: "git@personal.github:pazbryant7/{{ item.repo }}.git"
-    dest: "{{ github_dir }}/{{ item.repo }}"
-    version: "{{ item.branch | default('main') }}"
+    repo: "git@personal.github:pazbryant7/{{ item }}.git"
+    dest: "{{ repos_path }}/{{ item }}"
+    version: main
     update: false
     recursive: true
     clone: true
     single_branch: true
     accept_hostkey: true
   loop:
-    - { repo: "pass", branch: "main" }
-    - { repo: "nvim", branch: "main" }
-    - { repo: "media", branch: "main" }
-    - { repo: "notes", branch: "main" }
-    - { repo: "youtube", branch: "main" }
-    - { repo: "leetcode", branch: "main" }
-    - { repo: "portfolio", branch: "main" }
-    - { repo: "pass-backup", branch: "main" }
-    - { repo: "boilerplate", branch: "main" }
-    - { repo: "ansible-dots", branch: "main" }
-
-- name: Ensure tmux plugin manager is installed
-  become: false
-  ansible.builtin.git:
-    repo: "https://github.com/tmux-plugins/tpm"
-    dest: "{{ ansible_env.HOME }}/.tmux/plugins/tpm"
-    update: false
-    recursive: true
-    clone: yes
-    single_branch: true
+    - pass
+    - nvim
+    - media
+    - notes
+    - youtube
+    - leetcode
+    - portfolio
+    - pass-backup
+    - boilerplate
