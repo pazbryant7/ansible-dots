@@ -1,0 +1,32 @@
+- name: Ensure cronie is installed (Void)
+  become: true
+  community.general.xbps:
+    name: cronie
+    state: present
+
+- name: Ensure cronie service is enabled and running (runit)
+  become: true
+  ansible.builtin.service:
+    name: cronie
+    state: started
+    enabled: yes
+
+- name: Copy script to the target system
+  become: true
+  ansible.builtin.copy:
+    src: "files/common/backup-notes"
+    dest: "/usr/local/bin/backup-notes"
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Create hourly cron task for the regular user
+  ansible.builtin.cron:
+    name: "Execute backup-notes once per hour"
+    minute: "0"
+    hour: "*"
+    day: "*"
+    month: "*"
+    weekday: "*"
+    user: "{{ host_user }}"
+    job: "/usr/local/bin/backup-notes"

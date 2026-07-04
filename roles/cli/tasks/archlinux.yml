@@ -31,7 +31,6 @@
       - gopass
       - yt-dlp
       - rclone
-      - cronie
       - zoxide
       - lazygit
       - poppler
