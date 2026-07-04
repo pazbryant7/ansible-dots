@@ -9,7 +9,6 @@
 
 - name: Ensure clone dotfiles
   become: false
-  vars:
   ansible.builtin.git:
     update: false
     version: main
