@@ -30,6 +30,7 @@
       - atuin
       - qt6ct
       - yt-dlp
+      - bottom
       - gopass
       - rclone
       - zoxide

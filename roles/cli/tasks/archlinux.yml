@@ -30,6 +30,7 @@
       - nsxiv
       - rsync
       - zoxide
+      - bottom
       - yt-dlp
       - rclone
       - gopass
