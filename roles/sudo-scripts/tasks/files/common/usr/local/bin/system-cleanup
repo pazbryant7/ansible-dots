@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 # =============================================================================
-# Arch Linux System Maintenance Script
+# Arch / Void Linux System Maintenance Script
+# Auto-detects the distro (and init system) and runs the matching steps.
 # =============================================================================
 
 # --- Configuration ---
@@ -9,7 +10,7 @@ TMP_AGE_DAYS=2
 LARGE_FILE_MB=100
 PACMAN_KEEP_VERSIONS=2
 JOURNAL_VACUUM_TIME="2weeks"
-LOG_FILE="$HOME/.arch-maintenance.log"
+LOG_FILE="$HOME/.system-maintenance.log"
 SECTION_TIMERS_ENABLED=1
 
 # --- Color codes ---
@@ -25,6 +26,10 @@ NC='\033[0m'
 WARNINGS=0
 ERRORS=0
 STEPS_OK=0
+
+# --- Distro / init detection (populated by detect_distro / detect_init_system) ---
+DISTRO=""
+INIT_SYSTEM=""
 
 # =============================================================================
 # Logging & Output Helpers
@@ -95,6 +100,22 @@ has_cmd() {
   command -v "$1" >/dev/null 2>&1
 }
 
+distro_label() {
+  case "$DISTRO" in
+  arch) printf 'Arch' ;;
+  void) printf 'Void' ;;
+  *) printf '%s' "$DISTRO" ;;
+  esac
+}
+
+is_package_installed() {
+  pkg="$1"
+  case "$DISTRO" in
+  arch) pacman -Qq "$pkg" >/dev/null 2>&1 ;;
+  void) xbps-query "$pkg" >/dev/null 2>&1 ;;
+  esac
+}
+
 # =============================================================================
 # Pre-flight Checks
 # =============================================================================
@@ -106,9 +127,34 @@ check_root() {
   fi
 }
 
+detect_distro() {
+  if [ -r /etc/os-release ]; then
+    DISTRO=$(. /etc/os-release && printf '%s' "$ID")
+  fi
+  case "$DISTRO" in
+  arch | void) ;;
+  *)
+    error "Unsupported or undetected distro: '$DISTRO'. This script supports Arch and Void."
+    exit 1
+    ;;
+  esac
+}
+
+detect_init_system() {
+  if has_cmd systemctl && [ -d /run/systemd/system ]; then
+    INIT_SYSTEM="systemd"
+  else
+    INIT_SYSTEM="runit"
+  fi
+}
+
 check_internet() {
-  info "Checking internet connectivity..."
-  if ping -c 1 -W 3 archlinux.org >/dev/null 2>&1; then
+  case "$DISTRO" in
+  arch) host="archlinux.org" ;;
+  void) host="voidlinux.org" ;;
+  esac
+  info "Checking internet connectivity ($host)..."
+  if ping -c 1 -W 3 "$host" >/dev/null 2>&1; then
     ok "Internet connection is available."
   else
     warn "No internet connection detected. Some steps may fail or be skipped."
@@ -121,18 +167,37 @@ check_internet() {
 
 upgrade_system() {
   section "System Upgrade"
-  info "Running full system upgrade (pacman -Syu)..."
-  if pacman -Syu; then
-    ok "System upgrade complete."
-  else
-    error "System upgrade failed or was aborted."
-  fi
+  case "$DISTRO" in
+  arch)
+    info "Running full system upgrade (pacman -Syu)..."
+    if pacman -Syu; then
+      ok "System upgrade complete."
+    else
+      error "System upgrade failed or was aborted."
+    fi
+    ;;
+  void)
+    info "Running full system upgrade (xbps-install -Su)..."
+    if xbps-install -Su; then
+      ok "System upgrade complete."
+    else
+      error "System upgrade failed or was aborted."
+    fi
+    ;;
+  esac
   section_end
 }
 
-check_systemd() {
-  section "Systemd Health"
+check_init_health() {
+  section "Init System Health"
+  case "$INIT_SYSTEM" in
+  systemd) check_systemd_health ;;
+  runit) check_runit_health ;;
+  esac
+  section_end
+}
 
+check_systemd_health() {
   info "Checking for failed systemd services..."
   failed=$(systemctl --failed --no-legend 2>/dev/null)
   if [ -n "$failed" ]; then
@@ -152,8 +217,36 @@ check_systemd() {
   degraded) warn "System state: degraded — check 'systemctl --failed'" ;;
   *) warn "System state: $state" ;;
   esac
+}
 
-  section_end
+check_runit_health() {
+  info "Checking runit service status (/var/service)..."
+  if [ ! -d /var/service ]; then
+    warn "/var/service not found — cannot check runit service status."
+    return
+  fi
+  if ! has_cmd sv; then
+    warn "'sv' command not found — cannot query runit service status."
+    return
+  fi
+
+  down_services=""
+  for svc_dir in /var/service/*/; do
+    [ -d "$svc_dir" ] || continue
+    name=$(basename "$svc_dir")
+    status=$(sv status "$name" 2>/dev/null)
+    case "$status" in
+    run:*) ;;
+    *) down_services="$down_services\n  $name: $status" ;;
+    esac
+  done
+
+  if [ -n "$down_services" ]; then
+    warn "Services not running:"
+    printf "%b\n" "$down_services" | indent
+  else
+    ok "All enabled runit services are running."
+  fi
 }
 
 check_microcode() {
@@ -161,25 +254,29 @@ check_microcode() {
   info "Checking CPU microcode status..."
 
   cpu_vendor=$(grep -m1 'vendor_id' /proc/cpuinfo 2>/dev/null | awk '{print $3}')
+  ucode_pkg=""
   case "$cpu_vendor" in
   GenuineIntel)
-    if pacman -Qq intel-ucode >/dev/null 2>&1; then
-      ok "intel-ucode is installed."
-    else
-      warn "intel-ucode is NOT installed. Install it for CPU security patches: pacman -S intel-ucode"
-    fi
+    ucode_pkg="intel-ucode"
     ;;
   AuthenticAMD)
-    if pacman -Qq amd-ucode >/dev/null 2>&1; then
-      ok "amd-ucode is installed."
-    else
-      warn "amd-ucode is NOT installed. Install it for CPU security patches: pacman -S amd-ucode"
-    fi
+    case "$DISTRO" in
+    arch) ucode_pkg="amd-ucode" ;;
+    void) ucode_pkg="linux-firmware-amd" ;;
+    esac
     ;;
   *)
     info "Unknown CPU vendor: $cpu_vendor. Skipping microcode check."
     ;;
   esac
+
+  if [ -n "$ucode_pkg" ]; then
+    if is_package_installed "$ucode_pkg"; then
+      ok "$ucode_pkg is installed."
+    else
+      warn "$ucode_pkg is NOT installed. Install it for CPU security patches."
+    fi
+  fi
 
   if dmesg 2>/dev/null | grep -qi "microcode updated"; then
     ok "Microcode update applied at boot."
@@ -197,12 +294,16 @@ check_kernel_updates() {
   info "Checking running kernel vs installed kernel..."
 
   running_kernel=$(uname -r)
-  installed_kernel=$(pacman -Q linux 2>/dev/null | awk '{print $2}')
+  case "$DISTRO" in
+  arch) installed_kernel=$(pacman -Q linux 2>/dev/null | awk '{print $2}') ;;
+  void) installed_kernel=$(xbps-query -l 2>/dev/null | awk '{print $2}' | grep -E '^linux[0-9]' | head -1) ;;
+  esac
 
   info "Running kernel : $running_kernel"
-  info "Installed linux: $installed_kernel"
+  info "Installed linux: ${installed_kernel:-unknown}"
 
-  if echo "$running_kernel" | grep -q "$(echo "$installed_kernel" | cut -d. -f1-2)"; then
+  installed_major_minor=$(printf '%s' "$installed_kernel" | grep -oE '[0-9]+\.[0-9]+' | head -1)
+  if [ -n "$installed_major_minor" ] && echo "$running_kernel" | grep -q "$installed_major_minor"; then
     ok "Running kernel appears consistent with installed version."
   else
     warn "Kernel version mismatch — a reboot may be needed to use the newly installed kernel."
@@ -222,6 +323,14 @@ check_kernel_updates() {
 
 remove_orphans() {
   section "Orphaned Packages"
+  case "$DISTRO" in
+  arch) remove_orphans_pacman ;;
+  void) remove_orphans_xbps ;;
+  esac
+  section_end
+}
+
+remove_orphans_pacman() {
   info "Scanning for orphaned packages..."
   orphans=$(pacman -Qdtq 2>/dev/null || true)
   if [ -n "$orphans" ]; then
@@ -237,12 +346,35 @@ remove_orphans() {
   else
     ok "No orphaned packages found."
   fi
+}
+
+remove_orphans_xbps() {
+  info "Scanning for orphaned packages..."
+  orphans=$(xbps-query -O 2>/dev/null || true)
+  if [ -n "$orphans" ]; then
+    warn "Found orphaned packages:"
+    printf "%s\n" "$orphans" | indent
+    if confirm "Remove all orphaned packages?"; then
+      xbps-remove -o -y
+      ok "Orphaned packages removed."
+    else
+      info "Skipping orphan removal."
+    fi
+  else
+    ok "No orphaned packages found."
+  fi
+}
+
+clean_package_cache() {
+  section "Package Cache"
+  case "$DISTRO" in
+  arch) clean_pacman_cache ;;
+  void) clean_xbps_cache ;;
+  esac
   section_end
 }
 
 clean_pacman_cache() {
-  section "Pacman Cache"
-
   if has_cmd paccache; then
     info "Removing old cached packages (keeping last $PACMAN_KEEP_VERSIONS versions)..."
     paccache -rk"$PACMAN_KEEP_VERSIONS" | indent
@@ -262,8 +394,19 @@ clean_pacman_cache() {
 
   cache_size=$(du -sh /var/cache/pacman/pkg/ 2>/dev/null | cut -f1)
   info "Current pacman cache size: ${cache_size:-unknown}"
+}
 
-  section_end
+clean_xbps_cache() {
+  if has_cmd xbps-remove; then
+    info "Removing obsolete package files from the xbps cache..."
+    xbps-remove -O -y | indent
+    ok "Obsolete cached packages removed."
+  else
+    warn "xbps-remove not found."
+  fi
+
+  cache_size=$(du -sh /var/cache/xbps/ 2>/dev/null | cut -f1)
+  info "Current xbps cache size: ${cache_size:-unknown}"
 }
 
 clean_aur_cache() {
@@ -289,8 +432,16 @@ clean_aur_cache() {
   section_end
 }
 
-update_mirrorlist() {
+update_mirrors() {
   section "Mirror List"
+  case "$DISTRO" in
+  arch) update_arch_mirrorlist ;;
+  void) show_void_mirror_info ;;
+  esac
+  section_end
+}
+
+update_arch_mirrorlist() {
   if has_cmd reflector; then
     info "Updating mirrorlist with reflector (fastest 10 HTTPS mirrors synced within 12h)..."
     if reflector \
@@ -309,26 +460,52 @@ update_mirrorlist() {
     info "Current top mirrors in /etc/pacman.d/mirrorlist:"
     grep '^Server' /etc/pacman.d/mirrorlist 2>/dev/null | head -5 | indent
   fi
-  section_end
 }
 
-handle_pacnew_files() {
-  section "Pacnew / Pacsave Files"
-  info "Scanning /etc for .pacnew and .pacsave files..."
-
-  if has_cmd fd; then
-    pacnew_files=$(fd -H '\.pac(new|save)$' /etc 2>/dev/null || true)
+show_void_mirror_info() {
+  info "Void mirror selection is interactive (xmirror) and is not run automatically."
+  if has_cmd xmirror; then
+    info "Run 'sudo xmirror' manually to pick the fastest repository mirror."
   else
-    pacnew_files=$(find /etc \( -name '*.pacnew' -o -name '*.pacsave' \) 2>/dev/null || true)
+    info "Install xmirror to interactively choose a mirror: xbps-install -S xmirror"
   fi
+  info "Current configured repository:"
+  grep -rh '^repository=' /etc/xbps.d/ /usr/share/xbps.d/ 2>/dev/null | sort -u | indent
+}
 
-  if [ -n "$pacnew_files" ]; then
+handle_stale_config_files() {
+  section "Stale Config Files"
+
+  case "$DISTRO" in
+  arch)
+    info "Scanning /etc for .pacnew / .pacsave files..."
+    if has_cmd fd; then
+      stale_files=$(fd -H '\.pac(new|save)$' /etc 2>/dev/null || true)
+    else
+      stale_files=$(find /etc \( -name '*.pacnew' -o -name '*.pacsave' \) 2>/dev/null || true)
+    fi
+    ;;
+  void)
+    info "Scanning /etc for .new files..."
+    if has_cmd fd; then
+      stale_files=$(fd -H '\.new$' /etc 2>/dev/null || true)
+    else
+      stale_files=$(find /etc -name '*.new' 2>/dev/null || true)
+    fi
+    ;;
+  esac
+
+  if [ -n "$stale_files" ]; then
     warn "Found config files requiring manual review:"
-    printf "%s\n" "$pacnew_files" | indent
-    info "Use 'pacdiff' or 'vimdiff' to merge changes."
+    printf "%s\n" "$stale_files" | indent
+    case "$DISTRO" in
+    arch) info "Use 'pacdiff' or 'vimdiff' to merge changes." ;;
+    void) info "Review each '.new' file and merge manually, then remove it." ;;
+    esac
   else
-    ok "No .pacnew or .pacsave files found."
+    ok "No stale config files found."
   fi
+
   section_end
 }
 
@@ -340,15 +517,24 @@ trim_ssd() {
   section "SSD TRIM"
   info "Checking for SSD/NVMe drives that support TRIM..."
 
-  if systemctl is-active --quiet fstrim.timer 2>/dev/null; then
-    ok "fstrim.timer is active — periodic TRIM is running automatically."
-    info "Last TRIM run info:"
-    systemctl status fstrim.timer --no-pager 2>/dev/null | grep -E 'Trigger|Last' | indent
+  if [ "$INIT_SYSTEM" = "systemd" ]; then
+    if systemctl is-active --quiet fstrim.timer 2>/dev/null; then
+      ok "fstrim.timer is active — periodic TRIM is running automatically."
+      info "Last TRIM run info:"
+      systemctl status fstrim.timer --no-pager 2>/dev/null | grep -E 'Trigger|Last' | indent
+    else
+      warn "fstrim.timer is not active."
+      if confirm "Enable and start fstrim.timer for weekly automatic TRIM?"; then
+        systemctl enable --now fstrim.timer
+        ok "fstrim.timer enabled."
+      fi
+    fi
   else
-    warn "fstrim.timer is not active."
-    if confirm "Enable and start fstrim.timer for weekly automatic TRIM?"; then
-      systemctl enable --now fstrim.timer
-      ok "fstrim.timer enabled."
+    info "No systemd timer available — periodic TRIM must be scheduled via cron."
+    if has_cmd crontab && crontab -l 2>/dev/null | grep -q fstrim; then
+      ok "A cron job for fstrim appears to be configured."
+    else
+      warn "No scheduled TRIM job detected. Consider adding a weekly 'fstrim -av' cron job."
     fi
   fi
 
@@ -617,32 +803,69 @@ check_disk_usage() {
   section_end
 }
 
+cleanup_logs() {
+  section "System Logs"
+  if [ "$INIT_SYSTEM" = "systemd" ]; then
+    cleanup_journald
+  else
+    cleanup_runit_logs
+  fi
+  section_end
+}
+
 cleanup_journald() {
-  section "Systemd Journal"
   journal_size=$(journalctl --disk-usage 2>/dev/null | grep -oP '\d+\.\d+ [A-Z]+')
   info "Current journal disk usage: ${journal_size:-unknown}"
 
   info "Vacuuming journal (keeping last $JOURNAL_VACUUM_TIME)..."
   journalctl --vacuum-time="$JOURNAL_VACUUM_TIME" | indent
   ok "Journal vacuum complete."
+}
 
+cleanup_runit_logs() {
+  log_dir="/var/log"
+  info "Checking log sizes under $log_dir..."
+  du -sh "$log_dir"/*/ 2>/dev/null | sort -hr | head -10 | indent
+  info "Runit/svlogd logs rotate automatically per-service; review large logs above manually if disk space is low."
+}
+
+rebuild_initramfs() {
+  section "Initramfs Rebuild"
+  case "$DISTRO" in
+  arch) rebuild_initramfs_arch ;;
+  void) rebuild_initramfs_void ;;
+  esac
   section_end
 }
 
-rebuild_initcpio() {
-  section "initcpio Rebuild"
+rebuild_initramfs_arch() {
   if confirm "Rebuild initramfs (mkinitcpio -P)? Recommended after kernel/hook changes."; then
     info "Rebuilding initramfs for all presets..."
     mkinitcpio -P | indent
     ok "initramfs rebuilt."
 
-    info "Restarting systemd-vconsole-setup..."
-    systemctl restart systemd-vconsole-setup.service
-    ok "Console setup reloaded."
+    if [ "$INIT_SYSTEM" = "systemd" ]; then
+      info "Restarting systemd-vconsole-setup..."
+      systemctl restart systemd-vconsole-setup.service
+      ok "Console setup reloaded."
+    fi
   else
     info "Skipping initramfs rebuild."
   fi
-  section_end
+}
+
+rebuild_initramfs_void() {
+  if ! has_cmd dracut; then
+    info "dracut not installed — Void doesn't require an initramfs unless using LVM/encryption/etc."
+    return
+  fi
+  if confirm "Regenerate all dracut initramfs images? Recommended after kernel/hook changes."; then
+    info "Regenerating initramfs for all installed kernels..."
+    dracut --regenerate-all --force | indent
+    ok "initramfs regenerated."
+  else
+    info "Skipping initramfs rebuild."
+  fi
 }
 
 check_failed_crons() {
@@ -658,8 +881,16 @@ check_failed_crons() {
   section_end
 }
 
+check_distro_news() {
+  section "Distribution News"
+  case "$DISTRO" in
+  arch) check_arch_news ;;
+  void) check_void_news ;;
+  esac
+  section_end
+}
+
 check_arch_news() {
-  section "Arch Linux News"
   if has_cmd curl; then
     info "Fetching latest Arch Linux news headlines..."
     news=$(curl -s --max-time 10 "https://archlinux.org/feeds/news/" 2>/dev/null |
@@ -673,7 +904,13 @@ check_arch_news() {
   else
     info "curl not available. Check https://archlinux.org/news/ manually."
   fi
-  section_end
+}
+
+check_void_news() {
+  info "Void Linux doesn't publish a formal news feed like Arch."
+  info "Check the void-packages changelog for manual intervention notes:"
+  info "  https://github.com/void-linux/void-packages/commits/master"
+  info "Or check announcements at: https://voidlinux.org"
 }
 
 # =============================================================================
@@ -697,8 +934,11 @@ print_summary() {
     printf "  ${GREEN}All checks passed. System is in good shape!${NC}\n"
   fi
 
-  printf "\n  ${CYAN}Remember to check Arch news for manual interventions:${NC}\n"
-  printf "  ${CYAN}https://archlinux.org/news/${NC}\n\n"
+  printf "\n  ${CYAN}Remember to check for distro-specific manual interventions:${NC}\n"
+  case "$DISTRO" in
+  arch) printf "  ${CYAN}https://archlinux.org/news/${NC}\n\n" ;;
+  void) printf "  ${CYAN}https://voidlinux.org${NC}\n\n" ;;
+  esac
 
   _log_raw "=== SUMMARY: OK=$STEPS_OK WARN=$WARNINGS ERR=$ERRORS ==="
 }
@@ -709,28 +949,35 @@ print_summary() {
 
 main() {
   check_root
+  detect_distro
+  detect_init_system
 
-  printf "# Arch Linux Maintenance Log\n# Started: %s\n# User: %s\n\n" \
-    "$(_timestamp)" "$(whoami)" >"$LOG_FILE"
+  printf "# %s Linux Maintenance Log\n# Started: %s\n# User: %s\n\n" \
+    "$(distro_label)" "$(_timestamp)" "$(whoami)" >"$LOG_FILE"
 
   printf "\n${BOLD}╔══════════════════════════════════════════════════╗${NC}\n"
-  printf "${BOLD}║     Arch Linux System Maintenance Script          ║${NC}\n"
+  case "$DISTRO" in
+  arch) printf "${BOLD}║     Arch Linux System Maintenance Script          ║${NC}\n" ;;
+  void) printf "${BOLD}║     Void Linux System Maintenance Script          ║${NC}\n" ;;
+  esac
   printf "${BOLD}╚══════════════════════════════════════════════════╝${NC}\n\n"
+  printf "  Distro:  %s\n" "$(distro_label)"
+  printf "  Init:    %s\n" "$INIT_SYSTEM"
   printf "  Started: %s\n" "$(_timestamp)"
   printf "  Log:     %s\n" "$LOG_FILE"
 
   check_internet
 
   upgrade_system
-  check_systemd
+  check_init_health
   check_microcode
   check_kernel_updates
 
-  update_mirrorlist
+  update_mirrors
   remove_orphans
-  clean_pacman_cache
-  clean_aur_cache
-  handle_pacnew_files
+  clean_package_cache
+  [ "$DISTRO" = "arch" ] && clean_aur_cache
+  handle_stale_config_files
 
   trim_ssd
   clear_old_cache_files
@@ -747,10 +994,10 @@ main() {
   cleanup_dev_caches
 
   check_disk_usage
-  cleanup_journald
+  cleanup_logs
   check_failed_crons
-  rebuild_initcpio
-  check_arch_news
+  rebuild_initramfs
+  check_distro_news
 
   print_summary
 }
