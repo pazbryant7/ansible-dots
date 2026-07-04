@@ -1,0 +1,5 @@
+- name: Ensure openssh is installed
+  become: true
+  community.general.xbps:
+    name: openssh
+    state: present

@@ -1,21 +1,12 @@
-- name: Get distribution
-  ansible.builtin.stat:
-    path: "{{ role_path }}/tasks/{{ host_os }}.yml"
-  register: distribution_config
-
-- name: Run tasks for {{ host_os }}
-  ansible.builtin.include_tasks: "{{ host_os }}.yml"
-  when: distribution_config.stat.exists
-
 - name: Setup SSH
   vars:
-    ssh_dir: "{{ ansible_env.HOME }}/.ssh"
-    ssh_private_dir: "{{ ansible_env.HOME }}/.ssh/private"
-    ssh_secrets_dir: ".secrets/ssh/github"
+    dir: "{{ ansible_env.HOME }}/.ssh"
+    secrets: ".secrets/ssh/github"
+    private_dir: "{{ ansible_env.HOME }}/.ssh/private"
   block:
-    - name: Ensure .ssh/private directory exists
+    - name: Ensure ssh directory exists
       ansible.builtin.file:
-        path: "{{ ssh_private_dir }}"
+        path: "{{ private_dir }}"
         state: directory
         mode: "0700"
         owner: "{{ ansible_user_id }}"
@@ -23,8 +14,8 @@
 
     - name: Deploy SSH config files
       ansible.builtin.copy:
-        src: "files/{{ ssh_file }}"
-        dest: "{{ ssh_dir }}/{{ ssh_file }}"
+        src: "files/common/{{ file }}"
+        dest: "{{ dir }}/{{ file }}"
         mode: "0600"
         owner: "{{ ansible_user_id }}"
         group: "{{ ansible_user_gid | default(ansible_user_id) }}"
@@ -32,12 +23,12 @@
         - config
         - known_hosts
       loop_control:
-        loop_var: ssh_file
+        loop_var: file
 
     - name: Import SSH private keys
       ansible.builtin.copy:
-        src: "{{ ssh_secrets_dir }}/{{ ssh_key.name }}"
-        dest: "{{ ssh_private_dir }}/{{ ssh_key.name }}"
+        src: "{{ secrets }}/{{ ssh_key.name }}"
+        dest: "{{ private_dir }}/{{ ssh_key.name }}"
         mode: "0600"
         owner: "{{ ansible_user_id }}"
         group: "{{ ansible_user_gid | default(ansible_user_id) }}"
@@ -46,29 +37,3 @@
         - name: work_github
       loop_control:
         loop_var: ssh_key
-
-    - name: Start ssh-agent if not running
-      ansible.builtin.shell:
-        cmd: |
-          if [ -z "$SSH_AUTH_SOCK" ]; then
-            eval $(ssh-agent -s)
-            echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK"
-            echo "SSH_AGENT_PID=$SSH_AGENT_PID"
-          fi
-      register: ssh_agent_env
-      changed_when: false
-
-    - name: Add SSH keys to agent
-      ansible.builtin.shell:
-        cmd: ssh-add {{ ssh_private_dir }}/{{ ssh_key }}
-      environment:
-        SSH_AUTH_SOCK:
-          "{{ ssh_agent_env.stdout | regex_search('SSH_AUTH_SOCK=([^\\n]+)',
-          '\\1') | first | default(ansible_env.SSH_AUTH_SOCK | default('')) }}"
-      loop:
-        - personal_github
-        - work_github
-      loop_control:
-        loop_var: ssh_key
-      changed_when: false
-      ignore_errors: true
