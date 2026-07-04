@@ -92,7 +92,7 @@ long gap (Arch packages drift on rolling release).
 
 ```sh
 just run                                    # arch, zsh, xorg
-just shell=fish compositor=wayland run      # override defaults
+just shell=fish display_server=wayland run      # override defaults
 ```
 
 The manual tasks that cannot be automated are always printed at the end of every
@@ -162,11 +162,11 @@ All variables can be overridden on the command line:
 | ------------ | ----------- | --------------------------------------------- |
 | `os`         | `arch`      | Target OS (`arch`)                            |
 | `shell`      | `zsh`       | Passed as `chosen_shell` to the playbook      |
-| `compositor` | `xorg`      | Passed as `chosen_compositor` to the playbook |
+| `display_server` | `xorg`      | Passed as `display_server` to the playbook |
 | `playbook`   | `local.yml` | Playbook file to run                          |
 
 ```sh
-just os=arch shell=zsh compositor=wayland run
+just os=arch shell=zsh display_server=wayland run
 just os=arch run-role role=neovim
 ```
 
@@ -215,5 +215,5 @@ just shell-exec
 ansible-playbook local.yml --connection=local --inventory "localhost," \
   --become-password-file=.secrets/.become_password \
   --vault-password-file=.secrets/.passphrase \
-  --extra-vars "chosen_shell=zsh chosen_compositor=xorg" -vvv
+  --extra-vars "chosen_shell=zsh display_server=xorg" -vvv
 ```

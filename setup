@@ -6,12 +6,11 @@ cd "$(dirname "$0")" || {
 }
 
 PLAYBOOK="./local.yml"
-BECOME_FILE=".secrets/.become_password"
-VAULT_FILE=".secrets/.passphrase"
+SECRETS_DIR=".secrets"
+BECOME_FILE="$SECRETS_DIR/.become_password"
+VAULT_FILE="$SECRETS_DIR/.passphrase"
 STATE_DIR="$HOME/.local/state/ansible_setup"
 FIRST_RUN="$STATE_DIR/first_run_completed"
-
-# ── Helpers ───────────────────────────────────────────────────────────────────
 
 info() {
   printf "  → %s\n" "$1"
@@ -22,118 +21,91 @@ die() {
   exit 1
 }
 
-# ── Secrets ───────────────────────────────────────────────────────────────────
+# ── 1. Secrets ────────────────────────────────────────────────────────────────
+mkdir -p "$SECRETS_DIR" || die "Failed to create $SECRETS_DIR"
+chmod 700 "$SECRETS_DIR" || die "Failed to set permissions on $SECRETS_DIR"
 
-secrets() {
-  mkdir -p .secrets && chmod 700 .secrets
-  if [ ! -f "$BECOME_FILE" ]; then
-    printf "Enter sudo/become password: " >/dev/tty
-    read -r p </dev/tty && printf "%s" "$p" >"$BECOME_FILE" && chmod 600 "$BECOME_FILE"
-  fi
-  if [ ! -f "$VAULT_FILE" ]; then
-    printf "Enter ansible-vault passphrase: " >/dev/tty
-    read -r v </dev/tty && printf "%s" "$v" >"$VAULT_FILE" && chmod 600 "$VAULT_FILE"
-  fi
-  [ -f "$BECOME_FILE" ] || die "$BECOME_FILE missing"
-  [ -f "$VAULT_FILE" ] || die "$VAULT_FILE missing"
-}
+if [ ! -f "$BECOME_FILE" ]; then
+  printf "Enter sudo/become password: " >/dev/tty
+  read -r p </dev/tty || die "Failed to read become password"
+  printf "%s" "$p" >"$BECOME_FILE" || die "Failed to write become password"
+  chmod 600 "$BECOME_FILE" || die "Failed to secure become password file"
+fi
 
-# ── OS & dependencies ─────────────────────────────────────────────────────────
+if [ ! -f "$VAULT_FILE" ]; then
+  printf "Enter ansible-vault passphrase: " >/dev/tty
+  read -r v </dev/tty || die "Failed to read vault passphrase"
+  printf "%s" "$v" >"$VAULT_FILE" || die "Failed to write vault passphrase"
+  chmod 600 "$VAULT_FILE" || die "Failed to secure vault passphrase file"
+fi
 
-detect_os() {
-  [ -f /etc/os-release ] && {
-    . /etc/os-release
-    printf "%s" "$ID"
-    return
-  }
-  uname -s | tr '[:upper:]' '[:lower:]'
-}
+[ -f "$BECOME_FILE" ] || die "$BECOME_FILE missing"
+[ -f "$VAULT_FILE" ] || die "$VAULT_FILE missing"
 
-install_ansible() {
-  command -v ansible >/dev/null 2>&1 && return 0
-  info "Installing Ansible for $1..."
-  case "$1" in
-  arch) sudo pacman -S --noconfirm ansible ansible-core ansible-lint ;;
-  void) sudo xbps-install -y ansible ansible-lint ;;
-  *) die "Unsupported OS '$1' — install Ansible manually" ;;
+# ── 2. OS & Dependencies ──────────────────────────────────────────────────────
+if [ -f /etc/os-release ]; then
+  . /etc/os-release
+  os="$ID"
+else
+  os=$(uname -s | tr '[:upper:]' '[:lower:]')
+fi
+
+[ -z "$os" ] && die "Could not detect OS"
+
+if ! command -v ansible >/dev/null 2>&1; then
+  info "Installing Ansible for $os..."
+  case "$os" in
+  arch)
+    sudo pacman -S --noconfirm ansible ansible-core ansible-lint || die "Pacman failed to install Ansible"
+    ;;
+  void)
+    sudo xbps-install -y ansible ansible-lint || die "XBPS failed to install Ansible"
+    ;;
+  *)
+    die "Unsupported OS '$os' — install Ansible manually"
+    ;;
   esac
-}
+fi
 
-setup_deps() {
-  os="$(detect_os)"
-  [ -n "$os" ] || die "Could not detect OS"
-  install_ansible "$os"
-  req="requirements/${os}.yml"
-  common="requirements/common.yml"
-  if [ -f "$req" ]; then
-    info "Installing Galaxy collections for $os..."
-    ansible-galaxy collection install -r "$req" &&
-      ansible-galaxy collection install -r "$common"
-  fi
-}
+if [ -f "requirements/${os}.yml" ]; then
+  info "Installing Galaxy collections..."
+  ansible-galaxy collection install -r "requirements/${os}.yml" >/dev/null || die "Failed to install OS-specific collections"
+  ansible-galaxy collection install -r requirements/common.yml >/dev/null || die "Failed to install common collections"
+fi
 
-# ── Prompts ───────────────────────────────────────────────────────────────────
+# ── 3. Prompt & Run ───────────────────────────────────────────────────────────
+while true; do
+  printf "Choose display_server (xorg/wayland) [default: xorg]: " >/dev/tty
+  read -r ds </dev/tty
+  ds="${ds:-xorg}"
+  case "$ds" in
+  xorg | wayland) break ;;
+  *) printf "  Invalid — enter 'xorg' or 'wayland', or press Enter for default\n" >/dev/tty ;;
+  esac
+done
 
-prompt_compositor() {
-  while true; do
-    printf "Choose compositor (xorg/wayland) [default: xorg]: " >/dev/tty
-    read -r ans </dev/tty
+info "Running playbook for OS: $os with display_server: $ds"
 
-    # If the user just presses Enter, default to xorg
-    ans="${ans:-xorg}"
+ansible-playbook "$PLAYBOOK" \
+  --become-password-file="$BECOME_FILE" \
+  --vault-password-file="$VAULT_FILE" \
+  --extra-vars "display_server=$ds" || die "Ansible playbook execution failed!"
 
-    case "$ans" in
-    xorg | wayland)
-      printf "%s" "$ans"
-      return
-      ;;
-    *) printf "  Invalid — enter 'xorg' or 'wayland', or press Enter for default\n" >/dev/tty ;;
-    esac
-  done
-}
+# ── 4. Post-Install ───────────────────────────────────────────────────────────
+mkdir -p "$STATE_DIR" || die "Failed to create state directory"
 
-# ── Playbook ──────────────────────────────────────────────────────────────────
+if [ ! -f "$FIRST_RUN" ]; then
+  info "First run done — reboot, then run this script again to finish."
+  touch "$FIRST_RUN" || die "Failed to create first run lock file"
+  exit 0
+fi
 
-run() {
-  compositor="$(prompt_compositor)"
-  info "Running playbook for OS: $(detect_os) with compositor: $compositor"
-
-  ansible-playbook "$PLAYBOOK" \
-    --become-password-file="$BECOME_FILE" \
-    --vault-password-file="$VAULT_FILE" \
-    --extra-vars "chosen_compositor=${compositor}"
-}
-
-# ── Post-install ──────────────────────────────────────────────────────────────
-
-post() {
-  mkdir -p "$STATE_DIR"
-  if [ ! -f "$FIRST_RUN" ]; then
-    info "First run done — reboot, then run this script again to finish."
-    touch "$FIRST_RUN"
-    exit 0
-  fi
-  printf "\n"
-  printf "═══════════════════════════════════════════════\n"
-  printf "  Manual tasks remaining (cannot be automated)\n"
-  printf "═══════════════════════════════════════════════\n"
-  printf "  • Set GTK theme using nwg-look GUI\n"
-  printf "  • Log in to: Browser, Outlook, Bitwarden,\n"
-  printf "               GitHub, Google, Twitch\n"
-  printf "  • Retrive backups: Music,Brave,Books,\n"
-  printf "  • Bitwarden: login and paste new token session in gopass\n"
-  printf "  • YAY: Install downgrade,ventoy-bin,dragon-drop,brave-origin\n"
-  printf "               grpcurl-bin, helium-browser-bin\n"
-  printf "═══════════════════════════════════════════════\n"
-}
-
-# ── Entry point ───────────────────────────────────────────────────────────────
-
-main() {
-  secrets
-  setup_deps
-  run
-  post
-}
-
-main "$@"
+printf "\n═══════════════════════════════════════════════\n"
+printf "  Manual tasks remaining (cannot be automated)\n"
+printf "═══════════════════════════════════════════════\n"
+printf "  • Set GTK theme using nwg-look GUI\n"
+printf "  • Log in to: Browser, Outlook, Bitwarden, GitHub, Google, Twitch\n"
+printf "  • Retrieve backups: Music, Brave, Books\n"
+printf "  • Bitwarden: login and paste new token session in gopass\n"
+printf "  • YAY: Install downgrade, ventoy-bin, dragon-drop, brave-origin, grpcurl-bin, helium-browser-bin\n"
+printf "═══════════════════════════════════════════════\n"

@@ -9,16 +9,16 @@
         path: "{{ private_dir }}"
         state: directory
         mode: "0700"
-        owner: "{{ ansible_user_id }}"
-        group: "{{ ansible_user_gid | default(ansible_user_id) }}"
+        owner: "{{ host_user }}"
+        group: "{{ ansible_user_gid | default(host_user) }}"
 
     - name: Deploy SSH config files
       ansible.builtin.copy:
         src: "files/common/{{ file }}"
         dest: "{{ dir }}/{{ file }}"
         mode: "0600"
-        owner: "{{ ansible_user_id }}"
-        group: "{{ ansible_user_gid | default(ansible_user_id) }}"
+        owner: "{{ host_user }}"
+        group: "{{ ansible_user_gid | default(host_user) }}"
       loop:
         - config
         - known_hosts
@@ -30,8 +30,8 @@
         src: "{{ secrets }}/{{ ssh_key.name }}"
         dest: "{{ private_dir }}/{{ ssh_key.name }}"
         mode: "0600"
-        owner: "{{ ansible_user_id }}"
-        group: "{{ ansible_user_gid | default(ansible_user_id) }}"
+        owner: "{{ host_user }}"
+        group: "{{ ansible_user_gid | default(host_user) }}"
       loop:
         - name: personal_github
         - name: work_github
