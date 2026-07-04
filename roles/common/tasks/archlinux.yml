@@ -1,30 +1,15 @@
-- name: Ensure base development packages are installed
+- name: Ensure base development packages are installed (Arch)
   become: true
   community.general.pacman:
     name:
-      - ufw
-      - sudo
       - base
+      - sudo
       - linux
-      - rtkit
       - man-db
-      - cronie
-      - ntfs-3g
-      - pipewire
       - linux-lts
-      - libnotify
-      - efibootmgr
       - base-devel
-      - pipewire-alsa
-      - pipewire-jack
-      - terminus-font
+      - efibootmgr
       - linux-headers
       - linux-firmware
-      - zram-generator
-      - networkmanager
-      - pipewire-pulse
-      - zram-generator
-      - noto-fonts-emoji
       - linux-lts-headers
-      - gst-plugin-pipewire
     state: present
