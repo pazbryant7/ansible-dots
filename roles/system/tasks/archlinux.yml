@@ -46,45 +46,6 @@
         replace: '[multilib]\nInclude = /etc/pacman.d/mirrorlist'
         backup: true
 
-- name: Setup Grub
-  become: true
-  vars:
-    grub_conf: /etc/default/grub
-    grub_cfg: /boot/grub/grub.cfg
-  block:
-    - name: Ensure GRUB_DEFAULT is set to saved
-      ansible.builtin.lineinfile:
-        path: "{{ grub_conf }}"
-        regexp: "^GRUB_DEFAULT="
-        line: "GRUB_DEFAULT=saved"
-        backup: true
-      register: grub_default
-
-    - name: Ensure GRUB_SAVEDEFAULT is enabled
-      ansible.builtin.lineinfile:
-        path: "{{ grub_conf }}"
-        regexp: "^#?GRUB_SAVEDEFAULT="
-        line: "GRUB_SAVEDEFAULT=true"
-        backup: true
-      register: grub_savedefault
-
-    - name: Ensure GRUB_DISABLE_SUBMENU is enabled
-      ansible.builtin.lineinfile:
-        path: "{{ grub_conf }}"
-        regexp: "^#?GRUB_DISABLE_SUBMENU="
-        line: "GRUB_DISABLE_SUBMENU=y"
-        backup: true
-      register: grub_submenu
-
-    - name: Regenerate GRUB configuration
-      ansible.builtin.command: grub-mkconfig -o "{{ grub_cfg }}"
-      when:
-        grub_default.changed or grub_savedefault.changed or grub_submenu.changed
-      register: grub_result
-      failed_when:
-        - grub_result.rc != 0
-        - "'overlay' not in grub_result.stderr"
-
 - name: Finish setup and reload
   become: true
   block:
