@@ -6,26 +6,3 @@
 - name: "Run tasks for {{ host_os }}"
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
-
-- name: Deploy system scripts to sudo PATH
-  become: true
-  vars:
-    dir: "/usr/local/bin"
-    src_dir: "files/usr/local/bin"
-  block:
-    - name: Find all scripts in files directory
-      ansible.builtin.find:
-        paths: "{{ role_path }}/{{ src_dir }}"
-        file_type: file
-      register: scripts
-
-    - name: Copy scripts to target directory
-      ansible.builtin.copy:
-        src: "{{ item.path }}"
-        dest: "{{ dir }}/{{ item.path | basename }}"
-        owner: root
-        group: root
-        mode: "0700"
-      loop: "{{ scripts.files }}"
-      loop_control:
-        loop_var: item
