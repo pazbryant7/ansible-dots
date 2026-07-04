@@ -1,0 +1,5 @@
+- name: Ensure zsh is installed
+  become: true
+  community.general.xbps:
+    name: zsh
+    state: present
