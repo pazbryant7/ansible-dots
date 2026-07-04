@@ -10,23 +10,22 @@
 - name: Ensure clone dotfiles
   become: false
   vars:
-    dotfiles_repo: "git@personal.github:pazbryant7/dotfiles.git"
   ansible.builtin.git:
     update: false
     version: main
     recursive: true
     accept_newhostkey: true
-    dest: "{{ dotfiles_dir }}"
-    repo: "{{ dotfiles_repo }}"
+    dest: "{{ dots_path }}"
+    repo: "git@personal.github:pazbryant7/dotfiles.git"
   changed_when: true
 
 - name: Stow dotfiles (adopting conflicting system files)
   ansible.builtin.command:
     cmd:
-      stow --dir="{{ dotfiles_dir }}" --target="{{ ansible_user_dir }}" --adopt
+      stow --dir="{{ dots_path }}" --target="{{ ansible_user_dir }}" --adopt
       --restow .
   args:
-    chdir: "{{ dotfiles_dir }}"
+    chdir: "{{ dots_path }}"
   register: stow_result
   changed_when: false
   failed_when: stow_result.rc != 0
@@ -35,6 +34,6 @@
   ansible.builtin.command:
     cmd: git restore .
   args:
-    chdir: "{{ dotfiles_dir }}"
+    chdir: "{{ dots_path }}"
   register: git_result
   changed_when: false

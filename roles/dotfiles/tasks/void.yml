@@ -1,0 +1,6 @@
+- name: Ensure stow is installed
+  become: true
+  community.general.xbps:
+    name:
+      - stow
+    state: present
