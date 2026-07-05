@@ -365,6 +365,36 @@ remove_orphans_xbps() {
   fi
 }
 
+cleanup_old_kernels() {
+  section "Old Kernels"
+  case "$DISTRO" in
+  arch)
+    info "Arch Linux removes old kernels automatically during package upgrades."
+    ;;
+  void)
+    if has_cmd vkpurge; then
+      info "Checking for old Void Linux kernels..."
+      old_kernels=$(vkpurge list 2>/dev/null)
+      if [ -n "$old_kernels" ]; then
+        warn "Old kernels found taking up space:"
+        printf "%s\n" "$old_kernels" | indent
+        if confirm "Remove all old kernels (vkpurge rm all)?"; then
+          vkpurge rm all | indent
+          ok "Old kernels removed."
+        else
+          info "Skipping old kernel removal."
+        fi
+      else
+        ok "No old kernels found. System is clean."
+      fi
+    else
+      warn "vkpurge command not found. Cannot check for old kernels."
+    fi
+    ;;
+  esac
+  section_end
+}
+
 clean_package_cache() {
   section "Package Cache"
   case "$DISTRO" in
@@ -957,8 +987,8 @@ main() {
 
   printf "\n${BOLD}╔══════════════════════════════════════════════════╗${NC}\n"
   case "$DISTRO" in
-  arch) printf "${BOLD}║     Arch Linux System Maintenance Script          ║${NC}\n" ;;
-  void) printf "${BOLD}║     Void Linux System Maintenance Script          ║${NC}\n" ;;
+  arch) printf "${BOLD}║     Arch Linux System Maintenance Script         ║${NC}\n" ;;
+  void) printf "${BOLD}║     Void Linux System Maintenance Script         ║${NC}\n" ;;
   esac
   printf "${BOLD}╚══════════════════════════════════════════════════╝${NC}\n\n"
   printf "  Distro:  %s\n" "$(distro_label)"
@@ -975,6 +1005,7 @@ main() {
 
   update_mirrors
   remove_orphans
+  cleanup_old_kernels
   clean_package_cache
   [ "$DISTRO" = "arch" ] && clean_aur_cache
   handle_stale_config_files
