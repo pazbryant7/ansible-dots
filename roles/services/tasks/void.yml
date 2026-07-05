@@ -19,3 +19,10 @@
     - chronyd
     - nanoklogd
     - socklog-unix
+
+- name: Add current user to socklog group
+  become: true
+  ansible.builtin.user:
+    name: "{{ host_user }}"
+    groups: socklog
+    append: true
