@@ -25,6 +25,7 @@
       - aria2
       - dunst
       - rsync
+      - chafa
       - nsxiv
       - atuin
       - qt6ct
