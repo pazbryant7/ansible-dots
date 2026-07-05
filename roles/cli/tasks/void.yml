@@ -23,7 +23,6 @@
       - tmux
       - rofi
       - aria2
-      - steam
       - dunst
       - rsync
       - nsxiv
@@ -45,6 +44,7 @@
       - pipewire
       - luarocks
       - trash-cli
+      - xdg-utils
       - alacritty
       - hyperfine
       - gammastep
