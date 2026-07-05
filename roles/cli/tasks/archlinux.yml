@@ -47,6 +47,7 @@
       - pipewire
       - nwg-look
       - hyperfine
+      - xdg-utils
       - fastfetch
       - trash-cli
       - alacritty
