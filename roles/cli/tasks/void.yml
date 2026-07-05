@@ -42,6 +42,7 @@
       - calibre
       - lazygit
       - nwg-look
+      - tealdeer
       - pipewire
       - luarocks
       - trash-cli
