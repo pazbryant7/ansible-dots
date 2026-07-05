@@ -1,0 +1,12 @@
+- name: Set up explicit SSD fstrim script
+  ansible.builtin.copy:
+    dest: /etc/cron.weekly/fstrim
+    content: |
+      #!/bin/sh
+      # -b prints raw bytes. If DISC-MAX > 0, the device supports TRIM.
+      lsblk -b -n -o MOUNTPOINT,DISC-MAX | awk 'NF==2 && $2 > 0 { print $1 }' | while read -r mnt; do
+          /usr/sbin/fstrim "$mnt"
+      done
+    owner: root
+    group: root
+    mode: "0755"
