@@ -4,6 +4,7 @@
     name:
       - cronie
       - chrony
+      - socklog-void
     state: present
 
 - name: Enable system services via runit
@@ -16,3 +17,5 @@
     - dbus
     - cronie
     - chronyd
+    - nanoklogd
+    - socklog-unix
