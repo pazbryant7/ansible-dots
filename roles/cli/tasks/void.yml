@@ -107,3 +107,54 @@
       ansible.builtin.file:
         path: "{{ bw_tmp_dir }}"
         state: absent
+
+- name: Build and install undistrubuted void linux packages
+  vars:
+    void_packages_repo: "https://github.com/void-linux/void-packages.git"
+    void_packages_dest: "{{ repos_path }}/void-packages"
+    target_packages:
+      - google-chrome
+  block:
+    - name: Shallow-clone void-packages
+      ansible.builtin.git:
+        repo: "{{ void_packages_repo }}"
+        dest: "{{ void_packages_dest }}"
+        depth: 1
+        single_branch: true
+        version: master
+      register: clone_result
+
+    - name: Bootstrap the xbps-src build environment
+      ansible.builtin.command: ./xbps-src binary-bootstrap
+      args:
+        chdir: "{{ void_packages_dest }}"
+        creates: "{{ void_packages_dest }}/masterdir"
+
+    - name: Enable restricted packages
+      ansible.builtin.lineinfile:
+        path: "{{ void_packages_dest }}/etc/conf"
+        create: yes
+        regexp: "^XBPS_ALLOW_RESTRICTED="
+        line: "XBPS_ALLOW_RESTRICTED=yes"
+
+    - name: Build each requested package with xbps-src
+      ansible.builtin.command: ./xbps-src pkg {{ item }}
+      args:
+        chdir: "{{ void_packages_dest }}"
+        creates:
+          "{{ void_packages_dest }}/hostdir/binpkgs/{{ item }}-*.x86_64.xbps"
+      environment:
+        XBPS_ALLOW_RESTRICTED: "yes"
+      loop: "{{ target_packages }}"
+      loop_control:
+        label: "{{ item }}"
+      register: build_result
+
+    - name: Install all built packages from the local hostdir repo
+      become: true
+      ansible.builtin.command: >
+        xbps-install --yes --repository={{ void_packages_dest }}/hostdir/binpkgs
+        --repository={{ void_packages_dest }}/hostdir/binpkgs/nonfree {{
+        target_packages | join(' ') }}
+      register: install_result
+      changed_when: "'Nothing to do' not in install_result.stdout"
