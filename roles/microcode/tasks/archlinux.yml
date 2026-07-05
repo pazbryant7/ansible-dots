@@ -1,12 +1,36 @@
+- name: Detect CPU vendor_id from /proc/cpuinfo
+  ansible.builtin.shell:
+    cmd: "grep -m1 vendor_id /proc/cpuinfo | awk '{print $3}'"
+  register: cpu_vendor
+  changed_when: false
+
+- name: Map vendor_id to microcode package
+  ansible.builtin.set_fact:
+    ucode_pkg: >-
+      {{
+        {'GenuineIntel': 'intel-ucode', 'AuthenticAMD':
+      'amd-ucode'}[cpu_vendor.stdout]
+        | default('')
+      }}
+
+- name: Show detected vendor and package
+  ansible.builtin.debug:
+    msg:
+      "vendor_id={{ cpu_vendor.stdout }} -> package={{ ucode_pkg |
+      default('none') }}"
+
+- name: Warn if CPU vendor is neither Intel nor AMD
+  ansible.builtin.debug:
+    msg:
+      "CPU vendor '{{ cpu_vendor.stdout }}' is not Intel or AMD — skipping
+      microcode install."
+  when: ucode_pkg == ''
+
 - name: Install CPU-specific microcode
   become: true
-  vars:
-    cpu_ucode_map:
-      Intel: intel-ucode
-      AMD: amd-ucode
   community.general.pacman:
-    name: "{{ cpu_ucode_map[item] }}"
+    name: "{{ ucode_pkg }}"
     state: present
-  loop:
-    "{{ cpu_ucode_map.keys() | select('in', ansible_facts['processor'] | join('
-    ')) | list }}"
+    update_cache: true
+  when: ucode_pkg != ''
+  notify: Regenerate initramfs for microcode (arch)

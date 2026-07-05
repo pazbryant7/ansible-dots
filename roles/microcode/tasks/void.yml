@@ -1,0 +1,45 @@
+- name: Detect CPU vendor_id from /proc/cpuinfo
+  ansible.builtin.shell:
+    cmd: "grep -m1 vendor_id /proc/cpuinfo | awk '{print $3}'"
+  register: cpu_vendor
+  changed_when: false
+
+- name: Set fact for CPU vendor
+  ansible.builtin.set_fact:
+    is_intel: "{{ cpu_vendor.stdout == 'GenuineIntel' }}"
+    is_amd: "{{ cpu_vendor.stdout == 'AuthenticAMD' }}"
+
+- name: Show detected vendor
+  ansible.builtin.debug:
+    msg: "Detected CPU vendor_id: {{ cpu_vendor.stdout }}"
+
+- name: Enable void-repo-nonfree (required for intel-ucode)
+  community.general.xbps:
+    name: void-repo-nonfree
+    state: present
+  when: is_intel
+
+- name: Install intel-ucode
+  become: true
+  community.general.xbps:
+    name: intel-ucode
+    state: present
+    update_cache: true
+  when: is_intel
+  notify: Regenerate initramfs for microcode (void)
+
+- name: Install AMD microcode (linux-firmware-amd)
+  become: true
+  community.general.xbps:
+    name: linux-firmware-amd
+    state: present
+    update_cache: true
+  when: is_amd
+  notify: Regenerate initramfs for microcode (void)
+
+- name: Warn if CPU vendor is neither Intel nor AMD
+  ansible.builtin.debug:
+    msg:
+      "CPU vendor '{{ cpu_vendor.stdout }}' is not Intel or AMD — skipping
+      microcode install."
+  when: not is_intel and not is_amd
