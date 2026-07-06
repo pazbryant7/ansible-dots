@@ -1,0 +1,2 @@
+site="https://github.com/brave/brave-browser/releases"
+pattern="brave-origin_\K[\d\.]+(?=_amd64\.deb)"

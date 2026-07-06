@@ -1,0 +1,41 @@
+pkgname=brave-origin-bin
+version=1.92.134
+revision=1
+only_for_archs="x86_64"
+hostmakedepends="tar xz"
+depends="alsa-lib nss gtk+3"
+short_desc="Brave Origin - minimalist Brave browser (binary)"
+maintainer="aaa <pazbryant7@outlook.com>"
+license="MPL-2.0"
+homepage="https://brave.com/origin/"
+distfiles="https://github.com/brave/brave-browser/releases/download/v${version}/brave-origin_${version}_amd64.deb"
+checksum=6caeb1c92a00de0b8c7560c0fd4502ad34c5da36eaa9aa5c50bd15b7170279bb
+repository=nonfree
+restricted=yes
+nostrip=yes
+
+do_extract() {
+	mkdir -p ${DESTDIR}
+	ar x ${XBPS_SRCDISTDIR}/${pkgname}-${version}/brave-origin_${version}_amd64.deb
+}
+
+do_install() {
+	tar xf data.tar.xz -C ${DESTDIR}
+
+	# Drop optional Qt5/Qt6 desktop-integration shims (only used for
+	# native dialogs under KDE); removing them avoids pulling in qt5/qt6
+	# as hard runtime deps since Brave runs fine under GTK otherwise.
+	rm -f ${DESTDIR}/opt/brave.com/brave-origin/libqt5_shim.so
+	rm -f ${DESTDIR}/opt/brave.com/brave-origin/libqt6_shim.so
+
+	# Install the icons
+	for size in 16 24 32 48 64 128 256; do
+		mkdir -p ${DESTDIR}/usr/share/icons/hicolor/${size}x${size}/apps
+		mv ${DESTDIR}/opt/brave.com/brave-origin/product_logo_${size}.png \
+		   ${DESTDIR}/usr/share/icons/hicolor/${size}x${size}/apps/brave-browser.png
+	done
+
+	# Remove the Debian/Ubuntu crontab
+	rm -rf ${DESTDIR}/etc
+	rm -rf ${DESTDIR}/opt/brave.com/brave-origin/cron
+}
