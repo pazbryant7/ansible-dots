@@ -23,6 +23,7 @@
       - tmux
       - rofi
       - aria2
+      - piper
       - dunst
       - rsync
       - chafa
