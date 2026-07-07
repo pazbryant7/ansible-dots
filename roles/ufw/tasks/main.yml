@@ -44,17 +44,6 @@
         rule: allow
         from_ip: 172.16.0.0/12
 
-    - name: Allow port forwarding
-      community.general.ufw:
-        rule: allow
-        port: "17349"
-        proto: "{{ proto_item }}"
-      loop:
-        - tcp
-        - udp
-      loop_control:
-        loop_var: proto_item
-
     - name: Allow Deluge
       community.general.ufw:
         rule: allow
