@@ -1,74 +1,117 @@
 - name: Ensure common cli tools are installed (Void Linux)
   become: true
   community.general.xbps:
+    state: present
     name:
-      - jq
-      - uv
-      - fd
-      - lf
-      - feh
-      - mpc
-      - fzf
-      - bat
-      - xsv
-      - git
-      - lua
-      - mpd
-      - eza
-      - mpv
-      - just
-      - stow
+      # ==========================================
+      # Core System & Hardware
+      # ==========================================
       - lsof
-      - less
-      - tmux
-      - rofi
-      - aria2
-      - piper
-      - dunst
-      - rsync
-      - chafa
-      - nsxiv
-      - atuin
-      - qt6ct
-      - yt-dlp
-      - bottom
-      - xtools
-      - gopass
-      - rclone
-      - zoxide
-      - jujutsu
-      - ripgrep
-      - zathura
-      - ncmpcpp
-      - calibre
-      - lazygit
-      - nwg-look
-      - tealdeer
-      - pipewire
-      - luarocks
-      - trash-cli
       - xdg-utils
-      - alacritty
-      - hyperfine
-      - gammastep
-      - fastfetch
-      - breeze-gtk
-      - lazydocker
-      - github-cli
-      - qbittorrent
+      - android-tools
+      - xtools
+      - piper
+
+      # ==========================================
+      # Audio & Multimedia Stack
+      # ==========================================
+      - pipewire
       - pavucontrol
+      - mpd
+      - mpc
+      - ncmpcpp
+      - mpv
+      - yt-dlp
+
+      # ==========================================
+      # Modern CLI Upgrades (Rust/Go Alternatives)
+      # ==========================================
+      - bat
+      - eza
+      - fd
+      - ripgrep
+      - fzf
+      - zoxide
+      - atuin
+      - bottom
+      - fastfetch
+      - tealdeer
+
+      # ==========================================
+      # General Terminal Utilities
+      # ==========================================
+      - tmux
+      - less
+      - trash-cli
+      - translate-shell
+      - jq
+      - xsv
+      - hyperfine
       - ImageMagick
+      - chafa
+
+      # ==========================================
+      # Development & Version Control
+      # ==========================================
+      - git
+      - github-cli
+      - lazygit
+      - jujutsu
+      - lazydocker
+      - just
+      - tree-sitter-cli
+
+      # ==========================================
+      # Scripting & Programming Environments
+      # ==========================================
+      - lua
+      - luarocks
+      - uv
+
+      # ==========================================
+      # File Management, Sync & Downloading
+      # ==========================================
+      - lf
+      - rsync
+      - rclone
+      - aria2
+      - qbittorrent
+
+      # ==========================================
+      # Image & Document Viewers
+      # ==========================================
+      - feh
+      - nsxiv
+      - zathura
+      - calibre
+
+      # ==========================================
+      # Security & Dotfiles
+      # ==========================================
+      - gopass
       - oath-toolkit
       - pinentry-gtk
+      - stow
+
+      # ==========================================
+      # Desktop Environment, Theming & Appearance
+      # ==========================================
+      - alacritty
+      - rofi
+      - dunst
+      - gammastep
+      - nwg-look
+      - qt6ct
+      - breeze-gtk
       - breeze-icons
+
+      # ==========================================
+      # Fonts
+      # ==========================================
       - terminus-font
-      - android-tools
       - noto-fonts-cjk
-      - translate-shell
-      - tree-sitter-cli
       - noto-fonts-emoji
       - nerd-fonts-symbols-ttf
-    state: present
 
 - name: Download and install Bitwarden CLI
   become: true

@@ -1,73 +1,120 @@
 - name: Ensure common cli tools are installed
   become: true
   community.general.pacman:
+    state: present
     name:
-      - jq
-      - uv
-      - fd
-      - lf
-      - mpc
-      - xsv
-      - bat
-      - feh
-      - fzf
-      - mpd
-      - git
-      - lua
-      - eza
-      - mpv
-      - less
-      - lsof
-      - tmux
-      - just
-      - stow
-      - rofi
-      - aria2
-      - dunst
-      - atuin
-      - qt6ct
-      - steam
-      - nsxiv
-      - rsync
-      - zoxide
-      - bottom
-      - yt-dlp
-      - rclone
-      - gopass
-      - jujutsu
-      - ripgrep
-      - pcmanfm
-      - ncmpcpp
-      - zathura
-      - lazygit
-      - calibre
-      - ntfs-3g
-      - poppler
-      - luarocks
-      - pipewire
-      - nwg-look
-      - hyperfine
-      - xdg-utils
-      - fastfetch
-      - trash-cli
-      - alacritty
-      - gammastep
-      - lazydocker
-      - github-cli
-      - python-pip
-      - breeze-gtk
-      - imagemagick
-      - qbittorrent
-      - pavucontrol
-      - breeze-icons
-      - oath-toolkit
-      - terminus-font
-      - android-tools
-      - noto-fonts-cjk
+      # ==========================================
+      # Core System & Hardware
+      # ==========================================
       - networkmanager
       - zram-generator
+      - ntfs-3g
+      - lsof
+      - xdg-utils
+      - android-tools
+
+      # ==========================================
+      # Audio & Multimedia Stack
+      # ==========================================
+      - pipewire
+      - pavucontrol
+      - mpd
+      - mpc
+      - ncmpcpp
+      - mpv
+      - yt-dlp
+
+      # ==========================================
+      # Modern CLI Upgrades (Rust/Go Alternatives)
+      # ==========================================
+      - bat
+      - eza
+      - fd
+      - ripgrep
+      - fzf
+      - zoxide
+      - atuin
+      - bottom
+      - fastfetch
+
+      # ==========================================
+      # General Terminal Utilities
+      # ==========================================
+      - tmux
+      - less
+      - trash-cli
       - translate-shell
+      - jq
+      - xsv
+      - hyperfine
+      - imagemagick
+
+      # ==========================================
+      # Development & Version Control
+      # ==========================================
+      - git
+      - github-cli
+      - lazygit
+      - jujutsu
+      - lazydocker
+      - just
       - tree-sitter-cli
+
+      # ==========================================
+      # Scripting & Programming Environments
+      # ==========================================
+      - lua
+      - luarocks
+      - python-pip
+      - uv
+
+      # ==========================================
+      # File Management, Sync & Downloading
+      # ==========================================
+      - lf
+      - pcmanfm
+      - rsync
+      - rclone
+      - aria2
+      - qbittorrent
+
+      # ==========================================
+      # Image & Document Viewers
+      # ==========================================
+      - feh
+      - nsxiv
+      - zathura
+      - poppler
+      - calibre
+
+      # ==========================================
+      # Security & Dotfiles
+      # ==========================================
+      - gopass
+      - oath-toolkit
+      - stow
+
+      # ==========================================
+      # Desktop Environment, Theming & Appearance
+      # ==========================================
+      - alacritty
+      - rofi
+      - dunst
+      - gammastep
+      - nwg-look
+      - qt6ct
+      - breeze-gtk
+      - breeze-icons
+
+      # ==========================================
+      # Fonts
+      # ==========================================
+      - terminus-font
+      - noto-fonts-cjk
       - noto-fonts-emoji
       - ttf-nerd-fonts-symbols
-    state: present
+
+      # ==========================================
+      # Gaming
+      # ==========================================
+      - steam
