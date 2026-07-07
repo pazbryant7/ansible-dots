@@ -49,6 +49,11 @@
         rule: allow
         app: Deluge
 
+    - name: Allow qBittorrent
+      community.general.ufw:
+        rule: allow
+        app: qBittorrent
+
     - name: Limit SSH brute-force
       community.general.ufw:
         rule: limit
