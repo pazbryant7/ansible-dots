@@ -32,7 +32,6 @@
       - ripgrep
       - fzf
       - zoxide
-      - atuin
       - bottom
       - fastfetch
       - tealdeer
