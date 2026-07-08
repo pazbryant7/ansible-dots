@@ -84,6 +84,7 @@
       - nsxiv
       - zathura
       - calibre
+      - zathura-pdf-mupdf
 
       # ==========================================
       # Security & Dotfiles
