@@ -4,6 +4,7 @@
     name:
       - cronie
       - chrony
+      - elogind
       - socklog-void
     state: present
 
@@ -16,6 +17,7 @@
   loop:
     - dbus
     - cronie
+    - elogind
     - chronyd
     - nanoklogd
     - socklog-unix
