@@ -5,5 +5,5 @@
 
 - name: Register current OS
   ansible.builtin.set_fact:
-    host_os: "{{ ansible_distribution | lower }}"
+    host_os: "{{ ansible_distribution | lower | replace(' ', '') }}"
   when: host_os is not defined
