@@ -7,7 +7,6 @@ bootstrap_roles:
 default_roles:
   - cli
   - zsh
-  - ufw
   - mise
   - system
   - rclone
