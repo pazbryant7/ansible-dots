@@ -1,0 +1,33 @@
+- name: Setup pacman
+  become: true
+  vars:
+    pacman_conf: /etc/pacman.conf
+  block:
+    - name: Enable pacman ParallelDownloads
+      ansible.builtin.lineinfile:
+        path: "{{ pacman_conf }}"
+        regexp: '^#?ParallelDownloads\s*='
+        line: "ParallelDownloads = 5"
+        backup: true
+
+    - name: Enable pacman Color
+      ansible.builtin.lineinfile:
+        path: "{{ pacman_conf }}"
+        regexp: '^#?\s*Color\s*$'
+        line: "Color"
+        insertafter: '^\[options\]'
+        backup: true
+
+    - name: Enable pacman ILoveCandy
+      ansible.builtin.lineinfile:
+        path: "{{ pacman_conf }}"
+        regexp: '^#?\s*ILoveCandy\s*$'
+        line: "ILoveCandy"
+        insertafter: '^\[options\]'
+
+    - name: Enable multilib repository
+      ansible.builtin.replace:
+        path: "{{ pacman_conf }}"
+        regexp: '^#\s*\[multilib\]\n#\s*Include = /etc/pacman.d/mirrorlist'
+        replace: '[multilib]\nInclude = /etc/pacman.d/mirrorlist'
+        backup: true

@@ -1,24 +1,7 @@
-- name: Regenerate initramfs for microcode (arch)
+- name: Update bootloader config for microcode (artix)
   become: true
-  block:
-    - name: Regenerate mkinitcpio
-      ansible.builtin.command:
-        cmd: mkinitcpio -P
-      register: mkinitcpio_result
-      changed_when: true
-
-    - name: Regenerate GRUB config (only if GRUB is installed)
-      become: true
-      ansible.builtin.shell:
-        cmd: |
-          if command -v grub-mkconfig >/dev/null 2>&1 && [ -d /boot/grub ]; then
-            grub-mkconfig -o /boot/grub/grub.cfg
-            echo CHANGED
-          else
-            echo "GRUB not detected, skipping"
-          fi
-      register: grub_result
-      changed_when: "'CHANGED' in grub_result.stdout"
+  ansible.builtin.command:
+    cmd: grub-mkconfig -o /boot/grub/grub.cfg
 
 - name: Regenerate initramfs for microcode (void)
   become: true

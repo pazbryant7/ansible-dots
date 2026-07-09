@@ -32,7 +32,7 @@ The `os` variable in the justfile routes every command to the right
 .
 ├── docker/
 │   ├── arch/
-│   │   ├── Dockerfile          # archlinux:base + ansible + galaxy (arch)
+│   │   ├── Dockerfile          # artix:base + ansible + galaxy (arch)
 │   │   └── docker-compose.yml
 ├── requirements/
 │   ├── arch.yml                # kewlfft.aur + moreati.uv

@@ -1,3 +1,0 @@
-- name: Regenerate mkinitcpio binary image
-  become: true
-  ansible.builtin.command: mkinitcpio -P

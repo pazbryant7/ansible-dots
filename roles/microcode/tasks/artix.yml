@@ -33,4 +33,4 @@
     state: present
     update_cache: true
   when: ucode_pkg != ''
-  notify: Regenerate initramfs for microcode (arch)
+  notify: Update bootloader config for microcode (artix)

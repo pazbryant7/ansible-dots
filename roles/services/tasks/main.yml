@@ -6,3 +6,93 @@
 - name: Run tasks for {{ host_os }}
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
+
+- name: Copy script to the target system
+  become: true
+  ansible.builtin.copy:
+    src: "files/common/backup-notes"
+    dest: "/usr/local/bin/backup-notes"
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Create hourly cron task for the regular user
+  ansible.builtin.cron:
+    name: "Execute backup-notes once per hour"
+    minute: "0"
+    hour: "*"
+    day: "*"
+    month: "*"
+    weekday: "*"
+    user: "{{ host_user }}"
+    job: "/usr/local/bin/backup-notes"
+
+- name: Setup docker group
+  become: true
+  block:
+    - name: Ensure the docker group exists
+      ansible.builtin.group:
+        name: docker
+        state: present
+
+    - name: Ensure the user is in the docker group
+      ansible.builtin.user:
+        name: "{{ host_user }}"
+        groups: docker
+        append: true
+
+- name: Configure UFW firewall
+  become: true
+  # Removed the fragile iptables_status condition so it always configures safely
+  block:
+    - name: Ensure UFW is enabled and active (loads rules)
+      community.general.ufw:
+        state: enabled
+
+    - name: Allow UFW forwarding for Docker
+      ansible.builtin.lineinfile:
+        path: /etc/default/ufw
+        regexp: "^DEFAULT_FORWARD_POLICY="
+        line: 'DEFAULT_FORWARD_POLICY="ACCEPT"'
+
+    - name: Set default policies
+      community.general.ufw:
+        direction: "{{ ufw_item.direction }}"
+        default: "{{ ufw_item.policy }}"
+      loop:
+        - { direction: "incoming", policy: "deny" }
+        - { direction: "outgoing", policy: "allow" }
+      loop_control:
+        loop_var: ufw_item
+
+    - name: Allow LAN access
+      community.general.ufw:
+        rule: allow
+        from_ip: 192.168.0.0/24
+
+    - name: Allow Docker networks
+      community.general.ufw:
+        rule: allow
+        from_ip: 172.16.0.0/12
+
+    - name: Allow Deluge (Incoming default ports)
+      community.general.ufw:
+        rule: allow
+        port: "58846"
+        proto: tcp
+
+    - name: Allow qBittorrent (Incoming default BT ports)
+      community.general.ufw:
+        rule: allow
+        port: "6881"
+        proto: any
+
+    - name: Limit SSH brute-force (Standard Port 22 fallback)
+      community.general.ufw:
+        rule: limit
+        port: "22"
+        proto: tcp
+
+    - name: Enable UFW
+      community.general.ufw:
+        state: enabled

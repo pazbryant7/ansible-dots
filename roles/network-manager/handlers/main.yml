@@ -1,3 +1,0 @@
-- name: Bring up NetworkManager connection
-  ansible.builtin.command: nmcli connection up "{{ nm_connection_name }}"
-  changed_when: true

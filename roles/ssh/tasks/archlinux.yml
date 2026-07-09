@@ -1,5 +1,0 @@
-- name: Ensure openssh is installed
-  become: true
-  community.general.pacman:
-    name: "openssh"
-    state: present

@@ -4,14 +4,12 @@
     state: present
     name:
       # ==========================================
-      # Core System & Hardware
+      # Core System, Hardware & Runit Additions
       # ==========================================
-      - networkmanager
-      - zram-generator
-      - ntfs-3g
       - lsof
       - xdg-utils
       - android-tools
+      - pipewire-runit
 
       # ==========================================
       # Audio & Multimedia Stack
@@ -64,14 +62,12 @@
       # ==========================================
       - lua
       - luarocks
-      - python-pip
       - uv
 
       # ==========================================
       # File Management, Sync & Downloading
       # ==========================================
       - lf
-      - pcmanfm
       - rsync
       - rclone
       - aria2
@@ -83,7 +79,6 @@
       - feh
       - nsxiv
       - zathura
-      - poppler
       - calibre
 
       # ==========================================

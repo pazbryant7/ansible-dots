@@ -1,23 +1,30 @@
-- name: Ensure packages are installed via xbps
+- name: Ensure packages and their runit services are installed
   become: true
-  community.general.xbps:
+  community.general.pacman:
     name:
       - ufw
       - dbus
       - cronie
-      - chrony
-      - cronie
       - docker
+      - chrony
+      - socklog
       - elogind
-      - socklog-void
+      - ufw-runit
+      - dbus-runit
+      - chrony-runit
+      - cronie-runit
+      - docker-runit
+      - elogind-runit
+      - socklog-runit
       - docker-buildx
+      - docker-compose
     state: present
 
 - name: Enable system services via runit
   become: true
   ansible.builtin.file:
     src: "/etc/sv/{{ item }}"
-    dest: "/var/service/{{ item }}"
+    dest: "/run/runit/service/{{ item }}"
     state: link
   loop:
     - ufw
@@ -26,7 +33,6 @@
     - docker
     - elogind
     - chronyd
-    - nanoklogd
     - socklog-unix
 
 - name: Add current user to socklog group

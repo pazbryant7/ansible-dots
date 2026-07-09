@@ -3,3 +3,10 @@
   community.general.xbps:
     name: openssh
     state: present
+
+- name: Enable and start SSH daemon via runit
+  become: true
+  ansible.builtin.file:
+    src: /etc/sv/sshd
+    dest: /var/service/sshd
+    state: link

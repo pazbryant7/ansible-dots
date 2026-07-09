@@ -13,13 +13,10 @@ default_roles:
   - rclone
   - ffmpeg
   - github
-  - docker
   - services
-  - crontab
   - dotfiles
   - microcode
   - sudo-scripts
-  - network-manager
 
 display_server_roles:
   - xorg

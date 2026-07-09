@@ -15,7 +15,6 @@
           - xorg-server
           - xorg-xrandr
           - xorg-xsetroot
-          - xorg-server-xephyr
         state: present
 
     - name: Remove Wayland-related packages
@@ -25,7 +24,7 @@
 
     - name: Deploy vconsole configuration
       ansible.builtin.copy:
-        src: "files/archlinux/etc/vconsole.conf"
+        src: "files/artix/etc/vconsole.conf"
         dest: "/etc/vconsole.conf"
         owner: root
         group: root

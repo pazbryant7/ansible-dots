@@ -150,7 +150,7 @@ detect_init_system() {
 
 check_internet() {
   case "$DISTRO" in
-  arch) host="archlinux.org" ;;
+  arch) host="artix.org" ;;
   void) host="voidlinux.org" ;;
   esac
   info "Checking internet connectivity ($host)..."
@@ -923,16 +923,16 @@ check_distro_news() {
 check_arch_news() {
   if has_cmd curl; then
     info "Fetching latest Arch Linux news headlines..."
-    news=$(curl -s --max-time 10 "https://archlinux.org/feeds/news/" 2>/dev/null |
+    news=$(curl -s --max-time 10 "https://artix.org/feeds/news/" 2>/dev/null |
       grep -oP '(?<=<title>)[^<]+' | grep -v '^Arch Linux' | head -5)
     if [ -n "$news" ]; then
       info "Latest news:"
       printf "%s\n" "$news" | indent
     else
-      info "Could not fetch news. Visit: https://archlinux.org/news/"
+      info "Could not fetch news. Visit: https://artix.org/news/"
     fi
   else
-    info "curl not available. Check https://archlinux.org/news/ manually."
+    info "curl not available. Check https://artix.org/news/ manually."
   fi
 }
 
@@ -966,7 +966,7 @@ print_summary() {
 
   printf "\n  ${CYAN}Remember to check for distro-specific manual interventions:${NC}\n"
   case "$DISTRO" in
-  arch) printf "  ${CYAN}https://archlinux.org/news/${NC}\n\n" ;;
+  arch) printf "  ${CYAN}https://artix.org/news/${NC}\n\n" ;;
   void) printf "  ${CYAN}https://voidlinux.org${NC}\n\n" ;;
   esac
 

@@ -1,0 +1,14 @@
+- name: Ensure OpenSSH and runit scripts are installed
+  become: true
+  community.general.pacman:
+    name:
+      - openssh
+      - openssh-runit
+    state: present
+
+- name: Enable and start SSH daemon via runit
+  become: true
+  ansible.builtin.file:
+    src: /etc/sv/sshd
+    dest: /run/runit/service/sshd
+    state: link

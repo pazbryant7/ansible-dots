@@ -1,4 +1,4 @@
-FROM archlinux:base
+FROM artixlinux/artixlinux:base
 
 RUN pacman -Syu --noconfirm \
   && pacman -S --noconfirm python sudo ansible \
@@ -15,7 +15,7 @@ USER ${TEST_USER}
 
 WORKDIR /ansible
 
-ARG DISTRO=arch
+ARG DISTRO=artix
 
 COPY --chown=${TEST_USER} requirements/ requirements/
 

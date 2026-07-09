@@ -1,13 +1,13 @@
-name: ansible-arch
+name: ansible-artix
 services:
   ansible:
     build:
       context: ../../
-      dockerfile: docker/arch/Dockerfile
+      dockerfile: docker/artix/Dockerfile
       args:
         TEST_USER: testuser
-    image: ansible-arch-dev:latest
-    container_name: ansible-arch-test
+    image: ansible-artix-dev:latest
+    container_name: ansible-artix-test
     volumes:
       - ../../:/ansible
       - ../../.secrets:/ansible/.secrets:ro
