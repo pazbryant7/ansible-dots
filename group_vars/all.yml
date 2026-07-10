@@ -12,9 +12,9 @@ default_roles:
   - rclone
   - ffmpeg
   - github
+  - drivers
   - services
   - dotfiles
-  - microcode
   - sudo-scripts
 
 display_server_roles:

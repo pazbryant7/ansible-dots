@@ -1,0 +1,89 @@
+- name: Install hardware (GPU/CPU) drivers on Void Linux
+  vars:
+    gpu_driver_map:
+      intel:
+        packages:
+          - mesa-dri
+          - libglvnd
+          - mesa-vulkan-intel
+      amd:
+        packages:
+          - mesa-dri
+          - libglvnd
+          - mesa-vulkan-radeon
+      nvidia:
+        packages:
+          - nvidia
+          - nvidia-libs-32bit
+    cpu_microcode_map:
+      intel: intel-ucode
+      amd: linux-firmware-amd
+  become: true
+  block:
+    - name: Read PCI device info (GPU detection)
+      ansible.builtin.command: lspci -k
+      register: lspci_output
+      changed_when: false
+
+    - name: Determine GPU vendor from lspci output
+      ansible.builtin.set_fact:
+        gpu_vendor: >-
+          {%- if 'VGA compatible controller: Intel' in lspci_output.stdout
+                or '3D controller: Intel' in lspci_output.stdout -%}
+          intel {%- elif 'VGA compatible controller: NVIDIA' in
+          lspci_output.stdout
+                or '3D controller: NVIDIA' in lspci_output.stdout -%}
+          nvidia {%- elif 'VGA compatible controller: Advanced Micro Devices' in
+          lspci_output.stdout
+                or '3D controller: Advanced Micro Devices' in
+          lspci_output.stdout -%} amd {%- else -%} unknown {%- endif -%}
+
+    - name: Fail early if GPU vendor is unrecognized
+      ansible.builtin.fail:
+        msg: >-
+          Could not determine GPU vendor automatically from `lspci -k`. Please
+          install the appropriate mesa/nvidia packages manually.
+      when: gpu_vendor == 'unknown'
+
+    - name: Determine CPU vendor from gathered facts
+      ansible.builtin.set_fact:
+        cpu_vendor: >-
+          {%- set procstr = ansible_facts.processor | join(' ') -%} {%- if
+          'GenuineIntel' in procstr -%} intel {%- elif 'AuthenticAMD' in procstr
+          -%} amd {%- else -%} unknown {%- endif -%}
+
+    - name: Report detected hardware
+      ansible.builtin.debug:
+        msg:
+          "Detected GPU vendor: {{ gpu_vendor }} | Detected CPU vendor: {{
+          cpu_vendor }}"
+
+    - name: Install GPU driver packages
+      community.general.xbps:
+        name: "{{ gpu_driver_map[gpu_vendor].packages }}"
+        state: present
+        update_cache: true
+
+    - name: Install CPU microcode package
+      community.general.xbps:
+        name: "{{ cpu_microcode_map[cpu_vendor] }}"
+        state: present
+      when: cpu_vendor in cpu_microcode_map
+      notify: Regenerate initramfs for microcode (void)
+
+    - name:
+        Ensure target user is in the video group (required for /dev/dri access)
+      ansible.builtin.user:
+        name:
+          "{{ target_user | default(ansible_env.SUDO_USER) |
+          default(ansible_user_id) }}"
+        groups: video
+        append: true
+      register: video_group_result
+
+    - name: Remind about re-login if group membership changed
+      ansible.builtin.debug:
+        msg: >-
+          User was just added to the 'video' group — log out/in (or reboot) for
+          this to take effect.
+      when: video_group_result.changed
