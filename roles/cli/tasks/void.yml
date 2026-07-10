@@ -248,3 +248,15 @@
           0)
              else 'Install step completed.' }}
       when: built_packages | length > 0
+
+- name: Void Linux installation cleanup
+  become: true
+  community.general.xbps:
+    state: absent
+    name:
+      - lvm2
+      - mdadm
+      - dialog
+      - cryptsetup
+      - void-live-audio
+      - void-docs-browse
