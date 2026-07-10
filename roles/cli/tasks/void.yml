@@ -12,6 +12,9 @@
       - xtools
       - curl
       - piper
+      - gcc
+      - make
+      - freetype-devel
 
       # ==========================================
       # Audio & Multimedia Stack

@@ -5,15 +5,14 @@
       become: true
       community.general.xbps:
         name:
-          - gcc
           - xev
           - maim
           - xrdb
-          - make
           - xinit
           - picom
           - xclip
           - xrandr
+          - setxkbmap
           - xcolor
           - xdotool
           - xsetroot
@@ -21,7 +20,6 @@
           - xorg-minimal
           - libXft-devel
           - libX11-devel
-          - freetype-devel
           - libXinerama-devel
         state: present
 
