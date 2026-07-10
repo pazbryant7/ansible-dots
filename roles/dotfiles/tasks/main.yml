@@ -7,32 +7,99 @@
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
 
-- name: Ensure clone dotfiles
+- name: Clone dotfiles repositories
   become: false
   ansible.builtin.git:
-    repo: "git@personal.github:pazbryant7/dotfiles.git"
-    dest: "{{ dots_path }}"
+    repo: "git@personal.github:pazbryant7/{{ item }}.git"
+    dest: "{{ repos_path }}/{{ item }}"
     version: main
     depth: 1
     update: false
     recursive: true
     accept_newhostkey: true
+  loop:
+    - nvim
+    - dotfiles
 
-- name: Stow dotfiles (adopting conflicting system files)
-  ansible.builtin.command:
-    cmd:
-      stow --dir="{{ dots_path }}" --target="{{ ansible_user_dir }}" --adopt
-      --restow .
-  args:
-    chdir: "{{ dots_path }}"
-  register: stow_result
-  changed_when: false
-  failed_when: stow_result.rc != 0
+- name: Stow dotfiles
+  block:
+    - name: Ensure base directories exist
+      ansible.builtin.file:
+        path: "{{ ansible_user_dir }}/{{ item }}"
+        state: directory
+        mode: "0755"
+      loop:
+        - .config
 
-- name: Discard adopted system files so dotfiles repo versions win
-  ansible.builtin.command:
-    cmd: git restore .
-  args:
-    chdir: "{{ dots_path }}"
-  register: git_result
-  changed_when: false
+    - name: Stow dotfiles (adopting conflicting system files)
+      ansible.builtin.command:
+        cmd:
+          stow --dir="{{ dots_path }}" --target="{{ ansible_user_dir }}" --adopt
+          --restow .
+      args:
+        chdir: "{{ dots_path }}"
+      register: stow_result
+      changed_when: false
+      failed_when: stow_result.rc != 0
+
+    - name: Discard adopted system files so dotfiles repo versions win
+      ansible.builtin.command:
+        cmd: git restore .
+      args:
+        chdir: "{{ dots_path }}"
+      register: git_result
+      changed_when: false
+
+- name: Setup neovim
+  block:
+    - name: Check existing neovim configuration path
+      become: false
+      ansible.builtin.stat:
+        path: "{{ xdg_path }}/nvim"
+      register: nvim_dir_stat
+
+    - name: Remove neovim config folder if it exists as a standard directory
+      become: false
+      ansible.builtin.file:
+        path: "{{ xdg_path }}/nvim"
+        state: absent
+      when:
+        nvim_dir_stat.stat.exists and nvim_dir_stat.stat.isdir and not
+        nvim_dir_stat.stat.islnk
+
+    - name: Symlink neovim configuration
+      become: false
+      ansible.builtin.file:
+        src: "{{ repos_path }}/nvim"
+        dest: "{{ xdg_path }}/nvim"
+        state: link
+        force: true
+
+    - name: Copy nvim.desktop file to applications directory
+      become: true
+      ansible.builtin.copy:
+        src: files/common/nvim.desktop
+        dest: /usr/share/applications/nvim.desktop
+        owner: root
+        group: root
+        mode: "0644"
+
+- name: Update ansible-dots remote
+  block:
+    - name: Get current origin remote URL
+      ansible.builtin.command:
+        cmd: git remote get-url origin
+      args:
+        chdir: "{{ repos_path }}/ansible-dots"
+      register: origin_url
+      changed_when: false
+      failed_when: origin_url.rc != 0
+
+    - name: Set origin remote to use SSH (work.github)
+      ansible.builtin.command:
+        cmd: >-
+          git remote set-url origin {{ origin_url.stdout |
+          regex_replace('^https://github\.com/', 'git@work.github:') }}
+      args:
+        chdir: "{{ repos_path }}/ansible-dots"
+      when: origin_url.stdout is match('^https://github\.com/')
