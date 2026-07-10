@@ -1,16 +1,14 @@
 - name: Setup Xorg environment
   become: true
   block:
-    - name: Install required Xorg packages (Arch)
+    - name: Install required Xorg packages (Artix)
       community.general.pacman:
         name:
           - maim
           - picom
           - xclip
-          - xcolor
           - xdotool
           - xorg-xev
-          - screenkey
           - xorg-xinit
           - xorg-server
           - xorg-xrandr
@@ -24,7 +22,7 @@
 
     - name: Deploy vconsole configuration
       ansible.builtin.copy:
-        src: "files/artix/etc/vconsole.conf"
+        src: "files/artixlinux/etc/vconsole.conf"
         dest: "/etc/vconsole.conf"
         owner: root
         group: root

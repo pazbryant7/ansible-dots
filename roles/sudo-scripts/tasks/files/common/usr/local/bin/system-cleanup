@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 # =============================================================================
-# Arch / Void Linux System Maintenance Script
+# Artix / Void Linux System Maintenance Script
 # Auto-detects the distro (and init system) and runs the matching steps.
 # =============================================================================
 
@@ -102,7 +102,7 @@ has_cmd() {
 
 distro_label() {
   case "$DISTRO" in
-  arch) printf 'Arch' ;;
+  artix) printf 'Artix' ;;
   void) printf 'Void' ;;
   *) printf '%s' "$DISTRO" ;;
   esac
@@ -111,7 +111,7 @@ distro_label() {
 is_package_installed() {
   pkg="$1"
   case "$DISTRO" in
-  arch) pacman -Qq "$pkg" >/dev/null 2>&1 ;;
+  artix) pacman -Qq "$pkg" >/dev/null 2>&1 ;;
   void) xbps-query "$pkg" >/dev/null 2>&1 ;;
   esac
 }
@@ -132,9 +132,9 @@ detect_distro() {
     DISTRO=$(. /etc/os-release && printf '%s' "$ID")
   fi
   case "$DISTRO" in
-  arch | void) ;;
+  artix | void) ;;
   *)
-    error "Unsupported or undetected distro: '$DISTRO'. This script supports Arch and Void."
+    error "Unsupported or undetected distro: '$DISTRO'. This script supports Artix and Void."
     exit 1
     ;;
   esac
@@ -150,7 +150,7 @@ detect_init_system() {
 
 check_internet() {
   case "$DISTRO" in
-  arch) host="artix.org" ;;
+  artix) host="artix.org" ;;
   void) host="voidlinux.org" ;;
   esac
   info "Checking internet connectivity ($host)..."
@@ -168,7 +168,7 @@ check_internet() {
 upgrade_system() {
   section "System Upgrade"
   case "$DISTRO" in
-  arch)
+  artix)
     info "Running full system upgrade (pacman -Syu)..."
     if pacman -Syu; then
       ok "System upgrade complete."
@@ -261,7 +261,7 @@ check_microcode() {
     ;;
   AuthenticAMD)
     case "$DISTRO" in
-    arch) ucode_pkg="amd-ucode" ;;
+    artix) ucode_pkg="amd-ucode" ;;
     void) ucode_pkg="linux-firmware-amd" ;;
     esac
     ;;
@@ -295,7 +295,7 @@ check_kernel_updates() {
 
   running_kernel=$(uname -r)
   case "$DISTRO" in
-  arch) installed_kernel=$(pacman -Q linux 2>/dev/null | awk '{print $2}') ;;
+  artix) installed_kernel=$(pacman -Q linux 2>/dev/null | awk '{print $2}') ;;
   void) installed_kernel=$(xbps-query -l 2>/dev/null | awk '{print $2}' | grep -E '^linux[0-9]' | head -1) ;;
   esac
 
@@ -324,7 +324,7 @@ check_kernel_updates() {
 remove_orphans() {
   section "Orphaned Packages"
   case "$DISTRO" in
-  arch) remove_orphans_pacman ;;
+  artix) remove_orphans_pacman ;;
   void) remove_orphans_xbps ;;
   esac
   section_end
@@ -368,8 +368,8 @@ remove_orphans_xbps() {
 cleanup_old_kernels() {
   section "Old Kernels"
   case "$DISTRO" in
-  arch)
-    info "Arch Linux removes old kernels automatically during package upgrades."
+  artix)
+    info "Artix Linux removes old kernels automatically during package upgrades."
     ;;
   void)
     if has_cmd vkpurge; then
@@ -398,7 +398,7 @@ cleanup_old_kernels() {
 clean_package_cache() {
   section "Package Cache"
   case "$DISTRO" in
-  arch) clean_pacman_cache ;;
+  artix) clean_pacman_cache ;;
   void) clean_xbps_cache ;;
   esac
   section_end
@@ -465,13 +465,13 @@ clean_aur_cache() {
 update_mirrors() {
   section "Mirror List"
   case "$DISTRO" in
-  arch) update_arch_mirrorlist ;;
+  artix) update_artix_mirrorlist ;;
   void) show_void_mirror_info ;;
   esac
   section_end
 }
 
-update_arch_mirrorlist() {
+update_artix_mirrorlist() {
   if has_cmd reflector; then
     info "Updating mirrorlist with reflector (fastest 10 HTTPS mirrors synced within 12h)..."
     if reflector \
@@ -507,7 +507,7 @@ handle_stale_config_files() {
   section "Stale Config Files"
 
   case "$DISTRO" in
-  arch)
+  artix)
     info "Scanning /etc for .pacnew / .pacsave files..."
     if has_cmd fd; then
       stale_files=$(fd -H '\.pac(new|save)$' /etc 2>/dev/null || true)
@@ -529,7 +529,7 @@ handle_stale_config_files() {
     warn "Found config files requiring manual review:"
     printf "%s\n" "$stale_files" | indent
     case "$DISTRO" in
-    arch) info "Use 'pacdiff' or 'vimdiff' to merge changes." ;;
+    artix) info "Use 'pacdiff' or 'vimdiff' to merge changes." ;;
     void) info "Review each '.new' file and merge manually, then remove it." ;;
     esac
   else
@@ -862,13 +862,13 @@ cleanup_runit_logs() {
 rebuild_initramfs() {
   section "Initramfs Rebuild"
   case "$DISTRO" in
-  arch) rebuild_initramfs_arch ;;
+  artix) rebuild_initramfs_artix ;;
   void) rebuild_initramfs_void ;;
   esac
   section_end
 }
 
-rebuild_initramfs_arch() {
+rebuild_initramfs_artix() {
   if confirm "Rebuild initramfs (mkinitcpio -P)? Recommended after kernel/hook changes."; then
     info "Rebuilding initramfs for all presets..."
     mkinitcpio -P | indent
@@ -914,17 +914,17 @@ check_failed_crons() {
 check_distro_news() {
   section "Distribution News"
   case "$DISTRO" in
-  arch) check_arch_news ;;
+  artix) check_artix_news ;;
   void) check_void_news ;;
   esac
   section_end
 }
 
-check_arch_news() {
+check_artix_news() {
   if has_cmd curl; then
-    info "Fetching latest Arch Linux news headlines..."
+    info "Fetching latest Artix Linux news headlines..."
     news=$(curl -s --max-time 10 "https://artix.org/feeds/news/" 2>/dev/null |
-      grep -oP '(?<=<title>)[^<]+' | grep -v '^Arch Linux' | head -5)
+      grep -oP '(?<=<title>)[^<]+' | grep -v '^Artix Linux' | head -5)
     if [ -n "$news" ]; then
       info "Latest news:"
       printf "%s\n" "$news" | indent
@@ -937,7 +937,7 @@ check_arch_news() {
 }
 
 check_void_news() {
-  info "Void Linux doesn't publish a formal news feed like Arch."
+  info "Void Linux doesn't publish a formal news feed like Artix."
   info "Check the void-packages changelog for manual intervention notes:"
   info "  https://github.com/void-linux/void-packages/commits/master"
   info "Or check announcements at: https://voidlinux.org"
@@ -966,7 +966,7 @@ print_summary() {
 
   printf "\n  ${CYAN}Remember to check for distro-specific manual interventions:${NC}\n"
   case "$DISTRO" in
-  arch) printf "  ${CYAN}https://artix.org/news/${NC}\n\n" ;;
+  artix) printf "  ${CYAN}https://artix.org/news/${NC}\n\n" ;;
   void) printf "  ${CYAN}https://voidlinux.org${NC}\n\n" ;;
   esac
 
@@ -987,7 +987,7 @@ main() {
 
   printf "\n${BOLD}╔══════════════════════════════════════════════════╗${NC}\n"
   case "$DISTRO" in
-  arch) printf "${BOLD}║     Arch Linux System Maintenance Script         ║${NC}\n" ;;
+  artix) printf "${BOLD}║     Artix Linux System Maintenance Script         ║${NC}\n" ;;
   void) printf "${BOLD}║     Void Linux System Maintenance Script         ║${NC}\n" ;;
   esac
   printf "${BOLD}╚══════════════════════════════════════════════════╝${NC}\n\n"
@@ -1007,7 +1007,7 @@ main() {
   remove_orphans
   cleanup_old_kernels
   clean_package_cache
-  [ "$DISTRO" = "arch" ] && clean_aur_cache
+  [ "$DISTRO" = "artix" ] && clean_aur_cache
   handle_stale_config_files
 
   trim_ssd

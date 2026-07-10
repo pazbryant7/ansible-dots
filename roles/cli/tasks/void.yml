@@ -132,8 +132,8 @@
         mode: "0644"
         force: true
 
-    - name: Unzip Bitwarden CLI archive
-      ansible.builtin.unarchive:
+    - name: Unzip Bitwarden CLI artixive
+      ansible.builtin.unartixive:
         src: "{{ bw_tmp_dir }}/bw.zip"
         dest: "{{ bw_tmp_dir }}"
         remote_src: true

@@ -15,7 +15,7 @@ the `docker/` internals directly.
 │  your repo/  ──bind-mount──►  /ansible  (container)        │
 │  .secrets/   ──bind-mount──►  /ansible/.secrets  (ro)      │
 │                                                             │
-│  just [os=arch] <recipe>                             │
+│  just [os=artix] <recipe>                             │
 │       └─► docker compose -f docker/<os>/docker-compose.yml │
 │                 └─► ansible-playbook local.yml              │
 └─────────────────────────────────────────────────────────────┘
@@ -31,11 +31,11 @@ The `os` variable in the justfile routes every command to the right
 ```
 .
 ├── docker/
-│   ├── arch/
-│   │   ├── Dockerfile          # artix:base + ansible + galaxy (arch)
+│   ├── artix/
+│   │   ├── Dockerfile          # artix:base + ansible + galaxy (artix)
 │   │   └── docker-compose.yml
 ├── requirements/
-│   ├── arch.yml                # kewlfft.aur + moreati.uv
+│   ├── artix.yml                # kewlfft.aur + moreati.uv
 ├── roles/
 ├── local.yml
 └── justfile                    ← single entrypoint for everything
@@ -43,7 +43,7 @@ The `os` variable in the justfile routes every command to the right
 
 ### Why two requirements files?
 
-`kewlfft.aur` is an AUR-only module — it has no meaning outside Arch.
+`kewlfft.aur` is an AUR-only module — it has no meaning outside Artix.
 `moreati.uv` is cross-platform and is included in both files. Each Dockerfile
 bakes in the right requirements at build time so `just run` never re-downloads
 collections on every test cycle.
@@ -59,7 +59,7 @@ on a macOS host — no container path exists for it.
 
 ## Prerequisites
 
-| Tool                                          | Minimum version           | Install (Arch)          |
+| Tool                                          | Minimum version           | Install (Artix)          |
 | --------------------------------------------- | ------------------------- | ----------------------- |
 | [Docker](https://docs.docker.com/get-docker/) | 24+ (Compose v2 built-in) | `sudo pacman -S docker` |
 | [just](https://github.com/casey/just)         | 1.14+                     | `sudo pacman -S just`   |
@@ -81,17 +81,17 @@ baked into any image.
 ### 2. Build the image
 
 ```sh
-just build              # arch (default)
+just build              # artix (default)
 ```
 
 Galaxy collections are installed during the build step, so subsequent runs are
 fast. Only re-run `just rebuild` when `requirements/<os>.yml` changes or after a
-long gap (Arch packages drift on rolling release).
+long gap (Artix packages drift on rolling release).
 
 ### 3. Run the playbook
 
 ```sh
-just run                                    # arch, zsh, xorg
+just run                                    # artix, zsh, xorg
 just shell=fish display_server=wayland run      # override defaults
 ```
 
@@ -160,14 +160,14 @@ All variables can be overridden on the command line:
 
 | Variable     | Default     | Description                                   |
 | ------------ | ----------- | --------------------------------------------- |
-| `os`         | `arch`      | Target OS (`arch`)                            |
+| `os`         | `artix`      | Target OS (`artix`)                            |
 | `shell`      | `zsh`       | Passed as `chosen_shell` to the playbook      |
 | `display_server` | `xorg`      | Passed as `display_server` to the playbook |
 | `playbook`   | `local.yml` | Playbook file to run                          |
 
 ```sh
-just os=arch shell=zsh display_server=wayland run
-just os=arch run-role role=neovim
+just os=artix shell=zsh display_server=wayland run
+just os=artix run-role role=neovim
 ```
 
 ---
@@ -189,17 +189,17 @@ working on:
 
 ```sh
 just run-role role=neovim
-just os=arch run-role role=cli
+just os=artix run-role role=cli
 ```
 
 **Checking before applying** — always a good idea for destructive roles:
 
 ```sh
 just check
-just os=arch check
+just os=artix check
 ```
 
-**Arch package drift** — rolling release means cached layers go stale. If
+**Artix package drift** — rolling release means cached layers go stale. If
 `pacman -S` starts failing with signature errors during a run, force a fresh
 build:
 

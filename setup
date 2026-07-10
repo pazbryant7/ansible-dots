@@ -55,7 +55,7 @@ fi
 if ! command -v ansible >/dev/null 2>&1; then
   info "Installing Ansible for $os..."
   case "$os" in
-  arch)
+  artix)
     sudo pacman -S --noconfirm ansible ansible-core ansible-lint || die "Pacman failed to install Ansible"
     ;;
   void)
@@ -113,7 +113,7 @@ printf "════════════════════════
 printf "\n══════════════════════════════════════════════════════════════════════════════\n"
 printf "  Steam Installation & Setup\n"
 printf "══════════════════════════════════════════════════════════════════════════════\n"
-printf "  [Arch Linux]\n"
+printf "  [Artix Linux]\n"
 printf "  • pacman -S steam\n\n"
 printf "  [Void Linux - i686]\n"
 printf "  • xbps-install -S steam (No extra packages needed)\n\n"

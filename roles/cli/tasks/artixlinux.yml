@@ -9,12 +9,14 @@
       - lsof
       - xdg-utils
       - android-tools
-      - pipewire-runit
 
       # ==========================================
       # Audio & Multimedia Stack
       # ==========================================
       - pipewire
+      - pipewire-pulse
+      - wireplumber
+      - btop
       - pavucontrol
       - mpd
       - mpc
@@ -31,7 +33,6 @@
       - ripgrep
       - fzf
       - zoxide
-      - bottom
       - fastfetch
 
       # ==========================================
@@ -40,9 +41,7 @@
       - tmux
       - less
       - trash-cli
-      - translate-shell
       - jq
-      - xsv
       - hyperfine
       - imagemagick
 
@@ -53,7 +52,6 @@
       - github-cli
       - lazygit
       - jujutsu
-      - lazydocker
       - just
       - tree-sitter-cli
 
@@ -85,6 +83,7 @@
       # Security & Dotfiles
       # ==========================================
       - gopass
+      - pinentry-gtk
       - oath-toolkit
       - stow
 
@@ -107,8 +106,3 @@
       - noto-fonts-cjk
       - noto-fonts-emoji
       - ttf-nerd-fonts-symbols
-
-      # ==========================================
-      # Gaming
-      # ==========================================
-      - steam
