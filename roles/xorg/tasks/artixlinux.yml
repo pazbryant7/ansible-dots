@@ -10,8 +10,8 @@
           - xdotool
           - xorg-xev
           - xorg-xinit
-          - xorg-server
           - xorg-xrandr
+          - xorg-server
           - xorg-xsetroot
         state: present
 

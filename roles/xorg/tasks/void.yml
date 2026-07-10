@@ -5,13 +5,19 @@
       become: true
       community.general.xbps:
         name:
+          - gcc
           - maim
+          - make
           - picom
           - xclip
           - xcolor
           - xdotool
           - xsetroot
           - screenkey
+          - libXft-devel
+          - libX11-devel
+          - freetype-devel
+          - libXinerama-devel
         state: present
 
     - name: Remove Wayland-related packages (Void)
