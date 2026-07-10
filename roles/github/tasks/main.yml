@@ -21,6 +21,24 @@
     - pass-backup
     - boilerplate
 
+- name: "Update ansible-dots remote"
+  block:
+    - name: Get current origin remote URL
+      ansible.builtin.command:
+        cmd: git remote get-url origin
+        chdir: "{{ repos_path }}/ansible-dots"
+      register: origin_url
+      changed_when: false
+      failed_when: origin_url.rc != 0
+
+    - name: Set origin remote to use SSH (work.github)
+      ansible.builtin.command:
+        cmd: >-
+          git remote set-url origin {{ origin_url.stdout
+             | regex_replace('^https://github\.com/', 'git@work.github:') }}
+      chdir: "{{ repos_path }}/ansible-dots"
+      when: origin_url.stdout is match('^https://github\.com/')
+
 - name: "Setup neovim"
   block:
     - name: Check existing neovim configuration path
