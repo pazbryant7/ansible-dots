@@ -10,6 +10,7 @@
       - xdg-utils
       - android-tools
       - xtools
+      - curl
       - piper
 
       # ==========================================
@@ -66,6 +67,7 @@
       # Scripting & Programming Environments
       # ==========================================
       - lua
+      - lua-devel
       - luarocks
       - uv
 
