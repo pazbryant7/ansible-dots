@@ -41,6 +41,7 @@
       # General Terminal Utilities
       # ==========================================
       - tmux
+      - tree
       - less
       - trash-cli
       - translate-shell
@@ -133,7 +134,7 @@
         force: true
 
     - name: Unzip Bitwarden CLI artixive
-      ansible.builtin.unartixive:
+      ansible.builtin.unarchive:
         src: "{{ bw_tmp_dir }}/bw.zip"
         dest: "{{ bw_tmp_dir }}"
         remote_src: true
