@@ -1,4 +1,5 @@
 - name: Set up explicit SSD fstrim script
+  become: true
   ansible.builtin.copy:
     dest: /etc/cron.weekly/fstrim
     content: |
