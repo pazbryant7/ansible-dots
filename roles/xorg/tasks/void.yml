@@ -13,6 +13,7 @@
           - xinit
           - picom
           - xclip
+          - xrandr
           - xcolor
           - xdotool
           - xsetroot
