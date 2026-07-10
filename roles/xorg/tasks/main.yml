@@ -15,6 +15,7 @@
       ansible.builtin.git:
         repo: "{{ personal_github }}/st.git"
         dest: "{{ repos_path }}/st"
+        depth: 1
         version: main
         update: false
 
@@ -39,6 +40,7 @@
     - name: Clone DWM repository
       ansible.builtin.git:
         repo: "{{ personal_github }}/dwm.git"
+        depth: 1
         dest: "{{ repos_path }}/dwm"
         version: main
         update: false
@@ -58,6 +60,7 @@
       ansible.builtin.git:
         repo: "{{ personal_github }}/slstatus.git"
         dest: "{{ repos_path }}/slstatus"
+        depth: 1
         version: main
         update: false
 
