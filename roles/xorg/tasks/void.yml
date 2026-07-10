@@ -8,12 +8,14 @@
           - gcc
           - maim
           - make
+          - xinit
           - picom
           - xclip
           - xcolor
           - xdotool
           - xsetroot
           - screenkey
+          - xorg-minimal
           - libXft-devel
           - libX11-devel
           - freetype-devel
