@@ -6,21 +6,18 @@
       community.general.xbps:
         name:
           - xev
-          - maim
           - xrdb
-          - xinit
+          - maim
           - picom
+          - xinit
           - xclip
-          - xrandr
-          - setxkbmap
           - xcolor
+          - xrandr
           - xdotool
           - xsetroot
+          - setxkbmap
           - screenkey
           - xorg-minimal
-          - libXft-devel
-          - libX11-devel
-          - libXinerama-devel
         state: present
 
     - name: Remove Wayland-related packages (Void)

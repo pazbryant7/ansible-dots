@@ -12,9 +12,6 @@
       - xtools
       - curl
       - piper
-      - gcc
-      - make
-      - freetype-devel
 
       # ==========================================
       # Audio & Multimedia Stack
@@ -63,16 +60,7 @@
       - lazygit
       - jujutsu
       - lazydocker
-      - just
       - tree-sitter-cli
-
-      # ==========================================
-      # Scripting & Programming Environments
-      # ==========================================
-      - lua
-      - lua-devel
-      - luarocks
-      - uv
 
       # ==========================================
       # File Management, Sync & Downloading
