@@ -10,13 +10,13 @@
 - name: Ensure clone dotfiles
   become: false
   ansible.builtin.git:
-    update: false
+    repo: "git@personal.github:pazbryant7/dotfiles.git"
+    dest: "{{ dots_path }}"
     version: main
+    depth: 1
+    update: false
     recursive: true
     accept_newhostkey: true
-    dest: "{{ dots_path }}"
-    repo: "git@personal.github:pazbryant7/dotfiles.git"
-  changed_when: true
 
 - name: Stow dotfiles (adopting conflicting system files)
   ansible.builtin.command:

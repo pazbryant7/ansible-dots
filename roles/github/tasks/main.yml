@@ -4,6 +4,7 @@
     repo: "git@personal.github:pazbryant7/{{ item }}.git"
     dest: "{{ repos_path }}/{{ item }}"
     version: main
+    depth: 1
     update: false
     recursive: true
     clone: true
