@@ -28,11 +28,9 @@
       # Modern CLI Upgrades (Rust/Go Alternatives)
       # ==========================================
       - bat
-      - eza
       - fd
       - ripgrep
       - fzf
-      - zoxide
       - bottom
       - fastfetch
       - tealdeer
