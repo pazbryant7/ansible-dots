@@ -7,6 +7,7 @@
         name:
           - gcc
           - maim
+          - xrdb
           - make
           - xinit
           - picom
