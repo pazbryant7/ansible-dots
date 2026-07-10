@@ -1,5 +1,0 @@
-- name: Install mise (Void Linux)
-  become: true
-  community.general.xbps:
-    name: mise
-    state: present
