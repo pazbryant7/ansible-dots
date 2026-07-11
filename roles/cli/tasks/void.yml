@@ -114,6 +114,9 @@
       - lvm2
       - mdadm
       - dialog
+      - ansible
       - cryptsetup
+      - ansible-lint
       - void-live-audio
       - void-docs-browse
+      - python3-packaging
