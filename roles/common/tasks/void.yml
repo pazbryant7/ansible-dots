@@ -3,7 +3,6 @@
   become: true
   community.general.xbps:
     name:
-      - base-devel
       - base-system
       - void-repo-nonfree
       - void-repo-multilib
