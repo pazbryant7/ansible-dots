@@ -859,6 +859,50 @@ cleanup_runit_logs() {
   info "Runit/svlogd logs rotate automatically per-service; review large logs above manually if disk space is low."
 }
 
+cleanup_nix() {
+  section "Nix Cleanup"
+  if ! has_cmd nix; then
+    info "Nix not installed. Skipping."
+    section_end
+    return
+  fi
+
+  if [ ! -d /nix/store ]; then
+    warn "'nix' command found but /nix/store missing. Skipping."
+    section_end
+    return
+  fi
+
+  store_size_before=$(du -sh /nix/store 2>/dev/null | cut -f1)
+  info "Nix store size before cleanup: ${store_size_before:-unknown}"
+
+  info "Wiping old nix-profile generation history (older than 14 days)..."
+  if nix profile wipe-history --older-than 14d >/dev/null 2>&1; then
+    ok "Old profile generations wiped."
+  else
+    warn "Could not wipe profile history (no profile, or unsupported nix version)."
+  fi
+
+  info "Collecting garbage (removing unreferenced store paths)..."
+  if nix-collect-garbage -d | indent; then
+    ok "Garbage collection complete."
+  else
+    error "nix-collect-garbage failed."
+  fi
+
+  info "Optimising store (deduplicating via hardlinks)..."
+  if nix-store --optimise | indent; then
+    ok "Store optimised."
+  else
+    error "nix-store --optimise failed."
+  fi
+
+  store_size_after=$(du -sh /nix/store 2>/dev/null | cut -f1)
+  info "Nix store size after cleanup: ${store_size_after:-unknown}"
+
+  section_end
+}
+
 rebuild_initramfs() {
   section "Initramfs Rebuild"
   case "$DISTRO" in
@@ -1022,6 +1066,7 @@ main() {
   cleanup_docker
   cleanup_flatpak
   cleanup_snap
+  cleanup_nix
   cleanup_dev_caches
 
   check_disk_usage
