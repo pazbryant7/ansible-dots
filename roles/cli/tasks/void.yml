@@ -12,6 +12,9 @@
       - xtools
       - curl
       - piper
+      - unzip
+      - unrar
+      - 7zip
 
       # ==========================================
       # Audio & Multimedia Stack
@@ -159,9 +162,12 @@
       loop: "{{ pkgs }}"
       when: item not in installed.stdout
 
-    - name: Install bitwarden-cli (unstable)
-      ansible.builtin.command: "nix profile add nixpkgs#bitwarden-cli"
-      when: "'bitwarden-cli' not in installed.stdout"
+    - name: Install Nix packages
+      ansible.builtin.command: "nix profile add nixpkgs#{{ item }}"
+      loop:
+        - bitwarden-cli
+        - capitaine-cursors
+      when: item not in installed.stdout
 
 
 - name: Void Linux installation cleanup
