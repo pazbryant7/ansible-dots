@@ -2,12 +2,10 @@
   hosts: localhost
   connection: local
   vars:
-    nix_hm_profile: main
     display_server: "xorg"
     dots_path: "{{ repos_path }}/dotfiles"
     xdg_path: "{{ ansible_user_dir }}/.config"
     repos_path: "{{ ansible_user_dir }}/Documents/github"
-    nix_config_path: "/home/{{ host_user }}/.config/nix-config"
 
   pre_tasks:
     - name: Detect host system
