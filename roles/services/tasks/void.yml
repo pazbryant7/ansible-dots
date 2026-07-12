@@ -3,6 +3,7 @@
   community.general.xbps:
     name:
       - ufw
+      - nix
       - dbus
       - cronie
       - chrony
@@ -27,6 +28,7 @@
     - elogind
     - chronyd
     - nanoklogd
+    - nix-daemon
     - socklog-unix
 
 - name: Add current user to socklog group
