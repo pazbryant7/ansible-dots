@@ -7,6 +7,70 @@
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
 
+- name: Clone and build ST terminal emulator
+  vars:
+    personal_github: "git@personal.github:pazbryant7"
+  block:
+    - name: Clone ST repository
+      ansible.builtin.git:
+        repo: "{{ personal_github }}/st.git"
+        dest: "{{ repos_path }}/st"
+        depth: 1
+        version: main
+        update: false
+
+    - name: Build and install ST
+      become: true
+      ansible.builtin.command:
+        cmd: make clean install
+        chdir: "{{ repos_path }}/st"
+        creates: /usr/local/bin/st
+
+    - name: Symlink ST to xterm
+      become: true
+      ansible.builtin.file:
+        src: /usr/local/bin/st
+        dest: /usr/bin/xterm
+        state: link
+
+- name: Clone and build DWM window manager
+  vars:
+    personal_github: "git@personal.github:pazbryant7"
+  block:
+    - name: Clone DWM repository
+      ansible.builtin.git:
+        repo: "{{ personal_github }}/dwm.git"
+        depth: 1
+        dest: "{{ repos_path }}/dwm"
+        version: main
+        update: false
+
+    - name: Build and install DWM
+      become: true
+      ansible.builtin.command:
+        cmd: make clean install
+        chdir: "{{ repos_path }}/dwm"
+        creates: /usr/local/bin/dwm
+
+- name: Clone and build slstatus
+  vars:
+    personal_github: "git@personal.github:pazbryant7"
+  block:
+    - name: Clone slstatus repository
+      ansible.builtin.git:
+        repo: "{{ personal_github }}/slstatus.git"
+        dest: "{{ repos_path }}/slstatus"
+        depth: 1
+        version: main
+        update: false
+
+    - name: Build and install slstatus
+      become: true
+      ansible.builtin.command:
+        cmd: make clean install
+        chdir: "{{ repos_path }}/slstatus"
+        creates: /usr/local/bin/slstatus
+
 - name: Setup custom system configurations
   vars:
     files_base: files/common
