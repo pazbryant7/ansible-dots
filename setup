@@ -59,7 +59,7 @@ if ! command -v ansible >/dev/null 2>&1; then
     sudo pacman -S --noconfirm ansible ansible-core ansible-lint || die "Pacman failed to install Ansible"
     ;;
   void)
-    sudo xbps-install -y ansible ansible-lint python3-packaging || die "XBPS failed to install Ansible"
+    sudo xbps-install -y ansible python3-packaging || die "XBPS failed to install Ansible"
     ;;
   *)
     die "Unsupported OS '$os' — install Ansible manually"
