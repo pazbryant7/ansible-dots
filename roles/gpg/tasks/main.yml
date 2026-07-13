@@ -32,11 +32,11 @@
       block:
         - name: Copy GPG private key
           ansible.builtin.copy:
+            src: "{{ key }}"
             dest: "{{ key_dest }}"
             mode: "0600"
             owner: "{{ host_user }}"
             group: "{{ host_user }}"
-            content: "{{ lookup('file', key) }}"
 
         - name: Import private key into keyring
           ansible.builtin.command: gpg --batch --import {{ key_dest }}

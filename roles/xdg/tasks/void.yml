@@ -3,4 +3,5 @@
   community.general.xbps:
     name:
       - rclone
+      - github-cli
     state: present

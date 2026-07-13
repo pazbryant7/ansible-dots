@@ -6,9 +6,9 @@ bootstrap_roles:
 
 default_roles:
   - cli
+  - xdg
   - zsh
   - system
-  - rclone
   - ffmpeg
   - github
   - drivers

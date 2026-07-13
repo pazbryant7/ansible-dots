@@ -10,7 +10,7 @@
 - name: Setup rclone
   become: false
   vars:
-    dir: "{{ xdg_path }}/rclone"
+    dir: "{{ ansible_env.HOME }}/.config/rclone"
     config_file: ".secrets/xdg_config/rclone/rclone.conf"
   block:
     - name: Ensure rclone config directory exists
@@ -21,7 +21,27 @@
 
     - name: Deploy rclone configuration
       ansible.builtin.copy:
+        src: "{{ config_file }}"
         dest: "{{ dir }}/rclone.conf"
         mode: "0600"
-        content: "{{ lookup('file', config_file) }}"
+        force: false
+
+
+- name: Setup Github CLI
+  become: false
+  vars:
+    dir: "{{ ansible_env.HOME }}/.config/gh"
+    config_file: ".secrets/xdg_config/gh/"
+  block:
+    - name: Ensure Github CLI config directory exists
+      ansible.builtin.file:
+        path: "{{ dir }}"
+        state: directory
+        mode: "0700"
+
+    - name: Deploy Github CLI configuration files
+      ansible.builtin.copy:
+        src: "{{ config_file }}"
+        dest: "{{ dir }}/"
+        mode: "0600"
         force: false
