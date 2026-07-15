@@ -111,6 +111,7 @@
       - "pazbryant7/st"
       - "pazbryant7/dwm"
       - "pazbryant7/slstatus"
+      - "nix-community/nixGL"
       - "Daniel-42-z/brave-origin-flake"
 
   block:
@@ -159,8 +160,8 @@
     - name: Install Nix packages
       ansible.builtin.command: "nix profile add nixpkgs#{{ item }}"
       loop:
+        - tabularis
         - bitwarden-cli
-        - capitaine-cursors
       when: item not in installed.stdout
 
 
