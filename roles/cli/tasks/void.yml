@@ -12,6 +12,7 @@
       - unzip
       - unrar
       - 7zip
+      - cbonsai
 
       # ==========================================
       # Audio & Multimedia Stack
