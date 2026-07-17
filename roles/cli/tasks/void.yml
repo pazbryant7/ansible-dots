@@ -13,6 +13,7 @@
       - unrar
       - 7zip
       - cbonsai
+      - atuin
 
       # ==========================================
       # Audio & Multimedia Stack
@@ -160,7 +161,6 @@
     - name: Install Nix packages
       ansible.builtin.command: "nix profile add nixpkgs#{{ item }}"
       loop:
-        - tabularis
         - bitwarden-cli
       when: item not in installed.stdout
 
