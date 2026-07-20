@@ -1,47 +1,32 @@
-- name: Get distribution
-  ansible.builtin.stat:
-    path: "{{ role_path }}/tasks/{{ host_os }}.yml"
-  register: distribution_config
-
-- name: Run tasks for {{ host_os }}
-  ansible.builtin.include_tasks: "{{ host_os }}.yml"
-  when: distribution_config.stat.exists
-
-- name: Setup rclone
+- name: Setup XDG configuration files
   become: false
   vars:
-    dir: "{{ ansible_env.HOME }}/.config/rclone"
-    config_file: ".secrets/xdg_config/rclone/rclone.conf"
+    xdg_secrets_dir: "{{ playbook_dir }}/.secrets/xdg_config"
+    xdg_config_root: "{{ ansible_env.HOME }}/.config"
   block:
-    - name: Ensure rclone config directory exists
+    - name: Discover XDG secret config directories
+      become: false
+      ansible.builtin.find:
+        paths: "{{ xdg_secrets_dir }}"
+        file_type: directory
+      register: xdg_secret_dirs
+
+    - name: Ensure XDG config directories exist
       ansible.builtin.file:
-        path: "{{ dir }}"
+        path: "{{ xdg_config_root }}/{{ item.path | basename }}"
         state: directory
         mode: "0700"
+      loop: "{{ xdg_secret_dirs.files }}"
+      loop_control:
+        label: "{{ item.path | basename }}"
 
-    - name: Deploy rclone configuration
+    - name: Deploy XDG configuration files
       ansible.builtin.copy:
-        src: "{{ config_file }}"
-        dest: "{{ dir }}/rclone.conf"
+        src: "{{ xdg_secrets_dir }}/{{ item.path | basename }}/"
+        dest: "{{ xdg_config_root }}/{{ item.path | basename }}/"
         mode: "0600"
+        directory_mode: "0700"
         force: false
-
-
-- name: Setup Github CLI
-  become: false
-  vars:
-    dir: "{{ ansible_env.HOME }}/.config/gh"
-    config_file: ".secrets/xdg_config/gh/"
-  block:
-    - name: Ensure Github CLI config directory exists
-      ansible.builtin.file:
-        path: "{{ dir }}"
-        state: directory
-        mode: "0700"
-
-    - name: Deploy Github CLI configuration files
-      ansible.builtin.copy:
-        src: "{{ config_file }}"
-        dest: "{{ dir }}/"
-        mode: "0600"
-        force: false
+      loop: "{{ xdg_secret_dirs.files }}"
+      loop_control:
+        label: "{{ item.path | basename }}"
