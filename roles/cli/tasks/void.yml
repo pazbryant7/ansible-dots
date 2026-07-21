@@ -161,6 +161,8 @@
     - name: Install Nix packages
       ansible.builtin.command: "nix profile add nixpkgs#{{ item }}"
       loop:
+        - breeze-gtk
+        - breeze-icons
         - bitwarden-cli
       when: item not in installed.stdout
 
