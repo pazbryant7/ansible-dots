@@ -1,7 +1,7 @@
 default partial alphanumeric_keys modifier_keys
-xkb_symbols "bryantq" {
-    name[Group1]= "English (Bryant Qwerty)";
-    key <TLDE> { [ grave,        asciitilde, dead_grave,   dead_tilde     ] };
+xkb_symbols "bryantqi" {
+    name[Group1]= "English (Bryant Qwerty, International)";
+    key <TLDE> { [ dead_grave,   dead_tilde, grave,        asciitilde     ] };
     key <AE01> { [ bracketleft,  1          ] };
     key <AE02> { [ braceleft,    2          ] };
     key <AE03> { [ parenleft,    3          ] };
@@ -36,7 +36,7 @@ xkb_symbols "bryantq" {
     key <AC08> { [ k,            K          ] };
     key <AC09> { [ l,            L          ] };
     key <AC10> { [ semicolon,    colon      ] };
-    key <AC11> { [ apostrophe,   quotedbl,   dead_acute,   dead_diaeresis ] };
+    key <AC11> { [ dead_acute,   dead_diaeresis, apostrophe, quotedbl    ] };
     key <BKSL> { [ backslash,    bar        ] };
     key <AB01> { [ z,            Z          ] };
     key <AB02> { [ x,            X          ] };
