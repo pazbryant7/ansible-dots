@@ -120,3 +120,4 @@
             - { path: "/etc/X11/xorg.conf.d/00-keyboard.conf" }
             - { path: "/usr/share/X11/xkb/symbols/", force: false }
             - { path: "/usr/share/kbd/keymaps/i386/dvorak/", force: false }
+            - { path: "/usr/share/kbd/keymaps/i386/qwerty/", force: false }

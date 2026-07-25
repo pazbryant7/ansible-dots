@@ -1,7 +1,7 @@
 default partial alphanumeric_keys modifier_keys
-xkb_symbols "basic" {
+xkb_symbols "bryantq" {
 
-    name[Group1]= "English (US, inverted numbers, Spanish AltGr)";
+    name[Group1]= "English (Bryant Qwerty, Spanish AltGr)";
 
     key <TLDE> { [ grave,        asciitilde, dead_grave,   dead_tilde     ] };
     key <AE01> { [ exclam,       1,          exclamdown   ] };
