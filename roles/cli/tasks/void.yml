@@ -12,7 +12,6 @@
       - unzip
       - unrar
       - 7zip
-      - cbonsai
       - atuin
 
       # ==========================================
@@ -95,6 +94,7 @@
       - gammastep
       - breeze-gtk
       - breeze-icons
+      - lxappearance
 
       # ==========================================
       # Fonts

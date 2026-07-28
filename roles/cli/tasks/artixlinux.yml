@@ -92,7 +92,6 @@
       - rofi
       - dunst
       - gammastep
-      - nwg-look
       - qt6ct
       - breeze-gtk
       - breeze-icons

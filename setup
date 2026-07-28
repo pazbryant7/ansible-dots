@@ -103,7 +103,7 @@ fi
 printf "\n═══════════════════════════════════════════════\n"
 printf "  Manual tasks remaining (cannot be automated)\n"
 printf "═══════════════════════════════════════════════\n"
-printf "  • Set GTK theme using nwg-look GUI\n"
+printf "  • Set GTK theme using lxappearance GUI\n"
 printf "  • Log in to: Browser, Outlook, Bitwarden, GitHub, Google, Twitch\n"
 printf "  • Retrieve backups: Music, Brave, Books\n"
 printf "  • Bitwarden: login and paste new token session in gopass\n"
