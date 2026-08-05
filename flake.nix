@@ -26,12 +26,18 @@
             shellharden
             bash-language-server
 
-            # ── ansible ──────────────────────────────
+            # ── ansible ──────────────────────────
             ansible
             ansible-lint
 
             # ── language agnostic ────────────────
             typos
+
+            # ── formatters ───────────────────────
+            oxfmt
+
+            # ── LSP ──────────────────────────────
+            yaml-language-server
           ];
 
           shellHook = ''
