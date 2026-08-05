@@ -1,41 +1,45 @@
-- name: Ensure packages and their runit services are installed
-  become: true
-  community.general.pacman:
-    name:
-      - ufw
-      - ufw-runit
+- name: Artix services
+  vars:
+    runit_service_dir: /run/runit/service
+  block:
+    - name: Ensure packages and their runit services are installed
+      become: true
+      community.general.pacman:
+        name:
+          - ufw
+          - ufw-runit
+          - dbus
+          - dbus-runit
+          - cronie
+          - cronie-runit
+          - docker
+          - docker-runit
+          - docker-buildx
+          - docker-compose
+          - chrony
+          - chrony-runit
+          - elogind
+          - elogind-runit
+          - nix
+          - socklog
+        state: present
 
-      - dbus
-      - dbus-runit
-
-      - cronie
-      - cronie-runit
-
-      - docker
-      - docker-runit
-      - docker-buildx
-      - docker-compose
-
-      - chrony
-      - chrony-runit
-
-      - elogind
-      - elogind-runit
-
-      - socklog
-    state: present
-
-- name: Enable system services via runit
-  become: true
-  ansible.builtin.file:
-    src: "/etc/runit/sv/{{ item }}"
-    dest: "/run/runit/service/{{ item }}"
-    state: link
-  loop:
-    - ufw
-    - dbus
-    - cronie
-    - docker
-    - chrony
-    - elogind
-    - socklog
+    - name: Enable system services via runit
+      become: true
+      vars:
+        service_list: &service_list
+          - ufw
+          - nix
+          - dbus
+          - cronie
+          - docker
+          - chrony
+          - elogind
+          - socklog
+        runit_restart_services: *service_list
+      ansible.builtin.file:
+        src: "/etc/runit/sv/{{ item }}"
+        dest: "{{ runit_service_dir }}/{{ item }}"
+        state: link
+      loop: "{{ service_list }}"
+      notify: "restart runit services"

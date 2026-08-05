@@ -1,0 +1,10 @@
+- name: restart nix-daemon
+  become: true
+  ansible.builtin.command: "sv restart {{ runit_service_dir }}/nix-daemon"
+  listen: "restart nix-daemon"
+
+- name: restart runit services
+  become: true
+  ansible.builtin.command: "sv restart {{ runit_service_dir }}/{{ item }}"
+  loop: "{{ runit_restart_services | default([]) }}"
+  listen: "restart runit services"

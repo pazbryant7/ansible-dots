@@ -1,37 +1,46 @@
-- name: Ensure packages are installed via xbps
-  become: true
-  community.general.xbps:
-    name:
-      - ufw
-      - dbus
-      - cronie
-      - chrony
-      - cronie
-      - docker
-      - elogind
-      - socklog-void
-      - docker-buildx
-    state: present
+- name: Void services
+  vars:
+    runit_service_dir: /var/service
+  block:
+    - name: Ensure packages are installed via xbps
+      become: true
+      community.general.xbps:
+        name:
+          - ufw
+          - nix
+          - dbus
+          - cronie
+          - chrony
+          - docker
+          - elogind
+          - socklog-void
+          - docker-buildx
+        state: present
 
-- name: Enable system services via runit
-  become: true
-  ansible.builtin.file:
-    src: "/etc/sv/{{ item }}"
-    dest: "/var/service/{{ item }}"
-    state: link
-  loop:
-    - ufw
-    - dbus
-    - cronie
-    - docker
-    - elogind
-    - chronyd
-    - nanoklogd
-    - socklog-unix
+    - name: Enable system services via runit
+      become: true
+      vars:
+        service_list: &service_list
+          - ufw
+          - dbus
+          - cronie
+          - docker
+          - elogind
+          - chronyd
+          - nanoklogd
+          - nix-daemon
+          - socklog-unix
+        runit_restart_services: *service_list
+      ansible.builtin.file:
+        src: "/etc/sv/{{ item }}"
+        dest: "{{ runit_service_dir }}/{{ item }}"
+        state: link
+      loop: "{{ service_list }}"
+      notify: "restart runit services"
 
-- name: Add current user to socklog group
-  become: true
-  ansible.builtin.user:
-    name: "{{ host_user }}"
-    groups: socklog
-    append: true
+    - name: Add current user to socklog group
+      become: true
+      ansible.builtin.user:
+        name: "{{ host_user }}"
+        groups: socklog
+        append: true

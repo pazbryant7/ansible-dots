@@ -1,5 +1,0 @@
-- name: restart nix-daemon
-  become: true
-  ansible.builtin.service:
-    name: nix-daemon
-    state: restarted

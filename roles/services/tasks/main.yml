@@ -16,6 +16,51 @@
     group: root
     mode: "0755"
 
+- name: Set up Nix
+  vars:
+    stable: "github:NixOS/nixpkgs/nixos-26.05"
+    unstable: "github:NixOS/nixpkgs/nixos-unstable"
+    pkgs:
+      - "pazbryant7/st"
+      - "pazbryant7/dwm"
+      - "pazbryant7/slstatus"
+      - "Daniel-42-z/brave-origin-flake"
+  block:
+    - name: Enable experimental features
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/nix/nix.conf
+        line: "experimental-features = nix-command flakes"
+        create: true
+        mode: "0644"
+      notify: "restart nix-daemon"
+
+    - name: Pin unstable (default for bare nixpkgs#)
+      ansible.builtin.command: "nix registry add nixpkgs {{ unstable }}"
+      register: reg_unstable
+      changed_when: "'registry' in reg_unstable.stdout or reg_unstable.rc == 0"
+
+    - name: Pin stable
+      ansible.builtin.command: "nix registry add nixpkgs-stable {{ stable }}"
+      register: reg_stable
+      changed_when: "'registry' in reg_stable.stdout or reg_stable.rc == 0"
+
+    - name: Get installed packages
+      ansible.builtin.command: nix profile list
+      register: installed
+      changed_when: false
+
+    - name: Install flakes
+      ansible.builtin.command: "nix profile add --refresh github:{{ item }}"
+      loop: "{{ pkgs }}"
+      when: item not in installed.stdout
+
+    - name: Install Nix packages
+      ansible.builtin.command: "nix profile add nixpkgs#{{ item }}"
+      loop:
+        - bitwarden-cli
+      when: item not in installed.stdout
+
 - name: Create hourly cron task for the regular user
   ansible.builtin.cron:
     name: "Execute backup-notes once per hour"
