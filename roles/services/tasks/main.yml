@@ -55,11 +55,20 @@
       loop: "{{ pkgs }}"
       when: item not in installed.stdout
 
-    - name: Install Nix packages
+    - name: Install Nix packages (no special flags needed)
       ansible.builtin.command: "nix profile add nixpkgs#{{ item }}"
       loop:
         - bitwarden-cli
       when: item not in installed.stdout
+
+    - name: Install Ventoy (unfree + insecure)
+      ansible.builtin.command: "nix profile add nixpkgs#{{ item }} --impure"
+      loop:
+        - ventoy
+      when: item not in installed.stdout
+      environment:
+        NIXPKGS_ALLOW_UNFREE: "1"
+        NIXPKGS_ALLOW_INSECURE: "1"
 
 - name: Create hourly cron task for the regular user
   ansible.builtin.cron:
