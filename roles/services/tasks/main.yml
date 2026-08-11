@@ -25,6 +25,7 @@
       - "pazbryant7/dwm"
       - "pazbryant7/slstatus"
       - "Daniel-42-z/brave-origin-flake"
+      - "schembriaiden/helium-browser-nix-flake"
   block:
     - name: Enable experimental features
       become: true
