@@ -6,6 +6,7 @@
           - mesa-dri
           - libglvnd
           - mesa-vulkan-intel
+          - intel-media-driver
       amd:
         packages:
           - mesa-dri
