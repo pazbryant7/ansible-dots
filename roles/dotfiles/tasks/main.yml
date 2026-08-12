@@ -78,7 +78,7 @@
     - name: Copy nvim.desktop file to applications directory
       become: true
       ansible.builtin.copy:
-        src: files/common/nvim.desktop
+        src: files/common/usr/share/applications/nvim.desktop
         dest: /usr/share/applications/nvim.desktop
         owner: root
         group: root

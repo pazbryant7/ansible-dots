@@ -6,3 +6,12 @@
 - name: "Run tasks for {{ host_os }}"
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
   when: distribution_config.stat.exists
+
+- name: Copy st-lf.desktop file to applications directory
+  become: true
+  ansible.builtin.copy:
+    src: files/common/usr/share/applications/lf.desktop
+    dest: /usr/share/applications/lf-st.desktop
+    owner: root
+    group: root
+    mode: "0644"

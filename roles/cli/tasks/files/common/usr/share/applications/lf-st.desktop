@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=lf
+Exec=st -e lf %F
+Terminal=false
+MimeType=inode/directory;
