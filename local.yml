@@ -3,8 +3,8 @@
   connection: local
   vars:
     display_server: "xorg"
+    repos_path: "{{ playbook_dir | dirname }}"
     dots_path: "{{ repos_path }}/dotfiles"
-    repos_path: "{{ ansible_user_dir }}/Documents/github"
 
   pre_tasks:
     - name: Detect host system

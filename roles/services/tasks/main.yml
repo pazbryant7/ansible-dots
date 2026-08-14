@@ -98,7 +98,6 @@
 
 - name: Configure UFW firewall
   become: true
-  # Removed the fragile iptables_status condition so it always configures safely
   block:
     - name: Ensure UFW is enabled and active (loads rules)
       community.general.ufw:

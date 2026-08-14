@@ -9,9 +9,9 @@
 
 - name: Setup SSH
   vars:
-    dir: "{{ ansible_env.HOME }}/.ssh"
-    secrets: ".secrets/ssh/github"
-    private_dir: "{{ ansible_env.HOME }}/.ssh/private"
+    dir: "{{ ansible_user_dir }}/.ssh"
+    secrets: "{{ playbook_dir }}/.secrets/ssh/github"
+    private_dir: "{{ ansible_user_dir }}/.ssh/private"
   block:
     - name: Ensure ssh directory exists
       ansible.builtin.file:

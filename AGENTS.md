@@ -19,4 +19,4 @@
 
 ## Containers
 
-- `docker/void/docker-compose.yml` and `docker/artixlinux/docker-compose.yml` mount the working tree and `.secrets/` read-only for manual target-environment testing.
+- `docker/void/docker-compose.yml` and `docker/artixlinux/docker-compose.yml` mount the working tree read-write and `.secrets/` read-only for manual target-environment testing.

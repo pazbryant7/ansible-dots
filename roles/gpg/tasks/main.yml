@@ -10,8 +10,8 @@
 - name: Manage Main GPG Key
   become: false
   vars:
-    dir: "{{ ansible_env.HOME }}/.gnupg"
-    key: ".secrets/gpg/private-key.asc"
+    dir: "{{ ansible_user_dir }}/.gnupg"
+    key: "{{ playbook_dir }}/.secrets/gpg/private-key.asc"
     key_dest: "{{ dir }}/private_key.asc"
   block:
     - name: Ensure gpg directory exists
