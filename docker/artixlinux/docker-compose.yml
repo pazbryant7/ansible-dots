@@ -3,7 +3,7 @@ services:
   ansible:
     build:
       context: ../../
-      dockerfile: docker/artix/Dockerfile
+      dockerfile: docker/artixlinux/Dockerfile
       args:
         TEST_USER: testuser
     image: ansible-artix-dev:latest

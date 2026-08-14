@@ -15,7 +15,7 @@ USER ${TEST_USER}
 
 WORKDIR /ansible
 
-ARG DISTRO=artix
+ARG DISTRO=artixlinux
 
 COPY --chown=${TEST_USER} requirements/ requirements/
 
