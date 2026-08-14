@@ -67,20 +67,22 @@ if ! command -v ansible >/dev/null 2>&1; then
   esac
 fi
 
+info "Installing common Galaxy collections..."
+ansible-galaxy collection install -r requirements/common.yml >/dev/null || die "Failed to install common collections"
+
 if [ -f "requirements/${os}.yml" ]; then
-  info "Installing Galaxy collections..."
+  info "Installing Galaxy collections for $os..."
   ansible-galaxy collection install -r "requirements/${os}.yml" >/dev/null || die "Failed to install OS-specific collections"
-  ansible-galaxy collection install -r requirements/common.yml >/dev/null || die "Failed to install common collections"
 fi
 
 # ── 3. Prompt & Run ───────────────────────────────────────────────────────────
 while true; do
-  printf "Choose display_server (xorg/wayland) [default: xorg]: " >/dev/tty
+  printf "Choose display_server (xorg) [default: xorg]: " >/dev/tty
   read -r ds </dev/tty
   ds="${ds:-xorg}"
   case "$ds" in
-  xorg | wayland) break ;;
-  *) printf "  Invalid — enter 'xorg' or 'wayland', or press Enter for default\n" >/dev/tty ;;
+  xorg) break ;;
+  *) printf "  Invalid — enter 'xorg', or press Enter for default\n" >/dev/tty ;;
   esac
 done
 
