@@ -58,3 +58,12 @@
             - { path: "/usr/share/X11/xkb/symbols/", force: false }
             - { path: "/usr/share/kbd/keymaps/i386/dvorak/", force: false }
             - { path: "/usr/share/kbd/keymaps/i386/qwerty/", force: false }
+
+        - name: Deploy standard XKB layout variants
+          ansible.builtin.copy:
+            src: "{{ files_base }}/usr/share/X11/xkb/symbols/{{ item }}"
+            dest: "/usr/share/X11/xkb/symbols/{{ item }}"
+            mode: "0644"
+          loop:
+            - bryantqc
+            - bryantdc
