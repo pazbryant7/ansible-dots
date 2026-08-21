@@ -44,6 +44,7 @@
             - /usr/share/X11/xkb/symbols
             - /etc/X11/xorg.conf.d
             - /usr/share/kbd/keymaps/i386/dvorak
+            - /usr/share/kbd/keymaps/i386/qwerty
 
         - name: Deploy system configuration files
           ansible.builtin.copy:
