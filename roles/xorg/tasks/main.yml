@@ -48,24 +48,23 @@
 
         - name: Deploy system configuration files
           ansible.builtin.copy:
-            src: "{{ files_base }}{{ item.path }}"
-            dest: "{{ item.path }}"
-            mode: "0644"
-            force: "{{ item.force | default(true) }}"
-          loop:
-            - { path: "/etc/environment" }
-            - { path: "/etc/X11/xorg.conf.d/00-keyboard.conf" }
-            - { path: "/usr/share/X11/xkb/symbols/", force: false }
-            - { path: "/usr/share/kbd/keymaps/i386/dvorak/", force: false }
-            - { path: "/usr/share/kbd/keymaps/i386/qwerty/", force: false }
-
-        - name: Deploy standard XKB layout variants
-          ansible.builtin.copy:
-            src: "{{ files_base }}/usr/share/X11/xkb/symbols/{{ item }}"
-            dest: "/usr/share/X11/xkb/symbols/{{ item }}"
+            src: "{{ files_base }}{{ item }}"
+            dest: "{{ item }}"
             mode: "0644"
           loop:
-            - bryantqc
-            - bryantdc
-            - bryantqic
-            - bryantdic
+            - /etc/environment
+            - /etc/X11/xorg.conf.d/00-keyboard.conf
+            - /usr/share/X11/xkb/symbols/bryantq
+            - /usr/share/X11/xkb/symbols/bryantqi
+            - /usr/share/X11/xkb/symbols/bryantqc
+            - /usr/share/X11/xkb/symbols/bryantqic
+            - /usr/share/X11/xkb/symbols/bryantd
+            - /usr/share/X11/xkb/symbols/bryantdi
+            - /usr/share/X11/xkb/symbols/bryantdc
+            - /usr/share/X11/xkb/symbols/bryantdic
+            - /usr/share/kbd/keymaps/i386/qwerty/bryantq.map.gz
+            - /usr/share/kbd/keymaps/i386/qwerty/bryantqc.map.gz
+            - /usr/share/kbd/keymaps/i386/qwerty/bryantqic.map.gz
+            - /usr/share/kbd/keymaps/i386/dvorak/bryantd.map.gz
+            - /usr/share/kbd/keymaps/i386/dvorak/bryantdc.map.gz
+            - /usr/share/kbd/keymaps/i386/dvorak/bryantdic.map.gz
