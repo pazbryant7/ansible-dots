@@ -22,22 +22,26 @@
         files:
           - bryantq
           - bryantqi
-          - bryantqc
-          - bryantqic
-          - bryantd
-          - bryantdi
-          - bryantdc
-          - bryantdic
+          - bryantqinv
+          - bryantqinvi
       - path: /usr/share/kbd/keymaps/i386/qwerty
         files:
           - bryantq.map.gz
-          - bryantqc.map.gz
-          - bryantqic.map.gz
-      - path: /usr/share/kbd/keymaps/i386/dvorak
-        files:
-          - bryantd.map.gz
-          - bryantdc.map.gz
-          - bryantdic.map.gz
+          - bryantqi.map.gz
+          - bryantqinv.map.gz
+          - bryantqinvi.map.gz
+    obsolete_system_files:
+      - /usr/share/X11/xkb/symbols/bryantqc
+      - /usr/share/X11/xkb/symbols/bryantqic
+      - /usr/share/X11/xkb/symbols/bryantd
+      - /usr/share/X11/xkb/symbols/bryantdi
+      - /usr/share/X11/xkb/symbols/bryantdc
+      - /usr/share/X11/xkb/symbols/bryantdic
+      - /usr/share/kbd/keymaps/i386/qwerty/bryantqc.map.gz
+      - /usr/share/kbd/keymaps/i386/qwerty/bryantqic.map.gz
+      - /usr/share/kbd/keymaps/i386/dvorak/bryantd.map.gz
+      - /usr/share/kbd/keymaps/i386/dvorak/bryantdc.map.gz
+      - /usr/share/kbd/keymaps/i386/dvorak/bryantdic.map.gz
   block:
     - name: Setup personal fonts
       become: false
@@ -70,7 +74,6 @@
           loop:
             - /usr/share/X11/xkb/symbols
             - /etc/X11/xorg.conf.d
-            - /usr/share/kbd/keymaps/i386/dvorak
             - /usr/share/kbd/keymaps/i386/qwerty
 
         - name: Deploy system configuration files
@@ -81,3 +84,9 @@
           loop: "{{ system_files | subelements('files') }}"
           loop_control:
             label: "{{ item.0.path }}/{{ item.1 }}"
+
+        - name: Remove obsolete custom keyboard layouts
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: absent
+          loop: "{{ obsolete_system_files }}"

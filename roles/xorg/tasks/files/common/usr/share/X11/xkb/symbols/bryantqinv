@@ -1,0 +1,8 @@
+default partial alphanumeric_keys modifier_keys
+xkb_symbols "bryantqinv" {
+    include "bryantq(bryantq)"
+    include "ctrl(swap_lalt_lctl)"
+    include "ctrl(swap_ralt_rctl)"
+    include "capslock(swapescape)"
+    name[Group1]= "English (Bryant Qwerty, Inverted Modifiers)";
+};

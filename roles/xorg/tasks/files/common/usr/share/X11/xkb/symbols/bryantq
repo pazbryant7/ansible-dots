@@ -1,6 +1,6 @@
 default partial alphanumeric_keys modifier_keys
 xkb_symbols "bryantq" {
-    name[Group1]= "English (Bryant Qwerty)";
+    name[Group1]= "English (Bryant Qwerty, Standard Modifiers)";
     key <TLDE> { [ grave,        asciitilde, dead_grave,   dead_tilde     ] };
     key <AE01> { [ bracketleft,  1          ] };
     key <AE02> { [ braceleft,    2          ] };
