@@ -7,7 +7,6 @@
       community.general.xbps:
         name:
           - ufw
-          - nix
           - dbus
           - cronie
           - chrony
@@ -28,7 +27,6 @@
           - elogind
           - chronyd
           - nanoklogd
-          - nix-daemon
           - socklog-unix
         runit_restart_services: *service_list
       ansible.builtin.file:

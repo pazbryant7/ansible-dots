@@ -20,7 +20,6 @@
           - chrony-runit
           - elogind
           - elogind-runit
-          - nix
           - socklog
         state: present
 
@@ -29,7 +28,6 @@
       vars:
         service_list: &service_list
           - ufw
-          - nix
           - dbus
           - cronie
           - docker
