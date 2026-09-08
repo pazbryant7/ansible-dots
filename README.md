@@ -12,16 +12,18 @@ For example:
 ```
 
 The playbook clones `dotfiles`, `nvim`, and other repositories beside the
-`ansible-dots` checkout. Run provisioning through the flake:
+`ansible-dots` checkout. `setup` bootstraps single-user Nix when needed, then
+runs Ansible from this repository's flake:
 
 ```sh
-nix develop -c ./setup
+./setup
 ```
 
 `setup` changes to the repository directory, creates `.secrets/.passphrase`
 and `.secrets/.become_password` interactively when absent, installs the Galaxy
-collections, and runs `local.yml`. Secret material in `.secrets/` is required
-by several roles and must not be committed or printed.
+collections, and runs `local.yml`. Ansible is not installed through the system
+package manager. Secret material in `.secrets/` is required by several roles
+and must not be committed or printed.
 
 The first successful run asks for a reboot and records its state under
 `~/.local/state/ansible_setup`. Run the command again after reboot to see the

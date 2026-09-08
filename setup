@@ -42,7 +42,24 @@ fi
 [ -f "$BECOME_FILE" ] || die "$BECOME_FILE missing"
 [ -f "$VAULT_FILE" ] || die "$VAULT_FILE missing"
 
-# ── 2. OS & Dependencies ──────────────────────────────────────────────────────
+# ── 2. Nix & Dependencies ─────────────────────────────────────────────────────
+if ! command -v nix >/dev/null 2>&1; then
+  command -v curl >/dev/null 2>&1 || die "curl is required to install Nix"
+  info "Installing Nix (single-user)..."
+  nix_installer=$(mktemp) || die "Failed to create Nix installer file"
+  curl --proto '=https' --tlsv1.2 -fsSL https://nixos.org/nix/install \
+    -o "$nix_installer" || die "Failed to download Nix installer"
+  sh "$nix_installer" --no-daemon || die "Nix installation failed"
+  rm -f "$nix_installer"
+
+  # The installer updates future shells only; load Nix for this setup run too.
+  nix_profile="$HOME/.nix-profile/etc/profile.d/nix.sh"
+  [ -f "$nix_profile" ] || die "Nix was installed but its profile is unavailable"
+  . "$nix_profile"
+fi
+
+command -v nix >/dev/null 2>&1 || die "Nix is unavailable after installation"
+
 if [ -f /etc/os-release ]; then
   . /etc/os-release
   os="$ID"
@@ -50,29 +67,16 @@ else
   os=$(uname -s | tr '[:upper:]' '[:lower:]')
 fi
 
-[ -z "$os" ] && die "Could not detect OS"
-
-if ! command -v ansible >/dev/null 2>&1; then
-  info "Installing Ansible for $os..."
-  case "$os" in
-  artix)
-    sudo pacman -S --noconfirm ansible ansible-core ansible-lint || die "Pacman failed to install Ansible"
-    ;;
-  void)
-    sudo xbps-install -y ansible python3-packaging || die "XBPS failed to install Ansible"
-    ;;
-  *)
-    die "Unsupported OS '$os' — install Ansible manually"
-    ;;
-  esac
-fi
+[ -n "$os" ] || die "Could not detect OS"
 
 info "Installing common Galaxy collections..."
-ansible-galaxy collection install -r requirements/common.yml >/dev/null || die "Failed to install common collections"
+nix --extra-experimental-features 'nix-command flakes' develop -c \
+  ansible-galaxy collection install -r requirements/common.yml >/dev/null || die "Failed to install common collections"
 
 if [ -f "requirements/${os}.yml" ]; then
   info "Installing Galaxy collections for $os..."
-  ansible-galaxy collection install -r "requirements/${os}.yml" >/dev/null || die "Failed to install OS-specific collections"
+  nix --extra-experimental-features 'nix-command flakes' develop -c \
+    ansible-galaxy collection install -r "requirements/${os}.yml" >/dev/null || die "Failed to install OS-specific collections"
 fi
 
 # ── 3. Prompt & Run ───────────────────────────────────────────────────────────
@@ -88,7 +92,8 @@ done
 
 info "Running playbook for OS: $os with display_server: $ds"
 
-ansible-playbook "$PLAYBOOK" \
+nix --extra-experimental-features 'nix-command flakes' develop -c \
+  ansible-playbook "$PLAYBOOK" \
   --become-password-file="$BECOME_FILE" \
   --vault-password-file="$VAULT_FILE" \
   --extra-vars "display_server=$ds" || die "Ansible playbook execution failed!"
