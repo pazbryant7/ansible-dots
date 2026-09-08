@@ -12,8 +12,9 @@ For example:
 ```
 
 The playbook clones `dotfiles`, `nvim`, and other repositories beside the
-`ansible-dots` checkout. `setup` bootstraps single-user Nix when needed, then
-runs Ansible from this repository's flake:
+`ansible-dots` checkout. `setup` installs Nix through the host's native package
+manager, enables its runit daemon, and runs Ansible from this repository's
+flake:
 
 ```sh
 ./setup

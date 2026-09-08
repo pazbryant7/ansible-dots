@@ -26,19 +26,17 @@
       - "pazbryant7/slstatus"
       - "Daniel-42-z/brave-origin-flake"
       - "schembriaiden/helium-browser-nix-flake"
+  environment:
+    NIX_REMOTE: daemon
   block:
-    - name: Ensure the user Nix configuration directory exists
-      ansible.builtin.file:
-        path: "{{ ansible_env.HOME }}/.config/nix"
-        state: directory
-        mode: "0755"
-
     - name: Enable experimental features
+      become: true
       ansible.builtin.lineinfile:
-        path: "{{ ansible_env.HOME }}/.config/nix/nix.conf"
+        path: /etc/nix/nix.conf
         line: "experimental-features = nix-command flakes"
         create: true
         mode: "0644"
+      notify: "restart nix-daemon"
 
     - name: Pin unstable (default for bare nixpkgs#)
       ansible.builtin.command: "nix registry add nixpkgs {{ unstable }}"
