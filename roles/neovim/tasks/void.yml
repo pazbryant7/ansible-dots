@@ -1,0 +1,5 @@
+- name: Ensure Bob is installed on Void Linux
+  become: true
+  community.general.xbps:
+    name: bob
+    state: present

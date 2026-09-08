@@ -1,0 +1,30 @@
+- name: Get distribution
+  ansible.builtin.stat:
+    path: "{{ role_path }}/tasks/{{ host_os }}.yml"
+  register: distribution_config
+
+- name: Run tasks for {{ host_os }}
+  ansible.builtin.include_tasks: "{{ host_os }}.yml"
+  when: distribution_config.stat.exists
+
+- name: Ensure the Bob configuration directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/bob"
+    state: directory
+    mode: "0755"
+
+- name: Configure Bob without changing PATH
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.config/bob/config.toml"
+    regexp: '^add_neovim_binary_to_path\s*='
+    line: "add_neovim_binary_to_path = false"
+    create: true
+    mode: "0644"
+
+- name: Install the latest Neovim nightly with Bob
+  ansible.builtin.command: bob install nightly
+  changed_when: true
+
+- name: Select the Neovim nightly with Bob
+  ansible.builtin.command: bob use nightly
+  changed_when: true
