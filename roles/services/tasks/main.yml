@@ -60,7 +60,6 @@
     - name: Install Nix packages (no special flags needed)
       ansible.builtin.command: "nix profile add nixpkgs#{{ item }}"
       loop:
-        - codex
         - opencode
         - brave-origin
         - bitwarden-cli
