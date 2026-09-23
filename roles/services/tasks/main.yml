@@ -24,7 +24,6 @@
       - "pazbryant7/st"
       - "pazbryant7/dwm"
       - "pazbryant7/slstatus"
-      - "schembriaiden/helium-browser-nix-flake"
   environment:
     NIX_REMOTE: daemon
   block:
@@ -60,7 +59,6 @@
     - name: Install Nix packages (no special flags needed)
       ansible.builtin.command: "nix profile add nixpkgs#{{ item }}"
       loop:
-        - codex
         - opencode
         - brave-origin
         - bitwarden-cli
