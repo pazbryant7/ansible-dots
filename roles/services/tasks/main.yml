@@ -24,7 +24,6 @@
       - "pazbryant7/st"
       - "pazbryant7/dwm"
       - "pazbryant7/slstatus"
-      - "schembriaiden/helium-browser-nix-flake"
   environment:
     NIX_REMOTE: daemon
   block:
