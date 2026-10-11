@@ -7,13 +7,16 @@
       # Core System & Hardware
       # ==========================================
       - lsof
-      - xdg-utils
-      - curl
-      - aria2
-      - unzip
-      - unrar
       - 7zip
+      - curl
       - atuin
+      - unrar
+      - unzip
+      - aria2
+      - xdg-utils
+      - xdg-user-dirs
+      - xdg-desktop-portal
+      - xdg-desktop-portal-gtk
 
       # ==========================================
       # Audio & Multimedia Stack
