@@ -1,8 +1,8 @@
 # To do
 
-## Artix Linux
+## Arch Linux
 
-> Update main system
+> Validate full provisioning on a fresh Arch VM booted with systemd.
 
 ## Void
 
