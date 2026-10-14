@@ -1,11 +1,5 @@
-- name: Get distribution
-  ansible.builtin.stat:
-    path: "{{ role_path }}/tasks/{{ host_os }}.yml"
-  register: distribution_config
-
 - name: Run tasks for {{ host_os }}
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
-  when: distribution_config.stat.exists
 
 - name: Copy script to the target system
   become: true
@@ -15,6 +9,17 @@
     owner: root
     group: root
     mode: "0755"
+
+- name: Configure repositories for backup-notes
+  become: true
+  ansible.builtin.copy:
+    content: |
+      # One absolute repository path per line. Blank lines and comments are ignored.
+      {{ backup_notes_repositories | join('\n') }}
+    dest: /etc/backup-notes.conf
+    owner: root
+    group: root
+    mode: "0644"
 
 - name: Set up Nix
   vars:
@@ -38,23 +43,28 @@
 
     - name: Pin unstable (default for bare nixpkgs#)
       ansible.builtin.command: "nix registry add nixpkgs {{ unstable }}"
-      register: reg_unstable
-      changed_when: "'registry' in reg_unstable.stdout or reg_unstable.rc == 0"
+      changed_when: false
 
     - name: Pin stable
       ansible.builtin.command: "nix registry add nixpkgs-stable {{ stable }}"
-      register: reg_stable
-      changed_when: "'registry' in reg_stable.stdout or reg_stable.rc == 0"
-
-    - name: Get installed packages
-      ansible.builtin.command: nix profile list
-      register: installed
       changed_when: false
+
+    - name: Get installed Nix profile packages
+      ansible.builtin.command: nix profile list --json
+      register: services_installed_profiles
+      changed_when: false
+
+    - name: Collect installed Nix profile elements
+      ansible.builtin.set_fact:
+        services_installed_profile_elements: >-
+          {{ (services_installed_profiles.stdout | from_json).elements |
+          default({}) }}
 
     - name: Install flakes
       ansible.builtin.command: "nix profile add --refresh github:{{ item }}"
       loop: "{{ pkgs }}"
-      when: item not in installed.stdout
+      when: item not in services_installed_profile_elements
+      changed_when: true
 
     - name: Install Nix packages (no special flags needed)
       ansible.builtin.command: "nix profile add nixpkgs#{{ item }}"
@@ -62,16 +72,20 @@
         - opencode
         - brave-origin
         - bitwarden-cli
-      when: item not in installed.stdout
+      when: item not in services_installed_profile_elements
+      changed_when: true
 
     - name: Install Ventoy (unfree + insecure)
       ansible.builtin.command: "nix profile add nixpkgs#{{ item }} --impure"
       loop:
         - ventoy
-      when: item not in installed.stdout
+      when:
+        - install_ventoy | bool
+        - item not in services_installed_profile_elements
       environment:
         NIXPKGS_ALLOW_UNFREE: "1"
         NIXPKGS_ALLOW_INSECURE: "1"
+      changed_when: true
 
 - name: Create hourly cron task for the regular user
   ansible.builtin.cron:
@@ -86,6 +100,7 @@
 
 - name: Setup docker group
   become: true
+  when: manage_docker_group | bool
   block:
     - name: Ensure the docker group exists
       ansible.builtin.group:
@@ -101,10 +116,6 @@
 - name: Configure UFW firewall
   become: true
   block:
-    - name: Ensure UFW is enabled and active (loads rules)
-      community.general.ufw:
-        state: enabled
-
     - name: Allow UFW forwarding for Docker
       ansible.builtin.lineinfile:
         path: /etc/default/ufw
@@ -124,12 +135,12 @@
     - name: Allow LAN access
       community.general.ufw:
         rule: allow
-        from_ip: 192.168.0.0/24
+        from_ip: "{{ ufw_lan_cidr }}"
 
     - name: Allow Docker networks
       community.general.ufw:
         rule: allow
-        from_ip: 172.16.0.0/12
+        from_ip: "{{ ufw_docker_cidr }}"
 
     - name: Allow Deluge (Incoming default ports)
       community.general.ufw:
@@ -143,12 +154,28 @@
         port: "6881"
         proto: any
 
-    - name: Limit SSH brute-force (Standard Port 22 fallback)
+    - name: Limit SSH brute-force attempts
       community.general.ufw:
         rule: limit
-        port: "22"
+        port: "{{ ufw_ssh_port }}"
         proto: tcp
 
     - name: Enable UFW
       community.general.ufw:
         state: enabled
+
+- name: Start UFW after its rules are configured on Arch Linux
+  become: true
+  ansible.builtin.systemd_service:
+    name: ufw.service
+    enabled: true
+    state: started
+  when: host_os == 'archlinux'
+
+- name: Enable UFW after its rules are configured on Void Linux
+  become: true
+  ansible.builtin.file:
+    src: /etc/sv/ufw
+    dest: /var/service/ufw
+    state: link
+  when: host_os == 'void'

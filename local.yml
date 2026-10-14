@@ -20,12 +20,39 @@
       loop: "{{ bootstrap_roles }}"
       tags: always
 
-    - name: Compute role execution list
+    - name: Compute requested roles
       ansible.builtin.set_fact:
         cli_tags:
           "{{ ansible_run_tags | list | difference(['all', 'always']) }}"
-        excluded_display:
-          "{{ display_server_roles | difference([display_server]) }}"
+      tags: always
+
+    - name: Validate selected display role
+      ansible.builtin.assert:
+        that: display_server in display_server_roles
+        fail_msg: >-
+          Unsupported display_server '{{ display_server }}'. Supported values:
+          {{ display_server_roles | join(', ') }}.
+      tags: always
+
+    - name: Validate requested roles
+      ansible.builtin.assert:
+        that: >-
+          cli_tags | difference(
+            bootstrap_roles + default_roles + display_server_roles
+          ) | length == 0
+        fail_msg: >-
+          Unsupported role tag(s): {{ cli_tags | difference(bootstrap_roles +
+          default_roles + display_server_roles) | join(', ') }}.
+      when: cli_tags | length > 0
+      tags: always
+
+    - name: Compute target role execution list
+      ansible.builtin.set_fact:
+        target_roles: >-
+          {{
+            default_roles | select('in', cli_tags) | list
+            if cli_tags | length > 0 else default_roles
+          }}
       tags: always
 
     - name: Run target roles
@@ -34,14 +61,7 @@
         apply:
           tags: "{{ role_item }}"
       loop: >-
-        {{
-          ( (cli_tags if cli_tags | length > 0 else default_roles) +
-        [display_server] )
-          | difference(excluded_display)
-          | difference(bootstrap_roles)
-          | unique
-          | sort
-        }}
+        {{ (target_roles + [display_server]) | unique }}
       loop_control:
         loop_var: role_item
       tags: always

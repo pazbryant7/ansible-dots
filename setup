@@ -9,8 +9,7 @@ PLAYBOOK="./local.yml"
 SECRETS_DIR=".secrets"
 BECOME_FILE="$SECRETS_DIR/.become_password"
 VAULT_FILE="$SECRETS_DIR/.passphrase"
-STATE_DIR="$HOME/.local/state/ansible_setup"
-FIRST_RUN="$STATE_DIR/first_run_completed"
+TTY_ECHO_DISABLED=0
 
 info() {
   printf "  → %s\n" "$1"
@@ -21,45 +20,89 @@ die() {
   exit 1
 }
 
-# ── 1. Secrets ────────────────────────────────────────────────────────────────
+restore_tty() {
+  [ "$TTY_ECHO_DISABLED" = "1" ] || return 0
+  [ -r /dev/tty ] || return 1
+  stty echo </dev/tty
+  TTY_ECHO_DISABLED=0
+}
+
+cleanup_terminal() {
+  if ! restore_tty; then
+    printf "ERROR: failed to restore terminal echo\n" >&2
+  fi
+}
+
+read_secret() {
+  prompt="$1"
+
+  [ -r /dev/tty ] || return 1
+  printf "%s" "$prompt" >/dev/tty || return 1
+  stty -echo </dev/tty || return 1
+  IFS= read -r secret </dev/tty
+  status=$?
+  if ! restore_tty; then
+    printf "\nERROR: failed to restore terminal echo\n" >&2
+    return 1
+  fi
+  printf "\n" >/dev/tty || return 1
+
+  [ "$status" -eq 0 ] || return 1
+  [ -n "$secret" ] || return 1
+  printf "%s" "$secret"
+}
+
+[ -n "${HOME:-}" ] || die "HOME is required"
+uid=$(id -u) || die "Could not determine the current user"
+[ "$uid" -ne 0 ] || die "Run setup as a regular user, not root"
+trap cleanup_terminal 0
+trap 'cleanup_terminal; exit 1' 1 2 15
+umask 077
+STATE_DIR="$HOME/.local/state/ansible_setup"
+FIRST_RUN="$STATE_DIR/first_run_completed"
+
 mkdir -p "$SECRETS_DIR" || die "Failed to create $SECRETS_DIR"
 chmod 700 "$SECRETS_DIR" || die "Failed to set permissions on $SECRETS_DIR"
 
 if [ ! -f "$BECOME_FILE" ]; then
-  printf "Enter sudo/become password: " >/dev/tty
-  read -r p </dev/tty || die "Failed to read become password"
+  TTY_ECHO_DISABLED=1
+  p=$(read_secret "Enter sudo/become password: ") || die "Failed to read become password"
+  TTY_ECHO_DISABLED=0
   printf "%s" "$p" >"$BECOME_FILE" || die "Failed to write become password"
-  chmod 600 "$BECOME_FILE" || die "Failed to secure become password file"
+  unset p
 fi
+chmod 600 "$BECOME_FILE" || die "Failed to secure become password file"
 
 if [ ! -f "$VAULT_FILE" ]; then
-  printf "Enter ansible-vault passphrase: " >/dev/tty
-  read -r v </dev/tty || die "Failed to read vault passphrase"
+  TTY_ECHO_DISABLED=1
+  v=$(read_secret "Enter ansible-vault passphrase: ") || die "Failed to read vault passphrase"
+  TTY_ECHO_DISABLED=0
   printf "%s" "$v" >"$VAULT_FILE" || die "Failed to write vault passphrase"
-  chmod 600 "$VAULT_FILE" || die "Failed to secure vault passphrase file"
+  unset v
 fi
+chmod 600 "$VAULT_FILE" || die "Failed to secure vault passphrase file"
 
 [ -f "$BECOME_FILE" ] || die "$BECOME_FILE missing"
 [ -f "$VAULT_FILE" ] || die "$VAULT_FILE missing"
 
-# ── 2. OS, Nix & Dependencies ─────────────────────────────────────────────────
 if [ -f /etc/os-release ]; then
-  . /etc/os-release
-  os="$ID"
+  # shellcheck disable=SC1091
+  . /etc/os-release || die "Failed to read /etc/os-release"
+  os="${ID:-}"
 else
-  os=$(uname -s | tr '[:upper:]' '[:lower:]')
+  uname_s=$(uname -s) || die "Could not detect OS"
+  os=$(printf '%s\n' "$uname_s" | tr '[:upper:]' '[:lower:]') || die "Could not normalize OS name"
 fi
 
 [ -n "$os" ] || die "Could not detect OS"
 command -v sudo >/dev/null 2>&1 || die "sudo is required to install and enable Nix"
 
 case "$os" in
-artix)
+arch)
   info "Installing Nix with pacman..."
   sudo pacman -S --needed --noconfirm nix || die "Pacman failed to install Nix"
-  nix_service_dir="/etc/runit/sv/nix"
-  nix_service_link="/run/runit/service/nix"
-  nix_service_name="nix"
+  info "Enabling the Nix daemon service..."
+  sudo systemctl enable --now nix-daemon.service || die "Failed to enable Nix daemon"
   ;;
 void)
   info "Installing Nix with xbps..."
@@ -74,15 +117,23 @@ void)
 esac
 
 command -v nix >/dev/null 2>&1 || die "Nix is unavailable after installation"
-[ -d "$nix_service_dir" ] || die "Nix service directory '$nix_service_dir' is missing"
 
-if [ ! -L "$nix_service_link" ]; then
-  [ ! -e "$nix_service_link" ] || die "Nix service path '$nix_service_link' is not a symlink"
-  info "Enabling the Nix daemon service..."
-  sudo ln -s "$nix_service_dir" "$nix_service_link" || die "Failed to enable the Nix daemon"
-fi
+case "$os" in
+arch)
+  sudo systemctl is-active --quiet nix-daemon.service || die "Nix daemon is not active"
+  ;;
+void)
+  [ -d "$nix_service_dir" ] || die "Nix service directory '$nix_service_dir' is missing"
 
-sudo sv up "$nix_service_name" || die "Failed to start the Nix daemon"
+  if [ ! -L "$nix_service_link" ]; then
+    [ ! -e "$nix_service_link" ] || die "Nix service path '$nix_service_link' is not a symlink"
+    info "Enabling the Nix daemon service..."
+    sudo ln -s "$nix_service_dir" "$nix_service_link" || die "Failed to enable the Nix daemon"
+  fi
+
+  sudo sv up "$nix_service_name" || die "Failed to start the Nix daemon"
+  ;;
+esac
 export NIX_REMOTE=daemon
 
 info "Installing common Galaxy collections..."
@@ -95,14 +146,13 @@ if [ -f "requirements/${os}.yml" ]; then
     ansible-galaxy collection install -r "requirements/${os}.yml" >/dev/null || die "Failed to install OS-specific collections"
 fi
 
-# ── 3. Prompt & Run ───────────────────────────────────────────────────────────
 while true; do
-  printf "Choose display_server (xorg) [default: xorg]: " >/dev/tty
-  read -r ds </dev/tty
+  printf "Choose display_server (xorg) [default: xorg]: " >/dev/tty || die "Failed to write display server prompt"
+  read -r ds </dev/tty || die "Failed to read display server"
   ds="${ds:-xorg}"
   case "$ds" in
   xorg) break ;;
-  *) printf "  Invalid — enter 'xorg', or press Enter for default\n" >/dev/tty ;;
+  *) printf "  Invalid — enter 'xorg', or press Enter for default\n" >/dev/tty || die "Failed to write display server prompt" ;;
   esac
 done
 
@@ -114,7 +164,6 @@ nix --extra-experimental-features 'nix-command flakes' develop -c \
   --vault-password-file="$VAULT_FILE" \
   --extra-vars "display_server=$ds" || die "Ansible playbook execution failed!"
 
-# ── 4. Post-Install ───────────────────────────────────────────────────────────
 mkdir -p "$STATE_DIR" || die "Failed to create state directory"
 
 if [ ! -f "$FIRST_RUN" ]; then
@@ -136,7 +185,7 @@ printf "════════════════════════
 printf "\n══════════════════════════════════════════════════════════════════════════════\n"
 printf "  Steam Installation & Setup\n"
 printf "══════════════════════════════════════════════════════════════════════════════\n"
-printf "  [Artix Linux]\n"
+printf "  [Arch Linux]\n"
 printf "  • pacman -S steam\n\n"
 printf "  [Void Linux - i686]\n"
 printf "  • xbps-install -S steam (No extra packages needed)\n\n"

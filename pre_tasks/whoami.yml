@@ -7,3 +7,11 @@
   ansible.builtin.set_fact:
     host_os: "{{ ansible_distribution | lower | replace(' ', '') }}"
   when: host_os is not defined
+
+- name: Ensure host OS is supported
+  ansible.builtin.assert:
+    that: host_os in supported_host_os
+    fail_msg: >-
+      Unsupported distribution '{{ ansible_distribution }}' (normalized as '{{
+      host_os }}'). Supported distributions: {{ supported_host_os | join(', ')
+      }}.

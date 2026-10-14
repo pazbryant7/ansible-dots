@@ -1,68 +1,121 @@
 #!/usr/bin/env sh
 
-NOTE_REPO="$HOME/Documents/github/notes"
-YOUTUBE_REPO="$HOME/Documents/github/youtube"
-DELTOCHONOTES="$HOME/Documents/github/deltocho-notes"
+CONFIG_FILE="${BACKUP_NOTES_CONFIG:-/etc/backup-notes.conf}"
+user_id=$(id -u) || {
+  printf '%s\n' 'backup-notes: could not determine the current user' >&2
+  exit 1
+}
+LOCK_DIR="/tmp/backup-notes-${user_id}.lock"
+
+info() {
+  printf '%s\n' "$1"
+}
+
+error() {
+  printf 'backup-notes: %s\n' "$1" >&2
+}
+
+cleanup_lock() {
+  if [ -d "$LOCK_DIR" ] && ! rmdir "$LOCK_DIR"; then
+    error "could not remove lock: $LOCK_DIR"
+  fi
+}
 
 is_git_repo() {
   git -C "$1" rev-parse --is-inside-work-tree >/dev/null 2>&1
 }
 
-get_current_branch() {
+current_branch() {
   git -C "$1" rev-parse --abbrev-ref HEAD
 }
 
-remote_branch_exists() {
-  git -C "$1" rev-parse --verify "origin/$2" >/dev/null 2>&1
-}
-
-has_unpushed_commits() {
-  [ -n "$(git -C "$1" rev-list "origin/$2"..HEAD 2>/dev/null)" ]
-}
-
-has_local_changes() {
-  git -C "$1" status --porcelain | grep -q .
-}
-
-push_to_remote() {
-  git -C "$1" push origin "$2" >/dev/null 2>&1
-}
-
-stage_all_changes() {
-  git -C "$1" add -A
-}
-
-commit_changes() {
-  git -C "$1" commit -m "vault backup: $(date '+%Y-%m-%d %H:%M:%S')" >/dev/null 2>&1
-}
-
-push_existing_commits() {
+commit_local_changes() {
   repo="$1"
-  branch=$(get_current_branch "$repo")
-  remote_branch_exists "$repo" "$branch" || return 0
-  has_unpushed_commits "$repo" "$branch" || return 0
-  push_to_remote "$repo" "$branch"
-}
+  git_status=$(git -C "$repo" status --porcelain) || {
+    error "could not inspect repository status: $repo"
+    return 1
+  }
+  [ -n "$git_status" ] || return 0
 
-commit_and_push() {
-  repo="$1"
-  has_local_changes "$repo" || return 0
-  stage_all_changes "$repo"
-  commit_changes "$repo"
-  push_to_remote "$repo" "$(get_current_branch "$repo")"
+  git -C "$repo" add -A || {
+    error "could not stage changes: $repo"
+    return 1
+  }
+  git -C "$repo" diff --cached --quiet
+  diff_status=$?
+  case "$diff_status" in
+  0) return 0 ;;
+  1) ;;
+  *)
+    error "could not inspect staged changes: $repo"
+    return 1
+    ;;
+  esac
+  git -C "$repo" commit -m "vault backup: $(date '+%Y-%m-%d %H:%M:%S')" || {
+    error "could not commit changes: $repo"
+    return 1
+  }
 }
 
 sync_repo() {
   repo="$1"
-  [ -d "$repo" ] || return 1
-  is_git_repo "$repo" || return 1
-  push_existing_commits "$repo" && commit_and_push "$repo"
+  if [ ! -d "$repo" ]; then
+    error "repository does not exist: $repo"
+    return 1
+  fi
+  if ! is_git_repo "$repo"; then
+    error "not a Git repository: $repo"
+    return 1
+  fi
+
+  branch=$(current_branch "$repo") || {
+    error "could not determine the current branch: $repo"
+    return 1
+  }
+  if [ "$branch" = "HEAD" ]; then
+    error "repository is detached: $repo"
+    return 1
+  fi
+
+  commit_local_changes "$repo" || {
+    error "could not commit changes in: $repo"
+    return 1
+  }
+
+  if git -C "$repo" push --set-upstream origin "$branch"; then
+    info "backed up: $repo"
+  else
+    error "could not push $repo; resolve remote divergence or credentials manually"
+    return 1
+  fi
 }
 
 main() {
-  sync_repo "$NOTE_REPO"
-  sync_repo "$YOUTUBE_REPO"
-  sync_repo "$DELTOCHONOTES"
+  if [ ! -r "$CONFIG_FILE" ]; then
+    error "configuration is missing: $CONFIG_FILE"
+    return 1
+  fi
+
+  if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+    if [ -d "$LOCK_DIR" ]; then
+      info "another backup-notes run is already active"
+      return 0
+    fi
+    error "could not create lock: $LOCK_DIR"
+    return 1
+  fi
+  trap cleanup_lock 0
+  trap 'cleanup_lock; exit 1' 1 2 15
+
+  status=0
+  while IFS= read -r repo || [ -n "$repo" ]; do
+    case "$repo" in
+    '' | \#*) continue ;;
+    esac
+    sync_repo "$repo" || status=1
+  done <"$CONFIG_FILE"
+
+  return "$status"
 }
 
-main
+main "$@"

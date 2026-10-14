@@ -1,5 +1,0 @@
-- name: Ensure Bob is installed on Artix Linux
-  become: true
-  community.general.pacman:
-    name: bob
-    state: present

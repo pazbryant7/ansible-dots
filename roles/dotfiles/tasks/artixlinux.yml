@@ -1,6 +1,0 @@
-- name: Ensure stow is installed
-  become: true
-  community.general.pacman:
-    name:
-      - stow
-    state: present

@@ -1,17 +1,48 @@
-- name: Update bootloader config for microcode (artix)
+- name: Update bootloader config for microcode
+  become: true
+  ansible.builtin.stat:
+    path: /etc/default/grub
+  register: drivers_grub_microcode_config
+  listen: Update bootloader config for microcode
+
+- name: Generate GRUB config after microcode installation
   become: true
   ansible.builtin.command:
     cmd: grub-mkconfig -o /boot/grub/grub.cfg
+  when:
+    - manage_grub | bool
+    - drivers_grub_microcode_config.stat.exists
+  listen: Update bootloader config for microcode
+  changed_when: true
 
 - name: Regenerate initramfs for microcode (void)
   become: true
   ansible.builtin.shell:
     cmd: |
-      set -e
-      for pkg in $(xbps-query -l | awk '{print $2}' | grep -E '^linux[0-9]+\.[0-9]+-[0-9]'); do
-        kern=$(echo "$pkg" | sed -E 's/-[^-]+$//')
-        echo "Reconfiguring $kern to pick up new microcode..."
-        xbps-reconfigure -f "$kern"
-      done
-  register: reconf_result
-  changed_when: "'Reconfiguring' in reconf_result.stdout"
+      installed_packages=$(xbps-query -l) || {
+        printf '%s\n' 'Could not list installed Void packages.' >&2
+        exit 1
+      }
+      kernel_packages=$(
+        awk '$2 ~ /^linux[0-9]+\.[0-9]+-[0-9]/ { sub(/-[^-]+$/, "", $2); print $2 }' <<EOF
+      $installed_packages
+      EOF
+      ) || {
+        printf '%s\n' 'Could not identify installed Void kernel packages.' >&2
+        exit 1
+      }
+
+      while IFS= read -r kernel; do
+        [ -n "$kernel" ] || continue
+        printf 'Reconfiguring %s to pick up new microcode...\n' "$kernel"
+        xbps-reconfigure -f "$kernel" || {
+          printf 'Could not reconfigure %s.\n' "$kernel" >&2
+          exit 1
+        }
+      done <<EOF
+      $kernel_packages
+      EOF
+    executable: /bin/sh
+  register: drivers_reconf_result
+  changed_when: "'Reconfiguring' in drivers_reconf_result.stdout"
+  when: host_os == 'void'

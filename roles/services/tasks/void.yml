@@ -1,6 +1,15 @@
 - name: Void services
   vars:
     runit_service_dir: /var/service
+    runit_services:
+      - dbus
+      - cronie
+      - docker
+      - elogind
+      - chronyd
+      - nanoklogd
+      - nix-daemon
+      - socklog-unix
   block:
     - name: Ensure packages are installed via xbps
       become: true
@@ -19,24 +28,17 @@
 
     - name: Enable system services via runit
       become: true
-      vars:
-        service_list: &service_list
-          - ufw
-          - dbus
-          - cronie
-          - docker
-          - elogind
-          - chronyd
-          - nanoklogd
-          - nix-daemon
-          - socklog-unix
-        runit_restart_services: *service_list
       ansible.builtin.file:
         src: "/etc/sv/{{ item }}"
         dest: "{{ runit_service_dir }}/{{ item }}"
         state: link
-      loop: "{{ service_list }}"
-      notify: "restart runit services"
+      loop: "{{ runit_services }}"
+
+    - name: Ensure system services are running through runit
+      become: true
+      ansible.builtin.command: "sv up {{ runit_service_dir }}/{{ item }}"
+      changed_when: false
+      loop: "{{ runit_services }}"
 
     - name: Add current user to socklog group
       become: true

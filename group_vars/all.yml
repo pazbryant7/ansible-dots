@@ -4,6 +4,10 @@ bootstrap_roles:
   - ssh
   - gpg
 
+supported_host_os:
+  - archlinux
+  - void
+
 default_roles:
   - cli
   - neovim
@@ -15,7 +19,30 @@ default_roles:
   - drivers
   - services
   - dotfiles
-  - sudo-scripts
+  - sudo_scripts
 
 display_server_roles:
   - xorg
+
+# Destructive dotfile adoption and replacement require an explicit opt-in.
+dotfiles_adopt: false
+dotfiles_replace_existing_nvim: false
+remove_waybar: false
+xdg_config_force: false
+manage_grub: true
+
+# Docker group membership grants root-equivalent access to the local daemon.
+manage_docker_group: true
+
+# Ventoy currently requires an insecure Nix package and is therefore opt-in.
+install_ventoy: false
+
+# Keep the existing network policy configurable rather than hard-coding it in tasks.
+ufw_lan_cidr: 192.168.0.0/24
+ufw_docker_cidr: 172.16.0.0/12
+ufw_ssh_port: "22"
+
+# Only repositories provisioned by this playbook are backed up by default.
+backup_notes_repositories:
+  - "{{ repos_path }}/notes"
+  - "{{ repos_path }}/youtube"

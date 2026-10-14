@@ -1,13 +1,14 @@
-- name: restart nix-daemon
+- name: Restart Nix daemon through systemd
   become: true
-  ansible.builtin.command: >-
-    sv restart
-    {{ '/run/runit/service/nix' if host_os == 'artixlinux'
-    else '/var/service/nix-daemon' }}
-  listen: "restart nix-daemon"
+  ansible.builtin.systemd_service:
+    name: nix-daemon.service
+    state: restarted
+  when: host_os == 'archlinux'
+  listen: restart nix-daemon
 
-- name: restart runit services
+- name: Restart Nix daemon through runit
   become: true
-  ansible.builtin.command: "sv restart {{ runit_service_dir }}/{{ item }}"
-  loop: "{{ runit_restart_services | default([]) }}"
-  listen: "restart runit services"
+  ansible.builtin.command: sv restart /var/service/nix-daemon
+  when: host_os == 'void'
+  listen: restart nix-daemon
+  changed_when: true

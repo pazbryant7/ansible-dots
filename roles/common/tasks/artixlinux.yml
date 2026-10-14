@@ -1,6 +1,0 @@
-- name: Ensure base development packages are installed (Artix)
-  become: true
-  community.general.pacman:
-    name:
-      - man-db
-    state: present
