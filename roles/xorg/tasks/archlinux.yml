@@ -1,0 +1,31 @@
+- name: Setup Xorg environment
+  become: true
+  block:
+    - name: Install required Xorg packages (Arch Linux)
+      community.general.pacman:
+        name:
+          - maim
+          - picom
+          - xclip
+          - xdotool
+          - xorg-xev
+          - xorg-xinit
+          - xorg-xrandr
+          - xorg-server
+          - xorg-xsetroot
+        state: present
+
+    - name: Remove Wayland-related packages
+      community.general.pacman:
+        name: waybar
+        state: absent
+      when: remove_waybar | bool
+
+    - name: Deploy vconsole configuration
+      ansible.builtin.copy:
+        src: "files/archlinux/etc/vconsole.conf"
+        dest: "/etc/vconsole.conf"
+        owner: root
+        group: root
+        mode: "0644"
+        force: true

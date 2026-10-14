@@ -1,0 +1,56 @@
+- name: Arch Linux services
+  become: true
+  block:
+    - name: Ensure packages are installed
+      community.general.pacman:
+        name:
+          - ufw
+          - dbus
+          - cronie
+          - docker
+          - docker-buildx
+          - docker-compose
+          - chrony
+          - nix
+          - pacman-contrib
+          - reflector
+        state: present
+
+    - name: Stop systemd-timesyncd before enabling Chrony
+      ansible.builtin.systemd_service:
+        name: systemd-timesyncd.service
+        enabled: false
+        state: stopped
+
+    - name: Ensure systemd journal configuration directory exists
+      ansible.builtin.file:
+        path: /etc/systemd/journald.conf.d
+        state: directory
+        mode: "0755"
+
+    - name: Configure persistent systemd journal storage
+      ansible.builtin.copy:
+        content: |
+          [Journal]
+          Storage=persistent
+        dest: /etc/systemd/journald.conf.d/ansible-dots.conf
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Enable and start system services
+      ansible.builtin.systemd_service:
+        name: "{{ item }}"
+        enabled: true
+        state: started
+      loop:
+        - nix-daemon.service
+        - cronie.service
+        - docker.service
+        - chronyd.service
+
+    - name: Enable UFW without starting it before its rules are configured
+      ansible.builtin.systemd_service:
+        name: ufw.service
+        enabled: true
+        state: stopped

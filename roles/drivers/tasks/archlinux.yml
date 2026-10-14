@@ -1,0 +1,40 @@
+- name: Detect CPU vendor_id from /proc/cpuinfo
+  ansible.builtin.command:
+    argv:
+      - awk
+      - "/^vendor_id/ { print $3; exit }"
+      - /proc/cpuinfo
+  register: drivers_cpu_vendor
+  changed_when: false
+
+- name: Map vendor_id to microcode package
+  ansible.builtin.set_fact:
+    drivers_ucode_pkg: >-
+      {{
+        {
+          'GenuineIntel': 'intel-ucode',
+          'AuthenticAMD': 'amd-ucode'
+        }.get(drivers_cpu_vendor.stdout, '')
+      }}
+
+- name: Show detected vendor and package
+  ansible.builtin.debug:
+    msg:
+      "vendor_id={{ drivers_cpu_vendor.stdout }} -> package={{ drivers_ucode_pkg
+      | default('none') }}"
+
+- name: Warn if CPU vendor is neither Intel nor AMD
+  ansible.builtin.debug:
+    msg:
+      "CPU vendor '{{ drivers_cpu_vendor.stdout }}' is not Intel or AMD —
+      skipping microcode install."
+  when: drivers_ucode_pkg == ''
+
+- name: Install CPU-specific microcode
+  become: true
+  community.general.pacman:
+    name: "{{ drivers_ucode_pkg }}"
+    state: present
+    update_cache: true
+  when: drivers_ucode_pkg != ''
+  notify: Update bootloader config for microcode

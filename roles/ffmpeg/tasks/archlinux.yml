@@ -1,0 +1,7 @@
+- name: Setup ffmpeg
+  become: true
+  community.general.pacman:
+    name:
+      - ffmpeg
+      - ffmpegthumbnailer
+    state: present

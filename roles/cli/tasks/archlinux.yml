@@ -1,0 +1,104 @@
+- name: Ensure common cli tools are installed
+  become: true
+  community.general.pacman:
+    state: present
+    name:
+      # ==========================================
+      # Core System and Hardware
+      # ==========================================
+      - lsof
+      - xdg-utils
+      - android-tools
+
+      # ==========================================
+      # Audio & Multimedia Stack
+      # ==========================================
+      - pipewire
+      - pipewire-pulse
+      - wireplumber
+      - btop
+      - pavucontrol
+      - mpd
+      - mpc
+      - ncmpcpp
+      - mpv
+      - yt-dlp
+
+      # ==========================================
+      # Modern CLI Upgrades (Rust/Go Alternatives)
+      # ==========================================
+      - bat
+      - fd
+      - ripgrep
+      - fzf
+      - fastfetch
+
+      # ==========================================
+      # General Terminal Utilities
+      # ==========================================
+      - tmux
+      - less
+      - trash-cli
+      - jq
+      - hyperfine
+      - imagemagick
+
+      # ==========================================
+      # Development & Version Control
+      # ==========================================
+      - git
+      - github-cli
+      - lazygit
+      - jujutsu
+      - just
+      - tree-sitter-cli
+
+      # ==========================================
+      # Scripting & Programming Environments
+      # ==========================================
+      - lua
+      - luarocks
+
+      # ==========================================
+      # File Management, Sync & Downloading
+      # ==========================================
+      - lf
+      - rsync
+      - rclone
+      - aria2
+      - qbittorrent
+
+      # ==========================================
+      # Image & Document Viewers
+      # ==========================================
+      - feh
+      - nsxiv
+      - zathura
+      - calibre
+
+      # ==========================================
+      # Security & Dotfiles
+      # ==========================================
+      - gopass
+      - pinentry
+      - oath-toolkit
+      - stow
+
+      # ==========================================
+      # Desktop Environment, Theming & Appearance
+      # ==========================================
+      - alacritty
+      - rofi
+      - dunst
+      - gammastep
+      - qt6ct
+      - breeze-gtk
+      - breeze-icons
+
+      # ==========================================
+      # Fonts
+      # ==========================================
+      - terminus-font
+      - noto-fonts-cjk
+      - noto-fonts-emoji
+      - ttf-nerd-fonts-symbols

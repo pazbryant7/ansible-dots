@@ -1,0 +1,6 @@
+- name: Ensure packages are installed
+  become: true
+  community.general.pacman:
+    name:
+      - rclone
+    state: present
