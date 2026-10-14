@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+
+die() {
+  printf 'Error: %s\n' "$1" >&2
+  exit 1
+}
+
+check_root() {
+  uid=$(id -u) || die "Could not determine the current user"
+  [ "$uid" -eq 0 ] || die "This script must be run as root. Try: sudo $0"
+}
+
+update_grub() {
+  grub-mkconfig -o /boot/grub/grub.cfg || die "Failed to generate /boot/grub/grub.cfg"
+}
+
+main() {
+  check_root
+  update_grub
+}
+
+main "$@"
