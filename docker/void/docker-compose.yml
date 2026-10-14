@@ -10,7 +10,8 @@ services:
     container_name: ansible-void-test
     volumes:
       - ../../:/ansible
-      - ../../.secrets:/ansible/.secrets:ro
+    tmpfs:
+      - /ansible/.secrets:uid=1000,gid=1000,mode=0700
     tty: true
     stdin_open: true
     environment:

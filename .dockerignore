@@ -1,0 +1,7 @@
+.git/
+.secrets/
+.direnv/
+result
+result-*
+*.swp
+*.tmp

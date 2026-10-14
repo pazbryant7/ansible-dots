@@ -19,4 +19,8 @@ RUN ansible-galaxy collection install -r requirements/common.yml \
   && ansible-galaxy collection install -r requirements/${DISTRO}.yml
 
 RUN mkdir -p .secrets && chmod 700 .secrets
+
+COPY --chmod=0755 docker/entrypoint.sh /usr/local/bin/ansible-container-entrypoint
+
+ENTRYPOINT ["/usr/local/bin/ansible-container-entrypoint"]
 CMD ["/bin/sh"]
