@@ -1,0 +1,8 @@
+[files]
+extend-exclude = [
+  ".git/**",
+  ".secrets/**",
+]
+
+[default.extend-words]
+fpr = "fpr"

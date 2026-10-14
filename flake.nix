@@ -40,12 +40,6 @@
             yaml-language-server
           ];
 
-          shellHook = ''
-            if [ -z "$IN_NIX_ZSH" ]; then
-              export IN_NIX_ZSH=1
-              exec zsh
-            fi
-          '';
         };
 
         formatter = pkgs.nixfmt-tree;

@@ -1,0 +1,56 @@
+name: Checks
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v19
+
+      - name: Install Ansible collections
+        run:
+          nix develop -c ansible-galaxy collection install -r
+          requirements/common.yml
+
+      - name: Check Ansible syntax
+        run: nix develop -c ansible-playbook --syntax-check local.yml
+
+      - name: Lint Ansible
+        run: nix develop -c ansible-lint
+
+      - name: Check shell scripts
+        run: >-
+          nix develop -c shellcheck setup docker/entrypoint.sh
+          roles/services/tasks/files/common/backup-notes
+          roles/sudo_scripts/tasks/files/common/usr/local/bin/system-cleanup
+          roles/sudo_scripts/tasks/files/common/usr/local/bin/grub-update
+
+      - name: Check shell formatting
+        run: >-
+          nix develop -c shfmt -d setup docker/entrypoint.sh
+          roles/services/tasks/files/common/backup-notes
+          roles/sudo_scripts/tasks/files/common/usr/local/bin/system-cleanup
+          roles/sudo_scripts/tasks/files/common/usr/local/bin/grub-update
+
+      - name: Check YAML and documentation formatting
+        run: >-
+          nix develop -c oxfmt --check AGENTS.md README.md TODO.md
+          .github/workflows/checks.yml group_vars/all.yml local.yml
+          pre_tasks/whoami.yml requirements/common.yml requirements/arch.yml
+          requirements/void.yml 'roles/**/*.yml' 'docker/**/*.yml'
+
+      - name: Check spelling
+        run: nix develop -c typos
+
+      - name: Check Nix formatting
+        run: nix fmt -- --ci
