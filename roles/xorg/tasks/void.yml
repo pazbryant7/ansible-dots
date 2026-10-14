@@ -25,6 +25,7 @@
       community.general.xbps:
         name: waybar
         state: absent
+      when: remove_waybar | bool
 
     - name: Deploy vconsole configuration
       ansible.builtin.copy:

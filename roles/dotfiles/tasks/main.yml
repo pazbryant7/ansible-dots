@@ -1,11 +1,5 @@
-- name: Get distribution
-  ansible.builtin.stat:
-    path: "{{ role_path }}/tasks/{{ host_os }}.yml"
-  register: distribution_config
-
 - name: Run tasks for {{ host_os }}
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
-  when: distribution_config.stat.exists
 
 - name: Clone dotfiles repositories
   become: false
@@ -16,7 +10,6 @@
     depth: 1
     update: false
     recursive: true
-    accept_newhostkey: true
   loop:
     - nvim
     - dotfiles
@@ -31,24 +24,38 @@
       loop:
         - .config
 
-    - name: Stow dotfiles (adopting conflicting system files)
+    - name: Stow dotfiles without adopting conflicting files
+      ansible.builtin.command:
+        cmd:
+          stow --dir="{{ dots_path }}" --target="{{ ansible_user_dir }}"
+          --restow .
+      args:
+        chdir: "{{ dots_path }}"
+      register: dotfiles_stow_result
+      changed_when: false
+      failed_when: dotfiles_stow_result.rc != 0
+      when: not (dotfiles_adopt | bool)
+
+    - name: Stow dotfiles while adopting conflicting files
       ansible.builtin.command:
         cmd:
           stow --dir="{{ dots_path }}" --target="{{ ansible_user_dir }}" --adopt
           --restow .
       args:
         chdir: "{{ dots_path }}"
-      register: stow_result
+      register: dotfiles_stow_adopt_result
       changed_when: false
-      failed_when: stow_result.rc != 0
+      failed_when: dotfiles_stow_adopt_result.rc != 0
+      when: dotfiles_adopt | bool
 
-    - name: Discard adopted system files so dotfiles repo versions win
+    - name: Restore dotfiles after explicitly adopting conflicting files # noqa command-instead-of-module
       ansible.builtin.command:
         cmd: git restore .
       args:
         chdir: "{{ dots_path }}"
-      register: git_result
+      register: dotfiles_git_restore_result
       changed_when: false
+      when: dotfiles_adopt | bool
 
 - name: Setup neovim
   block:
@@ -56,16 +63,27 @@
       become: false
       ansible.builtin.stat:
         path: "{{ ansible_user_dir }}/.config/nvim"
-      register: nvim_dir_stat
+      register: dotfiles_nvim_dir_stat
 
-    - name: Remove neovim config folder if it exists as a standard directory
+    - name: Refuse to replace an existing Neovim configuration
+      ansible.builtin.assert:
+        that: >-
+          not (dotfiles_nvim_dir_stat.stat.exists and not
+          dotfiles_nvim_dir_stat.stat.islnk) or dotfiles_replace_existing_nvim |
+          bool
+        fail_msg: >-
+          {{ ansible_user_dir }}/.config/nvim already exists. Set
+          dotfiles_replace_existing_nvim=true only after backing it up.
+
+    - name: Remove existing Neovim configuration after explicit opt-in
       become: false
       ansible.builtin.file:
         path: "{{ ansible_user_dir }}/.config/nvim"
         state: absent
       when:
-        nvim_dir_stat.stat.exists and nvim_dir_stat.stat.isdir and not
-        nvim_dir_stat.stat.islnk
+        dotfiles_nvim_dir_stat.stat.exists and not
+        dotfiles_nvim_dir_stat.stat.islnk and dotfiles_replace_existing_nvim |
+        bool
 
     - name: Symlink neovim configuration
       become: false
@@ -73,7 +91,7 @@
         src: "{{ repos_path }}/nvim"
         dest: "{{ ansible_user_dir }}/.config/nvim"
         state: link
-        force: true
+        force: "{{ dotfiles_replace_existing_nvim | bool }}"
 
     - name: Copy nvim.desktop file to applications directory
       become: true
@@ -86,20 +104,21 @@
 
 - name: Update ansible-dots remote
   block:
-    - name: Get current origin remote URL
+    - name: Get current origin remote URL # noqa command-instead-of-module
       ansible.builtin.command:
         cmd: git remote get-url origin
       args:
-        chdir: "{{ repos_path }}/ansible-dots"
-      register: origin_url
+        chdir: "{{ playbook_dir }}"
+      register: dotfiles_origin_url
       changed_when: false
-      failed_when: origin_url.rc != 0
+      failed_when: dotfiles_origin_url.rc != 0
 
-    - name: Set origin remote to use SSH (work.github)
+    - name: Set origin remote to use SSH (work.github) # noqa command-instead-of-module
       ansible.builtin.command:
         cmd: >-
-          git remote set-url origin {{ origin_url.stdout |
+          git remote set-url origin {{ dotfiles_origin_url.stdout |
           regex_replace('^https://github\.com/', 'git@work.github:') }}
       args:
-        chdir: "{{ repos_path }}/ansible-dots"
-      when: origin_url.stdout is match('^https://github\.com/')
+        chdir: "{{ playbook_dir }}"
+      when: dotfiles_origin_url.stdout is match('^https://github\.com/')
+      changed_when: true

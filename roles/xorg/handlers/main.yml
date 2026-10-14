@@ -1,0 +1,6 @@
+---
+- name: Refresh user font cache
+  become: false
+  ansible.builtin.command: fc-cache -f -v
+  changed_when: true
+  listen: refresh user font cache

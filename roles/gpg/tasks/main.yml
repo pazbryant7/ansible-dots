@@ -1,18 +1,11 @@
-- name: Get distribution
-  ansible.builtin.stat:
-    path: "{{ role_path }}/tasks/{{ host_os }}.yml"
-  register: distribution_config
-
 - name: Run tasks for {{ host_os }}
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
-  when: distribution_config.stat.exists
 
 - name: Manage Main GPG Key
   become: false
   vars:
     dir: "{{ ansible_user_dir }}/.gnupg"
     key: "{{ playbook_dir }}/.secrets/gpg/private-key.asc"
-    key_dest: "{{ dir }}/private_key.asc"
   block:
     - name: Ensure gpg directory exists
       ansible.builtin.file:
@@ -25,31 +18,56 @@
     - name: Check if private key file exists
       ansible.builtin.stat:
         path: "{{ key }}"
-      register: key_file
+      register: gpg_key_file
+      no_log: true
 
     - name: Import and trust main private key
-      when: key_file.stat.exists
+      when: gpg_key_file.stat.exists
       block:
-        - name: Copy GPG private key
-          ansible.builtin.copy:
-            src: "{{ key }}"
-            dest: "{{ key_dest }}"
-            mode: "0600"
-            owner: "{{ host_user }}"
-            group: "{{ host_user }}"
-
         - name: Import private key into keyring
-          ansible.builtin.command: gpg --batch --import {{ key_dest }}
-          register: imported_key
-          changed_when: "'secret key imported' in imported_key.stderr"
+          ansible.builtin.command:
+            argv:
+              - gpg
+              - --batch
+              - --import
+              - "{{ key }}"
+          register: gpg_imported_key
+          changed_when: "'secret key imported' in gpg_imported_key.stderr"
+          no_log: true
+
+        - name: Read main GPG key details
+          ansible.builtin.command:
+            argv:
+              - gpg
+              - --with-colons
+              - --show-keys
+              - "{{ key }}"
+          register: gpg_key_details
+          changed_when: false
+          no_log: true
 
         - name: Get main GPG key fingerprint
-          ansible.builtin.shell: |
-            gpg --with-colons --show-keys {{ key_dest }} 2>&1 | awk -F: '$1 == "fpr" { print $10; exit }'
-          register: gpg_fingerprint
-          changed_when: false
+          ansible.builtin.set_fact:
+            gpg_fingerprint: >-
+              {{
+                (
+                  gpg_key_details.stdout_lines
+                  | select('match', '^fpr:')
+                  | map('split', ':')
+                  | map(attribute=9)
+                  | list
+                  | first
+                ) | default('')
+              }}
+          no_log: true
 
         - name: Set ultimate trust on main GPG key
-          ansible.builtin.shell: |
-            echo "{{ gpg_fingerprint.stdout }}:6:" | gpg --batch --import-ownertrust
+          ansible.builtin.command:
+            argv:
+              - gpg
+              - --batch
+              - --import-ownertrust
+            stdin: "{{ gpg_fingerprint }}:6:"
           changed_when: false
+          no_log: true
+          when: gpg_fingerprint | length > 0

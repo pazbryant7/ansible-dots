@@ -1,11 +1,5 @@
-- name: Load OS-specific tasks if available
-  ansible.builtin.stat:
-    path: "{{ role_path }}/tasks/{{ host_os }}.yml"
-  register: distribution_config
-
-- name: Include OS-specific tasks
+- name: Include OS-specific tasks for {{ host_os }}
   ansible.builtin.include_tasks: "{{ host_os }}.yml"
-  when: distribution_config.stat.exists
 
 - name: Setup custom system configurations
   vars:
@@ -57,11 +51,8 @@
             src: "{{ files_base }}/.local/share/fonts/"
             dest: "{{ fonts_dest }}"
             mode: "0644"
-          register: font_deployment
-
-        - name: Refresh user font cache
-          ansible.builtin.command: fc-cache -f -v
-          when: font_deployment.changed
+          register: xorg_font_deployment
+          notify: refresh user font cache
 
     - name: Setup system-wide configurations
       become: true

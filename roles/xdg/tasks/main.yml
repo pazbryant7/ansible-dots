@@ -1,3 +1,6 @@
+- name: Run tasks for {{ host_os }}
+  ansible.builtin.include_tasks: "{{ host_os }}.yml"
+
 - name: Setup XDG configuration files
   become: false
   vars:
@@ -26,7 +29,8 @@
         dest: "{{ xdg_config_root }}/{{ item.path | basename }}/"
         mode: "0600"
         directory_mode: "0700"
-        force: false
+        force: "{{ xdg_config_force | bool }}"
       loop: "{{ xdg_secret_dirs.files }}"
       loop_control:
         label: "{{ item.path | basename }}"
+      no_log: true
