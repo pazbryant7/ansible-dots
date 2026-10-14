@@ -4,10 +4,30 @@
     dest: /etc/cron.weekly/fstrim
     content: |
       #!/bin/sh
-      # -b prints raw bytes. If DISC-MAX > 0, the device supports TRIM.
-      lsblk -b -n -o MOUNTPOINT,DISC-MAX | awk 'NF==2 && $2 > 0 { print $1 }' | while read -r mnt; do
-          /usr/sbin/fstrim "$mnt"
-      done
+      # DISC-MAX is expressed in bytes; positive values indicate TRIM support.
+      devices=$(lsblk -b -n -o MOUNTPOINT,DISC-MAX) || {
+          printf '%s\n' 'fstrim: could not list block devices' >&2
+          exit 1
+      }
+      mounts=$(awk 'NF == 2 && $2 > 0 { print $1 }' <<EOF
+      $devices
+      EOF
+      ) || {
+          printf '%s\n' 'fstrim: could not identify TRIM-capable mounts' >&2
+          exit 1
+      }
+
+      status=0
+      while IFS= read -r mount; do
+          [ -n "$mount" ] || continue
+          if ! /usr/sbin/fstrim "$mount"; then
+              printf 'fstrim: failed for %s\n' "$mount" >&2
+              status=1
+          fi
+      done <<EOF
+      $mounts
+      EOF
+      exit "$status"
     owner: root
     group: root
     mode: "0755"

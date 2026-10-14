@@ -1,6 +1,6 @@
 - name: Install hardware (GPU/CPU) drivers on Void Linux
   vars:
-    gpu_driver_map:
+    drivers_gpu_driver_map:
       intel:
         packages:
           - mesa-dri
@@ -16,60 +16,75 @@
         packages:
           - nvidia
           - nvidia-libs-32bit
-    cpu_microcode_map:
+    drivers_cpu_microcode_map:
       intel: intel-ucode
       amd: linux-firmware-amd
   become: true
   block:
+    - name: Ensure pciutils is installed for GPU detection
+      community.general.xbps:
+        name: pciutils
+        state: present
+
     - name: Read PCI device info (GPU detection)
       ansible.builtin.command: lspci -k
-      register: lspci_output
+      register: drivers_lspci_output
       changed_when: false
 
     - name: Determine GPU vendor from lspci output
       ansible.builtin.set_fact:
-        gpu_vendor: >-
-          {%- if 'VGA compatible controller: Intel' in lspci_output.stdout
-                or '3D controller: Intel' in lspci_output.stdout -%}
-          intel {%- elif 'VGA compatible controller: NVIDIA' in
-          lspci_output.stdout
-                or '3D controller: NVIDIA' in lspci_output.stdout -%}
-          nvidia {%- elif 'VGA compatible controller: Advanced Micro Devices' in
-          lspci_output.stdout
-                or '3D controller: Advanced Micro Devices' in
-          lspci_output.stdout -%} amd {%- else -%} unknown {%- endif -%}
+        drivers_gpu_vendor: >-
+          {{
+            'intel'
+            if 'VGA compatible controller: Intel' in drivers_lspci_output.stdout
+            or '3D controller: Intel' in drivers_lspci_output.stdout
+            else 'nvidia'
+            if 'VGA compatible controller: NVIDIA' in
+          drivers_lspci_output.stdout
+            or '3D controller: NVIDIA' in drivers_lspci_output.stdout
+            else 'amd'
+            if 'VGA compatible controller: Advanced Micro Devices' in
+          drivers_lspci_output.stdout
+            or '3D controller: Advanced Micro Devices' in
+          drivers_lspci_output.stdout
+            else 'unknown'
+          }}
 
     - name: Fail early if GPU vendor is unrecognized
       ansible.builtin.fail:
         msg: >-
           Could not determine GPU vendor automatically from `lspci -k`. Please
           install the appropriate mesa/nvidia packages manually.
-      when: gpu_vendor == 'unknown'
+      when: drivers_gpu_vendor == 'unknown'
 
     - name: Determine CPU vendor from gathered facts
       ansible.builtin.set_fact:
-        cpu_vendor: >-
-          {%- set procstr = ansible_facts.processor | join(' ') -%} {%- if
-          'GenuineIntel' in procstr -%} intel {%- elif 'AuthenticAMD' in procstr
-          -%} amd {%- else -%} unknown {%- endif -%}
+        drivers_cpu_vendor: >-
+          {{
+            'intel'
+            if 'GenuineIntel' in (ansible_facts.processor | join(' '))
+            else 'amd'
+            if 'AuthenticAMD' in (ansible_facts.processor | join(' '))
+            else 'unknown'
+          }}
 
     - name: Report detected hardware
       ansible.builtin.debug:
         msg:
-          "Detected GPU vendor: {{ gpu_vendor }} | Detected CPU vendor: {{
-          cpu_vendor }}"
+          "Detected GPU vendor: {{ drivers_gpu_vendor }} | Detected CPU vendor:
+          {{ drivers_cpu_vendor }}"
 
     - name: Install GPU driver packages
       community.general.xbps:
-        name: "{{ gpu_driver_map[gpu_vendor].packages }}"
+        name: "{{ drivers_gpu_driver_map[drivers_gpu_vendor].packages }}"
         state: present
         update_cache: true
 
     - name: Install CPU microcode package
       community.general.xbps:
-        name: "{{ cpu_microcode_map[cpu_vendor] }}"
+        name: "{{ drivers_cpu_microcode_map[drivers_cpu_vendor] }}"
         state: present
-      when: cpu_vendor in cpu_microcode_map
+      when: drivers_cpu_vendor in drivers_cpu_microcode_map
       notify: Regenerate initramfs for microcode (void)
 
     - name:
@@ -80,11 +95,11 @@
           default(ansible_user_id) }}"
         groups: video
         append: true
-      register: video_group_result
+      register: drivers_video_group_result
 
-    - name: Remind about re-login if group membership changed
+    - name: Remind about re-login if group membership changed # noqa no-handler
       ansible.builtin.debug:
         msg: >-
           User was just added to the 'video' group — log out/in (or reboot) for
           this to take effect.
-      when: video_group_result.changed
+      when: drivers_video_group_result.changed
