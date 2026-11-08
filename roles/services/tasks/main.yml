@@ -26,9 +26,15 @@
     stable: "github:NixOS/nixpkgs/nixos-26.05"
     unstable: "github:NixOS/nixpkgs/nixos-unstable"
     pkgs:
-      - "pazbryant7/st"
-      - "pazbryant7/dwm"
-      - "pazbryant7/slstatus"
+      - name: st
+        installable: github:pazbryant7/st
+      - name: dwm
+        installable: github:pazbryant7/dwm
+      - name: slstatus
+        installable: github:pazbryant7/slstatus
+      - name: brave-origin
+        installable: >-
+          git+https://codeberg.org/buckley310/brave-browser-nix?ref=main#brave-origin
   environment:
     NIX_REMOTE: daemon
   block:
@@ -61,16 +67,16 @@
           default({}) }}
 
     - name: Install flakes
-      ansible.builtin.command: "nix profile add --refresh github:{{ item }}"
+      ansible.builtin.command:
+        "nix profile add --refresh {{ item.installable }}"
       loop: "{{ pkgs }}"
-      when: item not in services_installed_profile_elements
+      when: item.name not in services_installed_profile_elements
       changed_when: true
 
     - name: Install Nix packages (no special flags needed)
       ansible.builtin.command: "nix profile add nixpkgs#{{ item }}"
       loop:
         - opencode
-        - brave-origin
         - bitwarden-cli
       when: item not in services_installed_profile_elements
       changed_when: true
