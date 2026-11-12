@@ -32,9 +32,6 @@
         installable: github:pazbryant7/dwm
       - name: slstatus
         installable: github:pazbryant7/slstatus
-      - name: brave-origin
-        installable: >-
-          git+https://codeberg.org/buckley310/brave-browser-nix?ref=main#brave-origin
   environment:
     NIX_REMOTE: daemon
   block:
@@ -77,6 +74,7 @@
       ansible.builtin.command: "nix profile add nixpkgs#{{ item }}"
       loop:
         - opencode
+        - brave-origin
         - bitwarden-cli
       when: item not in services_installed_profile_elements
       changed_when: true
